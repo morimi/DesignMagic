@@ -37,8 +37,8 @@
 		<Extension Id="com.cyberagent.designmagic">
 			<DispatchInfo >
 				<Resources>
-				<MainPath>./index.html</MainPath>
-				<ScriptPath>./jsx/hostscript.jsx</ScriptPath>
+				<MainPath>./PSPanel/index.html</MainPath>
+				<ScriptPath>./common/jsx/hostscript.jsx</ScriptPath>
 				</Resources>
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>
@@ -62,11 +62,11 @@
                         
 					</Geometry>
 					<Icons>
-						<Icon Type="Normal">./icons/iconNormal.png</Icon>
-						<Icon Type="RollOver">./icons/iconRollover.png</Icon>
-						<Icon Type="Disabled">./icons/iconDisabled.png</Icon>
-						<Icon Type="DarkNormal">./icons/iconDarkNormal.png</Icon>
-						<Icon Type="DarkRollOver">./icons/iconDarkRollover.png</Icon>
+						<Icon Type="Normal">./PSPanel/icons/iconNormal.png</Icon>
+						<Icon Type="RollOver">./PSPanel/icons/iconRollover.png</Icon>
+						<Icon Type="Disabled">./PSPanel/icons/iconDisabled.png</Icon>
+						<Icon Type="DarkNormal">./PSPanel/icons/iconDarkNormal.png</Icon>
+						<Icon Type="DarkRollOver">./PSPanel/icons/iconDarkRollover.png</Icon>
 					</Icons>					
 				</UI>
 			</DispatchInfo>
