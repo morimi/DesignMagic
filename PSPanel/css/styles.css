@@ -1,22 +1,142 @@
-/*Your styles*/
+*, *:before, *:after {
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
 
- body {
-    margin: 10px;
+html, body {
+  height: 100%;
+  overflow: hidden;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-family: Lucida Grande;
+  font-weight: bold;
+  font-size : 9px;
+
+  -webkit-font-smoothing: antialiased;
+
+}
+
+html.windows,
+body.windows {
+  font-family: Tahoma;
+}
+
+body.darker, 
+body.dark {
+  color: #f0f0f0;
+}
+
+
+p {
+  cursor: default;
+}
+
+a {
+  font-size: 10px;
 }
 
 
 #content {
-    margin-right:auto;
-    margin-left:auto;
-    vertical-align:middle;
-    width:100%;
+margin-right:auto;
+margin-left:auto;
+vertical-align:middle;
+width:100%;
+height: 100%;
+}
+
+#validation {
+  height: 100%;
+}
+
+#validation-container {
+  height: 100%;
+}
+
+#message-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow-y: scroll;
+  background: #464646;
+}
+
+.message {
+  display: block;
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #383838;
+  background: #535353;
+}
+
+body.darker .message,
+body.dark .message {
+  border-bottom-color: #383838;
+}
+
+body.lighter .message,
+body.light .message {
+  border-bottom-color: #222222;
+}
+
+.message-wrapper {
+  font-size: 12px;
+  padding: 5px;
+}
+
+.message-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin: 0;
+}
+
+.message-hint {
+  margin: 0;
+  font-size: 10px;
+}
+
+body.darker .message-hint,
+body.dark .message-hint {
+    color: #888888;
+}
+
+body.lighter .message-hint {
+    color: #4f4f4f;
+}
+
+body.light .message-hint {
+    color: #404040;
 }
 
 
-#btn_test{
-    width: 100%;
+.panel-header {
+    padding-bottom: 1em;
+    margin-bottom: 0;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+    border-bottom-color: #383838;
+    text-indent: 9px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
+body.darker .panel-header,
+body.dark .panel-header {
+    color: #c0c0c0;
+}
+
+
+body.lighter .panel-header,
+body.light .panel-header {
+    color: #010101;
+}
 
 
 

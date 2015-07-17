@@ -4,19 +4,21 @@
 (function () {
     'use strict';
 
-    var csInterface = new CSInterface();
+    var csInterface = new CSInterface(),
+        localeStrings = csInterface.initResourceBundle();
     
+    var $content = $('#content');
+  
+  
     
     function init() {
-                
-        themeManager.init();
-                
-        $("#btn_test").click(function () {
-            csInterface.evalScript('sayHello()');
-        });
+      themeManager.init();
+      
     }
-        
-    init();
+    
+  
+    //素のinit()ではaddClassが想定通り動かんので
+    $(document).ready(init);
 
 }());
     

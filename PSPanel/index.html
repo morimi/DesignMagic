@@ -5,17 +5,29 @@
         
 <link rel="stylesheet" href="css/topcoat-desktop-dark.min.css"/>
 <link  id="hostStyle" rel="stylesheet" href="css/styles.css"/>
+<link  id="scrollbars" rel="stylesheet" href="css/scrollbars.css"/>
 
 <title></title>
 </head>
 
 <body class="hostElt">
 
-    <div id="content">        
-        
-        <div>                
-            <button id="btn_test" class="topcoat-button--large hostFontSize">Call ExtendScript</button>                
-        </div>   
+    <div id="content">    
+      <div id="validation">
+          <div id="title-container">
+              <p class="panel-header">Validation</p>
+          </div>
+          <div id="validation-container">
+              <ul id="message-list">
+                  <li class="message">
+                      <div class="message-wrapper">
+                          <p class="message-title">レイヤー1</p>
+                          <p class="message-hint">名前がありません</p>
+                      </div>
+                  </li>
+              </ul>
+          </div>
+      </div>
         
     </div>
     

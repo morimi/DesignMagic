@@ -68,6 +68,8 @@ var themeManager = (function () {
      * Update the theme with the AppSkinInfo retrieved from the host product.
      */
     function updateThemeWithAppSkinInfo(appSkinInfo) {
+  
+      var $body = $("body");
         
         var panelBgColor = appSkinInfo.panelBackgroundColor.color;
         var bgdColor = toHex(panelBgColor);
@@ -79,9 +81,9 @@ var themeManager = (function () {
             fontColor = "000000";
         }
         var lightBgdColor = toHex(panelBgColor, -100);
-                
+//                
         var styleId = "hostStyle";
-        
+//        
         addRule(styleId, ".hostElt", "background-color:" + "#" + bgdColor);
         addRule(styleId, ".hostElt", "font-size:" + appSkinInfo.baseFontSize + "px;");
         addRule(styleId, ".hostElt", "font-family:" + appSkinInfo.baseFontFamily);
@@ -103,6 +105,34 @@ var themeManager = (function () {
         addRule(styleId, ".hostButton:active", "background-color:" + "#" + darkBgdColor);
         addRule(styleId, ".hostButton", "border-color: " + "#" + lightBgdColor);        
 
+        var rgbBgColor = appSkinInfo.panelBackgroundColor.color,
+        cssBgColor = "#" + toHex(rgbBgColor);
+       
+        $body.removeClass();        
+        if (process.platform.substr(0, 3) === "win") {
+            $body.addClass("windows");
+        }
+        
+       switch (rgbBgColor.red) {
+        case 52:
+            $body.addClass("darker");
+            break;
+        case 83:
+            $body.addClass("dark");
+            break;
+        case 184:
+            $body.addClass("light");
+            break;
+        case 214:
+            $body.addClass("lighter");
+            break;
+          default:
+            // unrecognized theme
+            document.body.className ='dark';
+            break;
+        }
+
+        $body.css({"background-color": cssBgColor});
     }
     
     
