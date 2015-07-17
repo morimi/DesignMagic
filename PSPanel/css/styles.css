@@ -26,7 +26,7 @@ body.windows {
   font-family: Tahoma;
 }
 
-body.darker, 
+body.darker,
 body.dark {
   color: #f0f0f0;
 }
@@ -138,6 +138,10 @@ body.light .panel-header {
     color: #010101;
 }
 
+
+.icon {
+  vertical-align: text-top
+}
 
 
 /*
