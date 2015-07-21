@@ -14,11 +14,11 @@
 
 
   //Elements
-  var $content = $('#content');
+  var $content = $('#content'),
+      $list = $('#message-list');
 
 
   function showMessage() {
-    var $list = $('#message-list');
     var template = Handlebars.compile($('#message-template').html());
 
     var data = [
