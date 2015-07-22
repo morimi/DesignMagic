@@ -68,9 +68,7 @@ height: 100%;
 
 .message {
   display: block;
-  border-bottom-width: 1px;
-  border-bottom-style: solid;
-  border-bottom-color: #383838;
+  border-bottom: 1px solid #383838;
   background: #535353;
 }
 
@@ -116,15 +114,13 @@ body.light .message-hint {
 
 
 .panel-header {
-    padding-bottom: 1em;
-    margin-bottom: 0;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
-    border-bottom-color: #383838;
-    text-indent: 9px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  padding:0 0 5px 5px;
+  margin: 5px 0 0;
+  border-bottom: 1px solid #383838;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size:12px;
 }
 
 body.darker .panel-header,

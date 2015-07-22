@@ -15,8 +15,12 @@
   <div id="content">
     <div id="validation">
       <div id="title-container">
-        <p class="panel-header">Validation</p>
+        <p class="panel-header">
+        <img src="images/icon/error.png" width="14" height="14" class="icon" alt="{{type}}"> <span id="error-total">0</span>
+        <img src="images/icon/warn.png" width="14" height="14" class="icon" alt="{{type}}"> <span id="warn-total">0</span>
+        </p>
       </div>
+
       <div id="validation-container">
         <ul id="message-list">
 
@@ -41,6 +45,11 @@
 </script>
 
   <script src="js/libs/CSInterface.js"></script>
+  <script>
+    //JSXRunnner.jsの為に
+        csInterface = new CSInterface();
+        localeStrings = csInterface.initResourceBundle();
+    </script>
   <script src="js/libs/jquery-2.0.2.min.js"></script>
 
   <script src="js/themeManager.js"></script>

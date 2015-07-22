@@ -4,22 +4,23 @@
 (function () {
   'use strict';
 
-  var csInterface = new CSInterface()
+  var csInterface = new CSInterface();
       //,localeStrings = csInterface.initResourceBundle();
 
 
   //Modules
   var Handlebars  = require("handlebars"),
-      _           = require("lodash");
-
+      _           = require("lodash"),
+      JSXRunner   = require("../common/JSXRunner");
 
   //Elements
   var $content = $('#content'),
       $list = $('#message-list');
 
+  var template = Handlebars.compile($('#message-template').html());
+
 
   function showMessage() {
-    var template = Handlebars.compile($('#message-template').html());
 
     var data = [
       { title: 'レイヤー1', hint: '名前がありません', type: 'error'},
@@ -34,11 +35,15 @@
     });
   }
 
-
   //Init
   function init() {
     themeManager.init();
 
+    JSXRunner.runJSX("checkDocumentMode", null, function (result) {
+      //http://hamalog.tumblr.com/post/4047826621/json-javascript
+      var obj = (new Function("return " + result))();
+      $list.prepend(template(obj));
+    });
 
     showMessage();
   }
