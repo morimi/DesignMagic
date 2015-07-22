@@ -36,6 +36,7 @@
 <div class="message-wrapper">
   <p class="message-title">
     <img src="images/icon/{{type}}.png" width="14" height="14" class="icon" alt="{{type}}">
+    {{#if parent}}[{{parent}}] {{/if}}
     {{title}}
   </p>
   <p class="message-hint">{{hint}}</p>

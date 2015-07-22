@@ -23,7 +23,7 @@
   function showMessage() {
 
     var data = [
-      { title: 'レイヤー1', hint: '名前がありません', type: 'error'},
+      { title: 'レイヤー1', hint: '名前がありません', type: 'valid'},
       { title: 'レイヤー2', hint: '名前がありません', type: 'error'},
       { title: 'レイヤー3', hint: '名前がありません', type: 'warn'},
       { title: 'レイヤー4', hint: '名前がありません', type: 'error'},
@@ -42,10 +42,26 @@
     JSXRunner.runJSX("checkDocumentMode", null, function (result) {
       //http://hamalog.tumblr.com/post/4047826621/json-javascript
       var obj = (new Function("return " + result))();
-      $list.prepend(template(obj));
+      $list.append(template(obj));
     });
 
-    showMessage();
+    JSXRunner.runJSX("checkRulerUnits", null, function (result) {
+      //http://hamalog.tumblr.com/post/4047826621/json-javascript
+      var obj = (new Function("return " + result))();
+      $list.append(template(obj));
+    });
+
+    JSXRunner.runJSX("checkLayerName", null, function (result) {
+      //http://hamalog.tumblr.com/post/4047826621/json-javascript
+      var array = (new Function("return " + result))();
+      _.each(array, function(obj) {
+        $list.prepend(template(obj));
+      });
+
+    });
+
+
+    //showMessage();
   }
 
 
