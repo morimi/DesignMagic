@@ -1,8 +1,12 @@
 
 var mes = [];
-var artLayers = [];
+var artLayers = []; //レイヤー配列をextendするための入れ物
 
-function checkName(target, parentName) {
+
+/**
+ *
+ */
+function checkName(target) {
 
   for (var i = 0; i < target.length; i++) {
       var name = target[i].name;
@@ -15,19 +19,21 @@ function checkName(target, parentName) {
   }
 }
 
-function checkSetName() {
-  var l = activeDocument.layerSets.length;
+function checkSetName(target) {
+  var l = target.length;
 
   for (var i = 0; l; i++) {
-
-    var name = activeDocument.layerSets[i].name;
+    var name = target[i].name;
     if ( name.match(/グループ \d+/) ) {
       mes.push('{title:"' + name + '", hint:"命名されていません", type:"warn"}');
     }
 
-    if ( activeDocument.layerSets[i].artLayers.length ){
+    if (target[i].artLayers.length ){
+      Array.prototype.push.apply(artLayers, target[i].artLayers);
+    }
 
-      Array.prototype.push.apply(artLayers, activeDocument.layerSets[i].artLayers);
+    if ( target[i].layerSets.length ) {
+      checkSetName(target[i].layerSets);
     }
 
     if ( (l - 1) == i) {
@@ -42,7 +48,7 @@ if (documents.length !== 0 ) {
 
 
   checkName(activeDocument.artLayers);
-  checkSetName();
+  checkSetName(activeDocument.layerSets);
   checkName(artLayers);
 
 
