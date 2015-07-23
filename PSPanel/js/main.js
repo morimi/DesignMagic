@@ -11,6 +11,7 @@
   //Modules
   var Handlebars  = require("handlebars"),
       _           = require("lodash"),
+      Q           = require("Q"),
       JSXRunner   = require("../common/JSXRunner");
 
   //Elements
@@ -20,23 +21,9 @@
   var template = Handlebars.compile($('#message-template').html());
 
 
-  function showMessage() {
-
-    var data = [
-      { title: 'レイヤー1', hint: '名前がありません', type: 'valid'},
-      { title: 'レイヤー2', hint: '名前がありません', type: 'error'},
-      { title: 'レイヤー3', hint: '名前がありません', type: 'warn'},
-      { title: 'レイヤー4', hint: '名前がありません', type: 'error'},
-      { title: 'レイヤー5', hint: '名前がありません', type: 'warn'}
-    ];
-
-    _.each(data, function(dat) {
-      $list.append(template(dat));
-    });
-  }
-
   //Init
   function init() {
+
     themeManager.init();
 
     JSXRunner.runJSX("checkDocumentMode", null, function (result) {
@@ -51,6 +38,7 @@
       $list.append(template(obj));
     });
 
+
     JSXRunner.runJSX("checkLayerName", null, function (result) {
       //http://hamalog.tumblr.com/post/4047826621/json-javascript
       var array = (new Function("return " + result))();
@@ -60,8 +48,10 @@
 
     });
 
+    $('#message-list').on('click', '.message', function(e) {
+        alert($(this).text())
+    });
 
-    //showMessage();
   }
 
 
