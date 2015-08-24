@@ -12,7 +12,9 @@
   var Handlebars  = require("handlebars"),
       _           = require("lodash"),
       Q           = require("Q"),
-      JSXRunner   = require("../common/JSXRunner");
+      http        = require('http'),
+      JSXRunner   = require("../common/JSXRunner"),
+      conf   = require("../conf.json");
 
   //Elements
   var $content = $('#content'),
@@ -21,42 +23,74 @@
   var template = Handlebars.compile($('#message-template').html());
 
 
+  // 設定ファイルを外部から取得する
+  function confLoader(callback) {
+    if (!conf.url) {
+      callback && callback(conf);
+    }
+
+    var req = http.get(conf.url, function (res) {
+      if (res.statusCode == '200') {
+        res.setEncoding('utf8');
+        res.on('data', function (data) {
+          data = JSON.parse(data);
+          data = _.defaults(data, conf);
+
+          var obj = (new Function("return " + '{title: "'+data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました。", hint: "", type: "valid"}'))();
+          $list.append(template(obj));
+
+          callback && callback(data);
+        });
+      }
+    });
+    req.on('error', function (res) {
+      var obj = (new Function("return " + '{title: "設定ファイルの取得に失敗したので、デフォルトの設定を使用します。", hint: "", type: "error"}'))();
+      $list.append(template(obj));
+      // callback && callback();
+    });
+  }
+
   //Init
   function init() {
 
     themeManager.init();
 
-    JSXRunner.runJSX("checkDocumentMode", null, function (result) {
-      //http://hamalog.tumblr.com/post/4047826621/json-javascript
-      var obj = (new Function("return " + result))();
-      $list.append(template(obj));
-    });
+    confLoader(function (conf) {
 
-    JSXRunner.runJSX("checkRulerUnits", null, function (result) {
-      //http://hamalog.tumblr.com/post/4047826621/json-javascript
-      var obj = (new Function("return " + result))();
-      $list.append(template(obj));
-    });
+      if (conf.checkDocumentMode) {
+        JSXRunner.runJSX("checkDocumentMode", null, function (result) {
+          //http://hamalog.tumblr.com/post/4047826621/json-javascript
+          var obj = (new Function("return " + result))();
+          $list.append(template(obj));
+        });
+      }
 
+      if (conf.checkRulerUnits) {
+        JSXRunner.runJSX("checkRulerUnits", null, function (result) {
+          //http://hamalog.tumblr.com/post/4047826621/json-javascript
+          var obj = (new Function("return " + result))();
+          $list.append(template(obj));
+        });
+      }
 
-    JSXRunner.runJSX("checkLayerName", null, function (result) {
-      //http://hamalog.tumblr.com/post/4047826621/json-javascript
-      var array = (new Function("return " + result))();
-      _.each(array, function(obj) {
-        $list.prepend(template(obj));
+      if (conf.checkLayerName) {
+        JSXRunner.runJSX("checkLayerName", null, function (result) {
+          //http://hamalog.tumblr.com/post/4047826621/json-javascript
+          var array = (new Function("return " + result))();
+          _.each(array, function(obj) {
+            $list.prepend(template(obj));
+          });
+        });
+      }
+
+      $('#message-list').on('click', '.message', function(e) {
+          alert($(this).text())
       });
-
-    });
-
-    $('#message-list').on('click', '.message', function(e) {
-        alert($(this).text())
     });
 
   }
-
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
 
 }());
-
