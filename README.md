@@ -6,5 +6,5 @@ Adobe Photoshop CC 用のエクステンション DesignMagic のリポジトリ
 
 ## Wiki
 
-* [Photoshophへの導入手順](https://ghe.ca-tools.org/design-magic/extension/wiki/Installation)
+* [Photoshopへの導入手順](https://ghe.ca-tools.org/design-magic/extension/wiki/Installation)
 
