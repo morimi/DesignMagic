@@ -57,23 +57,23 @@
 
     confLoader(function (conf) {
 
-      if (conf.checkDocumentMode) {
-        JSXRunner.runJSX("checkDocumentMode", null, function (result) {
+      if (conf.check.config.documentMode) {
+        JSXRunner.runJSX("checkDocumentMode", {config: conf.check.config}, function (result) {
           //http://hamalog.tumblr.com/post/4047826621/json-javascript
           var obj = (new Function("return " + result))();
           $list.append(template(obj));
         });
       }
 
-      if (conf.checkRulerUnits) {
-        JSXRunner.runJSX("checkRulerUnits", null, function (result) {
+      if (conf.check.config.rulerUnits) {
+        JSXRunner.runJSX("checkRulerUnits", {config: conf.check.config}, function (result) {
           //http://hamalog.tumblr.com/post/4047826621/json-javascript
           var obj = (new Function("return " + result))();
           $list.append(template(obj));
         });
       }
 
-      if (conf.checkLayerName) {
+      if (conf.check.layers.name) {
         JSXRunner.runJSX("checkLayerName", null, function (result) {
           //http://hamalog.tumblr.com/post/4047826621/json-javascript
           var array = (new Function("return " + result))();

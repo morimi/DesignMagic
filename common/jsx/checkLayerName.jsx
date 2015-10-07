@@ -42,12 +42,22 @@ var VALIDATION_TYPE = {
   WARN: "warn"
 };
 
-var mes = []; //エラーメッセージ文字列格納用
-var artLayers = []; //レイヤー配列をextendするための入れ物
+/**
+ * エラーメッセージ文字列格納用
+ * @type {Array.<string>}
+ */
+var mes = [];
+
+/**
+ * レイヤー配列をextendするための入れ物
+ * @type {Array.<Object>}
+ */
+var artLayers = [];
 
 
 /**
- *
+ * Layerの命名チェック
+ * @param {Array.<Object>} target activeDocument.artLayers
  */
 function checkName(target) {
 
@@ -67,8 +77,8 @@ function checkName(target) {
 
 /**
  * LayerSetsの命名チェック
- * @param {Array.<Object>} layerSets
- * @return {Array.<Object>} メッセージの配列
+ * @param {Array.<Object>} activeDocument.layerSets
+ * @return {Array.<string>} メッセージの配列
  */
 function checkSetName(target) {
   var l = target.length;

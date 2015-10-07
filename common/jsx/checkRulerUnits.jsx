@@ -1,4 +1,14 @@
-if (preferences.rulerUnits !== Units.PIXELS ) {
+var LABEL = {
+  CM: 'cm',
+  INCHES: 'inch',
+  MM: 'mm',
+  PERCENT: '%',
+  PICAS: 'pica',
+  POINTS: 'pt',
+  PIXELS: 'px'
+};
+
+if (preferences.rulerUnits !== Units["<%= config.rulserUnitsType %>"] ) {
 
   var v;
 
@@ -25,8 +35,8 @@ if (preferences.rulerUnits !== Units.PIXELS ) {
 
   }
 
-  '{title: "単位が' + v + 'です", hint: "ピクセルに変更してください（環境設定→単位・定規）", type: "error"}';
+  '{title: "単位が' + v + 'です", hint: "' + LABEL["<%= config.rulserUnitsType %>"] + 'に変更してください（環境設定→単位・定規）", type: "error"}';
 
 } else {
-  '{title: "単位はPixelです", hint: "", type: "valid"}';
+  '{title: "単位は' + LABEL["<%= config.rulserUnitsType %>"] + 'に設定されています", hint: "", type: "valid"}';
 }
