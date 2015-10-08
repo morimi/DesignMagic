@@ -16,7 +16,7 @@
     },
 
     "files" : {
-      "name": null,
+      "name": ["hoge_\\\\w+", "i"],
       "size": 1000,
       "useLayerComps": false
     },

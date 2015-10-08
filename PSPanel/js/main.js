@@ -7,7 +7,6 @@
   var csInterface = new CSInterface();
       //,localeStrings = csInterface.initResourceBundle();
 
-
   //Modules
   var Handlebars  = require("handlebars"),
       _           = require("lodash"),
@@ -18,36 +17,155 @@
 
   //Elements
   var $content = $('#content'),
-      $list = $('#message-list');
+      $list = $('#message-list'),
+      $console = $('#console');
 
   var template = Handlebars.compile($('#message-template').html());
 
 
   // 設定ファイルを外部から取得する
-  function confLoader(callback) {
+  function loadConfig() {
+    var d = Q.defer();
+
     if (!conf.url) {
-      callback && callback(conf);
+
+      d.resolve(conf);
+
+    } else {
+
+     var req = http.get(conf.url, function (res) {
+        if (res.statusCode == '200') {
+          res.setEncoding('utf8');
+          res.on('data', function (data) {
+            data = JSON.parse(data);
+            data = _.defaults(data, conf);
+
+            $list.append(template({
+              title: data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました',
+              hint: "",
+              type: "valid"
+            }));
+
+            d.resolve(data);
+          });
+        }
+      });
+
+      req.on('error', function (res) {
+        $list.append(template({
+          title: '設定ファイルの取得に失敗しました',
+          hint: "デフォルト設定を使用します",
+          type: "warn"
+        }));
+        d.resolve(data);
+      });
+
     }
 
-    var req = http.get(conf.url, function (res) {
-      if (res.statusCode == '200') {
-        res.setEncoding('utf8');
-        res.on('data', function (data) {
-          data = JSON.parse(data);
-          data = _.defaults(data, conf);
+    return d.promise
+  };
 
-          var obj = (new Function("return " + '{title: "'+data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました。", hint: "", type: "valid"}'))();
-          $list.append(template(obj));
+  /**
+   *
+   */
+  function checkDocumentMode(c) {
+    var d = Q.defer();
 
-          callback && callback(data);
+    if (conf.check.config.documentMode) {
+
+      JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+        var obj = (new Function("return " + result))();
+        $list.append(template(obj));
+      });
+
+      d.resolve(c);
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+      return d.promise
+  };
+
+  /**
+   *
+   */
+  function checkRulerUnits(c) {
+    var d = Q.defer();
+
+    if (conf.check.config.rulerUnits) {
+
+      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+        var obj = (new Function("return " + result))();
+        $list.append(template(obj));
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise
+
+  };
+
+  /**
+   *
+   */
+  function checkFileName(c) {
+    var d = Q.defer();
+
+    if (_.isArray(conf.check.files.name)) {
+
+      JSXRunner.runJSX("checkFileName", {config: conf.check.files}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+        var obj = (new Function("return " + result))();
+        $list.append(template(obj));
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise
+
+  };
+
+
+  /**
+   *
+   */
+  function checkLayerName(c) {
+    var d = Q.defer();
+
+    if (conf.check.layers.name) {
+
+      JSXRunner.runJSX("checkLayerName", null, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+        var array = (new Function("return " + result))();
+        _.each(array, function(obj) {
+          $list.prepend(template(obj));
+          d.resolve(c);
         });
-      }
-    });
-    req.on('error', function (res) {
-      var obj = (new Function("return " + '{title: "設定ファイルの取得に失敗したので、デフォルトの設定を使用します。", hint: "", type: "error"}'))();
-      $list.append(template(obj));
-      // callback && callback();
-    });
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise
+
   }
 
   //Init
@@ -55,40 +173,22 @@
 
     themeManager.init();
 
-    confLoader(function (conf) {
-
-      if (conf.check.config.documentMode) {
-        JSXRunner.runJSX("checkDocumentMode", {config: conf.check.config}, function (result) {
-          //http://hamalog.tumblr.com/post/4047826621/json-javascript
-          var obj = (new Function("return " + result))();
-          $list.append(template(obj));
-        });
-      }
-
-      if (conf.check.config.rulerUnits) {
-        JSXRunner.runJSX("checkRulerUnits", {config: conf.check.config}, function (result) {
-          //http://hamalog.tumblr.com/post/4047826621/json-javascript
-          var obj = (new Function("return " + result))();
-          $list.append(template(obj));
-        });
-      }
-
-      if (conf.check.layers.name) {
-        JSXRunner.runJSX("checkLayerName", null, function (result) {
-          //http://hamalog.tumblr.com/post/4047826621/json-javascript
-          var array = (new Function("return " + result))();
-          _.each(array, function(obj) {
-            $list.prepend(template(obj));
-          });
-        });
-      }
-
-      $('#message-list').on('click', '.message', function(e) {
-          alert($(this).text())
-      });
+    Q.fcall(loadConfig)
+     .then(checkDocumentMode)
+     .then(checkRulerUnits)
+     .then(checkFileName)
+     .then(checkLayerName)
+     .done(function(val){
+        $console.append('<p>task complete!!</p>');
     });
 
+
+//      $('#message-list').on('click', '.message', function(e) {
+//          alert($(this).text())
+//      });
+
   }
+
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);

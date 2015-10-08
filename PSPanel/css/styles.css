@@ -34,6 +34,8 @@ body.dark {
 
 p {
   cursor: default;
+  margin: 0;
+  padding: 0;
 }
 
 a {
@@ -42,19 +44,23 @@ a {
 
 
 #content {
-margin-right:auto;
-margin-left:auto;
-vertical-align:middle;
-width:100%;
-height: 100%;
+  margin-right:auto;
+  margin-left:auto;
+  vertical-align:middle;
+  width:100%;
+  height: 100%;
 }
 
 #validation {
   height: 100%;
 }
 
+#title-container {
+  overflow: hidden;
+}
+
 #validation-container {
-  height: 100%;
+  height: calc(100% - 52px);
 }
 
 #message-list {
@@ -64,6 +70,13 @@ height: 100%;
   height: 100%;
   overflow-y: scroll;
   background: #464646;
+}
+
+#footer-container {
+}
+
+#console {
+  font-size: 9px;
 }
 
 .message {
@@ -113,14 +126,21 @@ body.light .message-hint {
 }
 
 
-.panel-header {
-  padding:0 0 5px 5px;
-  margin: 5px 0 0;
-  border-bottom: 1px solid #383838;
+.panel-hd {
+  padding:5px 0 5px 5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size:12px;
+}
+
+.panel-header {
+  border-bottom: 1px solid #383838;
+}
+
+#footer-container {
+  border-top: 1px solid #383838;
+  min-height: 26px;
 }
 
 body.darker .panel-header,
