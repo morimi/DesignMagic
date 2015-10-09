@@ -123,7 +123,7 @@
 
     if (_.isArray(conf.check.files.name)) {
 
-      JSXRunner.runJSX("checkFileName", {config: conf.check.files}, function (result) {
+      JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
         $list.append(template(obj));
@@ -144,12 +144,12 @@
   /**
    *
    */
-  function checkLayerName(c) {
+  function checkLayers(c) {
     var d = Q.defer();
 
-    if (conf.check.layers.name) {
+    if (c.check.layers.name || c.check.layers.blendingMode) {
 
-      JSXRunner.runJSX("checkLayerName", null, function (result) {
+      JSXRunner.runJSX("checkLayers", {config: c.check.layers}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var array = (new Function("return " + result))();
         _.each(array, function(obj) {
@@ -177,7 +177,7 @@
      .then(checkDocumentMode)
      .then(checkRulerUnits)
      .then(checkFileName)
-     .then(checkLayerName)
+     .then(checkLayers)
      .done(function(val){
         $console.append('<p>task complete!!</p>');
     });

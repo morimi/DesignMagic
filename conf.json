@@ -23,6 +23,7 @@
 
     "layers": {
       "name": true,
+      "namingLevel": 2,
       "blendingMode": false
     },
 

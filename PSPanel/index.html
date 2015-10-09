@@ -46,7 +46,9 @@
       {{#if parent}}<span class="parent">[{{parent}}] </span>{{/if}}
       {{title}}
     </p>
-    <p class="message-hint">{{hint}}</p>
+    {{#each hint}}
+      <p class="message-hint">{{this}}</p>
+    {{/each}}
   </div>
 </li>
 
