@@ -89,19 +89,19 @@ function check(targets) {
 
     /**
      * 命名チェックレベル
-     * 0 : レイヤー、グループ のみ
+     * 0 : レイヤー、グループ のコピー のみ
      * 1 : Lv0 + シェイプ
      * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
      */
     switch(level) {
       case "1":
-        regex = /[レイヤー|シェイプ] \d+/;
+        regex = /レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/;
         break;
       case "2":
-        regex = /[レイヤー|シェイプ|多角形|楕円形|長方形|角丸長方形] \d+/;
+        regex = /レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/;
         break;
       default:
-        regex = /レイヤー \d+/;
+        regex = /レイヤー(\s\d+)*|のコピー(\s\d+)*/;
     }
 
     //命名
@@ -134,7 +134,7 @@ function checkSets(target) {
     var name = target[i].name;
 
     //命名
-    if ( name.match(/グループ \d+/) ) {
+    if ( name.match(/グループ(\s\d+)*|のコピー(\s\d+)*/) ) {
      var result = new Result(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN);
       mes.push(result.toString());
     }
