@@ -157,11 +157,12 @@ function checkSets(target) {
 
 if (documents.length !== 0 ) {
 
-
-  check(activeDocument.artLayers);
+  Array.prototype.push.apply(artLayers, activeDocument.artLayers);
   checkSets(activeDocument.layerSets);
-  check(artLayers);
 
+  if (artLayers.length) {
+    check(artLayers);
+  }
 
   "[" + mes.join(',') + "]";
 }
