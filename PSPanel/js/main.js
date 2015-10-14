@@ -76,11 +76,10 @@
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        if (_.isObject(obj) ) {
-          $list.append(template(obj));
-        }
-        d.resolve(c);
+        $list.append(template(obj));
       });
+
+      d.resolve(c);
 
     } else {
 
@@ -102,9 +101,7 @@
       JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        if (_.isObject(obj) ) {
-          $list.append(template(obj));
-        }
+        $list.append(template(obj));
         d.resolve(c);
       });
 
@@ -129,9 +126,7 @@
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        if (_.isObject(obj) ) {
-          $list.append(template(obj));
-        }
+        $list.append(template(obj));
         d.resolve(c);
       });
 
@@ -184,7 +179,10 @@
      .then(checkFileName)
      .then(checkLayers)
      .done(function(val){
-        $console.append('<p>task complete!!</p>');
+        $console.append('<p>エラーの内容を確認してください...</p>');
+        //エラーカウント
+        $('#error-total').text($list.find('.icon.error').length);
+        $('#warn-total').text($list.find('.icon.warn').length);
     });
 
 
