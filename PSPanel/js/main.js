@@ -76,10 +76,11 @@
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj) ) {
+          $list.append(template(obj));
+        }
+        d.resolve(c);
       });
-
-      d.resolve(c);
 
     } else {
 
@@ -101,7 +102,9 @@
       JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj) ) {
+          $list.append(template(obj));
+        }
         d.resolve(c);
       });
 
@@ -126,7 +129,9 @@
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj) ) {
+          $list.append(template(obj));
+        }
         d.resolve(c);
       });
 

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview 単位のチェック
+ */
+
+
 var LABEL = {
   CM: 'cm',
   INCHES: 'inch',

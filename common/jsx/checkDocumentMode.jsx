@@ -1,6 +1,6 @@
-function noOpen() {
-  return '{title: "ファイルが開かれていません", hint: "", type: "valid"}';
-}
+/**
+ * @fileoverview documentModeチェック
+ */
 
 function checkMode() {
   if (activeDocument.mode !== DocumentMode["<%= config.documentModeType %>"]) {
@@ -43,9 +43,7 @@ function checkMode() {
 
 }
 
-if (documents.length === 0 ) {
-  noOpen();
-} else {
+if (documents.length > 0 ) {
   checkMode();
 }
 
