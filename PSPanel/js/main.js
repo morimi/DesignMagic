@@ -154,8 +154,8 @@
         var array = (new Function("return " + result))();
         _.each(array, function(obj) {
           $list.prepend(template(obj));
-          d.resolve(c);
         });
+        d.resolve(c);
       });
 
     } else {
@@ -179,16 +179,20 @@
      .then(checkFileName)
      .then(checkLayers)
      .done(function(val){
-        $console.append('<p>エラーの内容を確認してください...</p>');
+
+      var errorNum = $list.find('.icon.error').length;
         //エラーカウント
-        $('#error-total').text($list.find('.icon.error').length);
+        $('#error-total').text(errorNum);
         $('#warn-total').text($list.find('.icon.warn').length);
+
+      if ( errorNum > 0 ) {
+        $console.html('<p>エラーの内容を確認してください...</p>');
+      } else {
+        $console.html('<p>╭( ･ㅂ･)و ̑̑ ｸﾞｯ</p>');
+      }
+
     });
 
-
-//      $('#message-list').on('click', '.message', function(e) {
-//          alert($(this).text())
-//      });
 
   }
 

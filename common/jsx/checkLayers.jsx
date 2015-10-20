@@ -67,14 +67,14 @@ var mes = [];
 
 /**
  * レイヤー配列をextendするための入れ物
- * @type {Array.<Object>}
+ * @type {Array.<ArtLayers>}
  */
 var artLayers = [];
 
 
 /**
  * Layerのチェック
- * @param {Array.<Object>} target activeDocument.artLayers
+ * @param {Array.<ArtLayer>} target activeDocument.artLayers
  * @return {void}
  */
 function check(targets) {
@@ -124,7 +124,7 @@ function check(targets) {
 
 /**
  * LayerSetsのチェック
- * @param {Array.<Object>} activeDocument.layerSets
+ * @param {Array.<LayerSet>} activeDocument.layerSets
  * @return {Array.<string>} メッセージの配列
  */
 function checkSets(target) {
@@ -164,5 +164,9 @@ if (documents.length !== 0 ) {
     check(artLayers);
   }
 
-  "[" + mes.join(',') + "]";
+  if ( mes.length ) {
+    "[" + mes.join(',') + "]";
+  } else {
+    '[]';
+  }
 }
