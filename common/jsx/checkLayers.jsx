@@ -166,7 +166,5 @@ if (documents.length !== 0 ) {
 
   if ( mes.length ) {
     "[" + mes.join(',') + "]";
-  } else {
-    '[]';
   }
 }

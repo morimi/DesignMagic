@@ -127,7 +127,7 @@ body.light .message-hint {
 
 
 .panel-hd {
-  padding:5px 0 5px 5px;
+  padding:5px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -136,6 +136,9 @@ body.light .message-hint {
 
 .panel-header {
   border-bottom: 1px solid #383838;
+  display: -webkit-box;
+  -webkit-box-pack: justify;
+
 }
 
 #footer-container {

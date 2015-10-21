@@ -15,6 +15,9 @@
       JSXRunner   = require("../common/JSXRunner"),
       conf   = require("../conf.json");
 
+  //conf cache
+  var confCache = null;
+
   //Elements
   var $content = $('#content'),
       $list = $('#message-list'),
@@ -31,6 +34,10 @@
 
       d.resolve(conf);
 
+    } else if ( confCache ) {
+
+      d.resolve(confCache);
+
     } else {
 
      var req = http.get(conf.url, function (res) {
@@ -46,6 +53,8 @@
               type: "valid"
             }));
 
+            confCache = data;
+
             d.resolve(data);
           });
         }
@@ -57,7 +66,8 @@
           hint: "デフォルト設定を使用します",
           type: "warn"
         }));
-        d.resolve(data);
+        confCache = conf;
+        d.resolve(conf);
       });
 
     }
@@ -66,7 +76,7 @@
   };
 
   /**
-   *
+   * ドキュメントモードのチェック
    */
   function checkDocumentMode(c) {
     var d = Q.defer();
@@ -76,7 +86,9 @@
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj)) {
+          $list.append(template(obj));
+        }
       });
 
       d.resolve(c);
@@ -91,7 +103,7 @@
   };
 
   /**
-   *
+   * 単位チェック
    */
   function checkRulerUnits(c) {
     var d = Q.defer();
@@ -101,7 +113,9 @@
       JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj)) {
+          $list.append(template(obj));
+        }
         d.resolve(c);
       });
 
@@ -116,7 +130,7 @@
   };
 
   /**
-   *
+   * ファイル名チェック
    */
   function checkFileName(c) {
     var d = Q.defer();
@@ -126,7 +140,9 @@
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
-        $list.append(template(obj));
+        if (_.isObject(obj)) {
+          $list.append(template(obj));
+        }
         d.resolve(c);
       });
 
@@ -142,7 +158,7 @@
 
 
   /**
-   *
+   * レイヤーのチェック
    */
   function checkLayers(c) {
     var d = Q.defer();
@@ -152,9 +168,11 @@
       JSXRunner.runJSX("checkLayers", {config: c.check.layers}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var array = (new Function("return " + result))();
-        _.each(array, function(obj) {
-          $list.prepend(template(obj));
-        });
+        if ( _.isArray(array) && array.length ) {
+          _.each(array, function(obj) {
+            $list.prepend(template(obj));
+          });
+        }
         d.resolve(c);
       });
 
@@ -165,6 +183,30 @@
     }
 
     return d.promise
+
+  }
+
+  /**
+   * エラー総数の表示
+   */
+  function countResult(val){
+
+    var errorNum = $list.find('.icon.error').length,
+        warnNum  = $list.find('.icon.warn').length;
+
+    //エラーカウント
+    $('#error-total').text(errorNum);
+    $('#warn-total').text($list.find('.icon.warn').length);
+
+    if ( errorNum > 0 ) {
+      $console.html('<p>エラーの内容を確認してください...</p>');
+    } else if (warnNum > 0) {
+      $console.html('<p>いくつか注意点があるようです...</p>');
+    } else {
+      $console.html('<p>╭( ･ㅂ･)و ̑̑ ｸﾞｯ</p>');
+    }
+
+    console.log('╭( ･ㅂ･)و ̑̑ done!');
 
   }
 
@@ -178,24 +220,21 @@
      .then(checkRulerUnits)
      .then(checkFileName)
      .then(checkLayers)
-     .done(function(val){
-
-      var errorNum = $list.find('.icon.error').length;
-        //エラーカウント
-        $('#error-total').text(errorNum);
-        $('#warn-total').text($list.find('.icon.warn').length);
-
-      if ( errorNum > 0 ) {
-        $console.html('<p>エラーの内容を確認してください...</p>');
-      } else {
-        $console.html('<p>╭( ･ㅂ･)و ̑̑ ｸﾞｯ</p>');
-      }
-
-    });
+     .done(countResult);
 
 
   }
 
+  $('.btn-check').on('click', function() {
+    $list.empty();
+
+    Q.fcall(loadConfig)
+     .then(checkDocumentMode)
+     .then(checkRulerUnits)
+     .then(checkFileName)
+     .then(checkLayers)
+     .done(countResult);
+  });
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
