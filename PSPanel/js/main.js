@@ -21,9 +21,12 @@
   //Elements
   var $content = $('#content'),
       $list = $('#message-list'),
-      $console = $('#console');
+      $config = $('#config-container'),
+      $console = $('#console'),
+      $loader = $('#icon-loader');
 
-  var template = Handlebars.compile($('#message-template').html());
+  var messageTmp = Handlebars.compile($('#message-template').html()),
+      configTmp = Handlebars.compile($('#config-template').html());
 
 
   // 設定ファイルを外部から取得する
@@ -32,6 +35,7 @@
 
     if (!conf.url) {
 
+      $console.html('デフォルト設定を利用しています');
       d.resolve(conf);
 
     } else if ( confCache ) {
@@ -47,11 +51,7 @@
             data = JSON.parse(data);
             data = _.defaults(data, conf);
 
-            $list.append(template({
-              title: data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました',
-              hint: "",
-              type: "valid"
-            }));
+            $console.html(data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました');
 
             confCache = data;
 
@@ -61,11 +61,7 @@
       });
 
       req.on('error', function (res) {
-        $list.append(template({
-          title: '設定ファイルの取得に失敗しました',
-          hint: "デフォルト設定を使用します",
-          type: "warn"
-        }));
+        $console.html('デフォルト設定を利用しています');
         confCache = conf;
         d.resolve(conf);
       });
@@ -74,6 +70,16 @@
 
     return d.promise
   };
+
+  /**
+   * 設定表示
+   * @param {Object} c config object
+   */
+  function displayConfig(c) {
+    if ( _.isObject(c) ) {
+      $config.append(configTmp(c));
+    }
+  }
 
   /**
    * ドキュメントモードのチェック
@@ -87,7 +93,7 @@
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
         if (_.isObject(obj)) {
-          $list.append(template(obj));
+          $list.append(messageTmp(obj));
         }
       });
 
@@ -114,7 +120,7 @@
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
         if (_.isObject(obj)) {
-          $list.append(template(obj));
+          $list.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -141,7 +147,7 @@
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var obj = (new Function("return " + result))();
         if (_.isObject(obj)) {
-          $list.append(template(obj));
+          $list.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -170,7 +176,7 @@
         var array = (new Function("return " + result))();
         if ( _.isArray(array) && array.length ) {
           _.each(array, function(obj) {
-            $list.prepend(template(obj));
+            $list.prepend(messageTmp(obj));
           });
         }
         d.resolve(c);
@@ -216,24 +222,31 @@
     themeManager.init();
 
     Q.fcall(loadConfig)
-     .then(checkDocumentMode)
-     .then(checkRulerUnits)
-     .then(checkFileName)
-     .then(checkLayers)
-     .done(countResult);
-
+     .then(displayConfig)
+     .done(function() {
+      $loader.hide();
+    });
 
   }
 
   $('.btn-check').on('click', function() {
     $list.empty();
+    $config.hide();
+    $loader.show();
 
     Q.fcall(loadConfig)
      .then(checkDocumentMode)
      .then(checkRulerUnits)
      .then(checkFileName)
      .then(checkLayers)
-     .done(countResult);
+     .done(function() {
+      countResult();
+      $loader.hide();
+    });
+  });
+
+  $('.btn-config').on('click', function() {
+    $config.toggle();
   });
 
   //素のinit()ではaddClassが想定通り動かんので

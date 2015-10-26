@@ -130,7 +130,7 @@ function check(targets) {
 function checkSets(target) {
   var l = target.length;
 
-  for (var i = 0; l; i++) {
+  for (var i = 0; i < l; i++) {
     var name = target[i].name;
 
     //命名

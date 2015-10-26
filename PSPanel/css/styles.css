@@ -59,11 +59,21 @@ a {
   overflow: hidden;
 }
 
-#validation-container {
+#validation-container,
+#config-container {
   height: calc(100% - 52px);
 }
 
-#message-list {
+#config-container {
+  display: none;
+  position: absolute;
+  top:28px;
+  left:0;
+  width: 100%;
+}
+
+#message-list,
+#config-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -77,6 +87,46 @@ a {
 
 #console {
   font-size: 9px;
+}
+
+
+table {
+  border-collapse: collapse;
+  border: solid 1px #666;
+  width: 80%;
+  margin: 1rem auto;
+}
+
+caption {
+  padding-bottom: .5rem
+}
+
+th, td {
+  border-bottom: solid 1px #666;
+  padding: .3rem;
+}
+
+th {
+  border-right: dotted 1px #666;
+  width: 60%;
+  background-color: rgba(0,0,0,0.1);
+}
+
+dl {
+  margin: 1rem auto;
+  width: 80%;
+  border: solid 1px #333;
+  background-color: rgba(0,0,0,0.1);
+}
+
+dt{
+  padding: .2rem .5rem;
+  margin: 0;
+  background-color: rgba(0,0,0,0.2);
+}
+dd {
+  margin-left: .5rem;
+  padding: .2rem .5rem;
 }
 
 .message {
@@ -110,6 +160,13 @@ body.light .message {
 .message-hint {
   margin: 0;
   font-size: 10px;
+}
+
+.validation-info {
+  padding: 2rem;
+  text-align: center;
+  font-size: 10px;
+  color: #999;
 }
 
 body.darker .message-hint,

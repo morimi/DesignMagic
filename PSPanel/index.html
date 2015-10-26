@@ -21,16 +21,25 @@
           <div id="status">
 
           </div>
+          <img src="images/icon/loader.gif" alt="" id="icon-loader">
           <div class="topcoat-button btn-check">
             Check
+          </div>
+          <div class="topcoat-button btn-config">
+            Config
           </div>
         </div>
       </div>
 
       <div id="validation-container">
         <ul id="message-list">
-
+          <li class="validation-info">
+            Checkボタンを押すとバリデーションを実行します
+          </li>
         </ul>
+      </div>
+
+      <div id="config-container">
       </div>
 
       <div id="footer-container" class="panel-hd">
@@ -38,23 +47,124 @@
       </div>
     </div>
 
+
   </div>
 
 <script id="message-template" type="text/x-handlebars-template">
 
-<li class="message" data-type="{{type}}">
-  <div class="message-wrapper">
-    <p class="message-title">
-      <img src="images/icon/{{type}}.png" width="14" height="14" class="icon {{type}}" alt="{{type}}">
-      {{#if parent}}<span class="parent">[{{parent}}] </span>{{/if}}
-      <span class="title">{{title}}</span>
-    </p>
-    {{#each hint}}
-      <p class="message-hint">{{this}}</p>
-    {{/each}}
-  </div>
-</li>
+  <li class="message" data-type="{{type}}">
+    <div class="message-wrapper">
+      <p class="message-title">
+        <img src="images/icon/{{type}}.png" width="14" height="14" class="icon {{type}}" alt="{{type}}">
+        {{#if parent}}<span class="parent">[{{parent}}] </span>{{/if}}
+        <span class="title">{{title}}</span>
+      </p>
+      {{#each hint}}
+        <p class="message-hint">{{this}}</p>
+      {{/each}}
+    </div>
+  </li>
 
+</script>
+
+<script id="config-template" type="text/x-handlebars-template">
+  <div id="config-list">
+    <table>
+     <caption>設定</caption>
+      <tr>
+        <th scope="row">Version</th>
+        <td>{{version}}</td>
+      </tr>
+      <tr>
+        <th scope="row">Name</th>
+        <td>{{name}}</td>
+      </tr>
+      <tr>
+        <th scope="row">URL</th>
+        <td>{{url}}</td>
+      </tr>
+    </table>
+
+    {{#if check.config}}
+      <table>
+       <caption>Config</caption>
+        <tr>
+          <th scope="row">規定のカラーモードであるか</th>
+          <td>{{check.config.documentMode}}</td>
+        </tr>
+        <tr>
+          <th scope="row">規定のカラーモード</th>
+          <td>{{check.config.documentModeType}}</td>
+        </tr>
+        <tr>
+          <th scope="row">規定の単位であるかチェックする</th>
+          <td>{{check.config.rulerUnits}}</td>
+        </tr>
+        <tr>
+          <th scope="row">規定の単位</th>
+          <td>{{check.config.rulserUnitsType}}</td>
+        </tr>
+      </table>
+    {{/if}}
+
+    {{#if check.files}}
+      <table>
+       <caption>Files</caption>
+        <tr>
+          <th scope="row">規定のファイル名であるか</th>
+          <td>{{check.files.name}}</td>
+        </tr>
+        <tr>
+          <th scope="row">規定のファイルサイズ<br>以下であるか(MB)</th>
+          <td>{{check.files.size}}</td>
+        </tr>
+        <tr>
+          <th scope="row">レイヤーカンプが<br>設定されているか</th>
+          <td>{{check.files.useLayerComps}}</td>
+        </tr>
+      </table>
+    {{/if}}
+
+    {{#if check.layers}}
+      <table>
+       <caption>Layers</caption>
+        <tr>
+          <th scope="row">レイヤーやグループの<br>命名をチェックする</th>
+          <td>{{check.layers.name}}</td>
+        </tr>
+        <tr>
+          <th scope="row">命名チェックレベル</th>
+          <td>{{check.layers.namingLevel}}</td>
+        </tr>
+        <tr>
+          <th scope="row">ブレンドモードが<br>「通常」モードになっているか</th>
+          <td>{{check.layers.blendingMode}}</td>
+        </tr>
+      </table>
+
+      <dl>
+       <dt>命名チェックレベル</dt>
+       <dd>0 : レイヤー、グループ、のコピー</dd>
+       <dd>1 : Lv0 + シェイプ</dd>
+       <dd>2 : Lv0 + Lv1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)</dd>
+      </dl>
+    {{/if}}
+
+
+    {{#if check.effects}}
+      <table>
+       <caption>Effects</caption>
+        <tr>
+          <th scope="row">エフェクトの数値に<br>整数が使用されているか</th>
+          <td>{{check.effects.absValue}}</td>
+        </tr>
+        <tr>
+          <th scope="row">エフェクトの数が<br>設定数を超えていないか<br>(-1で無制限)</th>
+          <td>{{check.effects.totalCount}}</td>
+        </tr>
+      </table>
+    {{/if}}
+  </div>
 </script>
 
   <script src="js/libs/CSInterface.js"></script>
