@@ -33,9 +33,7 @@
 
       <div id="validation-container">
         <ul id="message-list">
-          <li class="validation-info">
-            Checkボタンを押すとバリデーションを実行します
-          </li>
+
         </ul>
       </div>
 
@@ -51,7 +49,6 @@
   </div>
 
 <script id="message-template" type="text/x-handlebars-template">
-
   <li class="message" data-type="{{type}}">
     <div class="message-wrapper">
       <p class="message-title">
@@ -64,7 +61,12 @@
       {{/each}}
     </div>
   </li>
+</script>
 
+<script id="info-template" type="text/x-handlebars-template">
+<li class="validation-info">
+  Checkボタンを押すとバリデーションを実行します
+</li>
 </script>
 
 <script id="config-template" type="text/x-handlebars-template">

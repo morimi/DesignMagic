@@ -26,7 +26,8 @@
       $loader = $('#icon-loader');
 
   var messageTmp = Handlebars.compile($('#message-template').html()),
-      configTmp = Handlebars.compile($('#config-template').html());
+      configTmp = Handlebars.compile($('#config-template').html()),
+      infoTmp = Handlebars.compile($('#info-template').html());
 
 
   // 設定ファイルを外部から取得する
@@ -202,7 +203,7 @@
 
     //エラーカウント
     $('#error-total').text(errorNum);
-    $('#warn-total').text($list.find('.icon.warn').length);
+    $('#warn-total').text(warnNum);
 
     if ( errorNum > 0 ) {
       $console.html('<p>エラーの内容を確認してください...</p>');
@@ -224,10 +225,23 @@
     Q.fcall(loadConfig)
      .then(displayConfig)
      .done(function() {
+      $list.append(infoTmp());
       $loader.hide();
     });
 
   }
+
+  /**
+   * Reset
+   */
+  function reset() {
+    $config.hide();
+    $list.empty().append(infoTmp());
+    $console.empty();
+    $('#error-total').text(0);
+    $('#warn-total').text(0);
+  }
+
 
   $('.btn-check').on('click', function() {
     $list.empty();
@@ -245,11 +259,16 @@
     });
   });
 
+
   $('.btn-config').on('click', function() {
     $config.toggle();
   });
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
+
+  //ドキュメント閉じた時
+  csInterface.addEventListener( 'documentAfterDeactivate' , reset);
+
 
 }());
