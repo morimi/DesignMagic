@@ -17,13 +17,13 @@
 
     "files" : {
       "name": null,
-      "size": 1000,
+      "size": 100,
       "useLayerComps": false
     },
 
     "layers": {
       "name": true,
-      "namingLevel": 2,
+      "namingLevel": 1,
       "blendingMode": true
     },
 

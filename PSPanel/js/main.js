@@ -159,10 +159,36 @@
 
     }
 
-    return d.promise
+    return d.promise;
 
   };
 
+
+  /**
+   * ファイルサイズのチェック
+   */
+  function checkFileSize(c) {
+    var d = Q.defer();
+
+    if ( _.isNumber(c.check.files.size) ) {
+
+      JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+       var obj = (new Function("return " + result))();
+        if (_.isObject(obj)) {
+          $list.append(messageTmp(obj));
+        }
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+  }
 
   /**
    * レイヤーのチェック
@@ -189,9 +215,10 @@
 
     }
 
-    return d.promise
+    return d.promise;
 
   }
+
 
   /**
    * エラー総数の表示
@@ -252,6 +279,7 @@
      .then(checkDocumentMode)
      .then(checkRulerUnits)
      .then(checkFileName)
+     .then(checkFileSize)
      .then(checkLayers)
      .done(function() {
       countResult();
