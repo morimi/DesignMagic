@@ -78,8 +78,9 @@ var artLayers = [];
  * @return {void}
  */
 function check(targets) {
+  var i = 0;
 
-  for (var i = 0; i < targets.length; i++) {
+  while (i < targets.length ) {
     var target = targets[i],
         name = target.name,
         level = "<%= config.namingLevel %>",
@@ -119,6 +120,8 @@ function check(targets) {
       var result = new Result(name, hint, type );
       mes.push(result.toString());
     }
+
+    i = (i+1)|0;
   }
 }
 
@@ -128,11 +131,10 @@ function check(targets) {
  * @return {Array.<string>} メッセージの配列
  */
 function checkSets(target) {
-  var l = target.length;
+  var i = 0, l = target.length;
 
-  for (var i = 0; i < l; i++) {
+  while ( i < target.length ) {
     var name = target[i].name;
-
     //命名
     if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
      var result = new Result(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN);
@@ -150,6 +152,9 @@ function checkSets(target) {
     if ( (l - 1) == i) {
       return mes;
     }
+
+    i = (i+1)|0;
+
   }
 }
 
