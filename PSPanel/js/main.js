@@ -191,6 +191,32 @@
   }
 
   /**
+   * レイヤーカンプのチェック
+   */
+  function checkLayerComps(c) {
+    var d = Q.defer();
+
+    if ( c.check.files.useLayerComps ) {
+
+      JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+       var obj = (new Function("return " + result))();
+        console.log(obj)
+        if (_.isObject(obj)) {
+          $list.append(messageTmp(obj));
+        }
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+  }
+  /**
    * レイヤーのチェック
    */
   function checkLayers(c) {
@@ -280,6 +306,7 @@
      .then(checkRulerUnits)
      .then(checkFileName)
      .then(checkFileSize)
+     .then(checkLayerComps)
      .then(checkLayers)
      .done(function() {
       countResult();

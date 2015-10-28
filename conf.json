@@ -18,7 +18,7 @@
     "files" : {
       "name": null,
       "size": 100,
-      "useLayerComps": false
+      "useLayerComps": true
     },
 
     "layers": {
