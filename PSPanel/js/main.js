@@ -96,10 +96,9 @@
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
+        d.resolve(c);
       });
-
-      d.resolve(c);
-
+      
     } else {
 
       d.resolve(c);
