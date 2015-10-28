@@ -105,7 +105,7 @@ function check(targets) {
     }
 
     //命名
-    if (name.match(regex)) {
+    if (regex.test(name)) {
       hint.push(VALIDATION_MESSAGE.NONAME);
     }
 
@@ -134,7 +134,7 @@ function checkSets(target) {
     var name = target[i].name;
 
     //命名
-    if ( name.match(/グループ(\s\d+)*|のコピー(\s\d+)*/) ) {
+    if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
      var result = new Result(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN);
       mes.push(result.toString());
     }

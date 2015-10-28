@@ -201,7 +201,6 @@
       JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
        var obj = (new Function("return " + result))();
-        console.log(obj)
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
