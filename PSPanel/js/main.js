@@ -98,7 +98,7 @@
         }
         d.resolve(c);
       });
-      
+
     } else {
 
       d.resolve(c);
@@ -219,6 +219,7 @@
    */
   function checkLayers(c) {
     var d = Q.defer();
+    var start = $.now();
 
     if (c.check.layers.name || c.check.layers.blendingMode) {
 
@@ -230,6 +231,7 @@
             $list.prepend(messageTmp(obj));
           });
         }
+        console.log( Math.abs((start - $.now()) / 1000) + 's');
         d.resolve(c);
       });
 

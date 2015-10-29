@@ -4,39 +4,25 @@
 
 
 /**
- * Result
- * バリデーション結果
  * @param {string} title
- * @param {string} hint
+ * @param {Array} hint
  * @param {string} type
+ * @return {string} stringifyした文字列
  */
-function Result(title, hint, type) {
-  this.data = {
-      title : title || null,
-      hint : hint || null,
-      type : type || null
-  };
-}
-
-/**
- * @return {string} this.dataをJSON.stringifyした文字列
- */
-Result.prototype.toString = function resultToString() {
+function resultToString(title, hint, type) {
   //return JSON.stringify(this.data); JSON使えないよ
-  var d = this.data;
-  //return '{title:"' + d.title + '", hint:"' + d.hint + '", type:"' + d.type + '"}';
 
-  var text = '{title:"' + d.title + '", hint:[';
+  var text = '{title:"' + title + '", hint:[';
 
-  for ( var i = 0; i < d.hint.length; i++ ) {
-    text += '"' + d.hint[i] + '"';
+  for ( var i = 0; i < hint.length; i++ ) {
+    text += '"' + hint[i] + '"';
 
-    if ( i !== (d.hint.length-1) ) {
+    if ( i !== (hint.length-1) ) {
       text += ',';
     }
   }
 
-  text += '], type:"' + d.type + '"}';
+  text += '], type:"' + type + '"}';
 
   return  text;
 
@@ -117,8 +103,7 @@ function check(targets) {
     }
 
     if ( hint.length ) {
-      var result = new Result(name, hint, type );
-      mes.push(result.toString());
+      mes.push(resultToString(name, hint, type));
     }
 
     i = (i+1)|0;
@@ -137,8 +122,8 @@ function checkSets(target) {
     var name = target[i].name;
     //命名
     if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
-     var result = new Result(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN);
-      mes.push(result.toString());
+
+      mes.push(resultToString(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN));
     }
 
     if (target[i].artLayers.length ){
