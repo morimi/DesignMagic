@@ -57,6 +57,18 @@ var mes = [];
  */
 var artLayers = [];
 
+/**
+ * 命名チェックレベル毎の正規表現
+ * 0 : レイヤー、グループ のコピー のみ
+ * 1 : Lv0 + シェイプ
+ * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
+ */
+var NAME_REGEX = {
+  0 : /レイヤー(\s\d+)*|のコピー(\s\d+)*/,
+  1 : /レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/,
+  2 : /レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/
+};
+
 
 /**
  * Layerのチェック
@@ -64,36 +76,34 @@ var artLayers = [];
  * @return {void}
  */
 function check(targets) {
-  var i = 0;
+  var i = 0,
+      nameRegex = NAME_REGEX["<%= config.namingLevel %>"];
 
   while (i < targets.length ) {
     var target = targets[i],
         name = target.name,
-        level = "<%= config.namingLevel %>",
         hint = [],
-        type = VALIDATION_TYPE.WARN,
-        regex;
+        type = VALIDATION_TYPE.WARN;
 
-    /**
-     * 命名チェックレベル
-     * 0 : レイヤー、グループ のコピー のみ
-     * 1 : Lv0 + シェイプ
-     * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
-     */
-    switch(level) {
-      case "1":
-        regex = /レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/;
+
+    //内容による分岐
+    switch ( target.kind ) {
+
+      //文字の場合
+      case LayerKind.TEXT:
+//        if ( target.textItem.size < 10) {
+//          hint.push(target.textItem.size);
+//        }
+
         break;
-      case "2":
-        regex = /レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/;
-        break;
+
       default:
-        regex = /レイヤー(\s\d+)*|のコピー(\s\d+)*/;
-    }
 
-    //命名
-    if (regex.test(name)) {
-      hint.push(VALIDATION_MESSAGE.NONAME);
+        //命名
+        if (nameRegex.test(name)) {
+          hint.push(VALIDATION_MESSAGE.NONAME);
+        }
+
     }
 
     //ブレンドモード
@@ -120,9 +130,9 @@ function checkSets(target) {
 
   while ( i < target.length ) {
     var name = target[i].name;
+
     //命名
     if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
-
       mes.push(resultToString(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN));
     }
 
