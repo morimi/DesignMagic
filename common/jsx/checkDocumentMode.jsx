@@ -2,6 +2,8 @@
  * @fileoverview documentModeチェック
  */
 
+try {
+
 function checkMode() {
   if (activeDocument.mode !== DocumentMode["<%= config.documentModeType %>"]) {
       var v;
@@ -47,4 +49,6 @@ if (documents.length > 0 ) {
   checkMode();
 }
 
-
+} catch(e) {
+  '{errorType: "jsx", errorMessage: "' + e + '"}';
+}

@@ -2,6 +2,7 @@
  * @fileoverview 単位のチェック
  */
 
+try {
 
 var LABEL = {
   CM: 'cm',
@@ -44,4 +45,8 @@ if (preferences.rulerUnits !== Units["<%= config.rulserUnitsType %>"] ) {
 
 } else {
   '{title: "単位は' + LABEL["<%= config.rulserUnitsType %>"] + 'に設定されています", hint: "", type: "valid"}';
+}
+
+} catch(e) {
+  '{errorType: "jsx", errorMessage: "' + e + '"}';
 }
