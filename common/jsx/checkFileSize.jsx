@@ -2,6 +2,7 @@
  * @fileoverview activeDocument のファイルサイズチェック
  */
 
+try {
 
 if (documents.length > 0 ) {
   var obj = new File(activeDocument.fullName);
@@ -16,4 +17,8 @@ if (documents.length > 0 ) {
   } else {
     '{title: "ファイルサイズは ' + size + 'MB です", hint: "", type: "valid"}';
   }
+}
+
+} catch(e) {
+  '{errorType: "jsx", errorMessage: "' + e + '"}';
 }

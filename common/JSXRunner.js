@@ -57,10 +57,26 @@ function _getJSXTemplate(scriptName) {
  *
  * @param {string} script Script text to evaluate
  * @param {function} callback Function to be called by csInterface with the result
+ * @param {string} optScriptName Name of the JSX script (options)
  */
-function _evalJSX(script, callback) {
+function _evalJSX(script, callback, optScriptName) {
+    var self = this;
     _.defer(function () {
-        csInterface.evalScript(script, callback);
+        csInterface.evalScript(script, function () {
+          // 返却値に {errorType:type, errorMessage:message} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
+          if (arguments[0] != EvalScript_ErrMessage) {
+            var obj = (new Function("return " + arguments[0]))();
+            try {
+              if (obj.errorType == 'jsx') {
+                console.log('[jsx error - ' + optScriptName + '] ' + obj.errorMessage);
+                arguments[0] = null; //エラー用データを破棄
+              }
+            } catch(e) {
+              // obj.errorType が undefined というエラーが表示されるので握りつぶす.
+            }
+          }
+          callback.apply(self, arguments);
+        });
     });
 }
 
@@ -76,7 +92,7 @@ function runJSX(scriptName, data, callback) {
     var template = _getJSXTemplate(scriptName),
         rendered = template(data);
 
-    _evalJSX(rendered, callback);
+    _evalJSX(rendered, callback, scriptName);
 }
 
 exports.runJSX = runJSX;

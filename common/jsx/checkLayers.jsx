@@ -2,6 +2,7 @@
  * @fileoverview layerSets & artLayersの命名チェック
  */
 
+try {
 
 /**
  * @param {string} title
@@ -167,4 +168,8 @@ if (documents.length !== 0 ) {
   if ( mes.length ) {
     "[" + mes.join(',') + "]";
   }
+}
+
+} catch(e) {
+  '{errorType: "jsx", errorMessage: "' + e + '"}';
 }

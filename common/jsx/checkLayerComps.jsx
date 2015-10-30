@@ -2,6 +2,8 @@
  * @fileoverview LayerCompsのチェック
  */
 
+try {
+
 if (documents.length > 0 ) {
   if ( activeDocument.layerComps.length ) {
     var n;
@@ -20,4 +22,8 @@ if (documents.length > 0 ) {
     '{title: "レイヤーカンプが設定されていません", hint: ["「レイヤーカンプ」パネルで設定できます"], type: "warn"}';
 
   }
+}
+
+} catch(e) {
+  '{errorType: "jsx", errorMessage: "' + e + '"}';
 }
