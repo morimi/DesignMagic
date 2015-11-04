@@ -72,6 +72,12 @@ var NAME_REGEX = {
 
 
 /**
+ * Hidden Layer Count
+ */
+var h = 0;
+
+
+/**
  * Layerのチェック
  * @param {Array.<ArtLayer>} target activeDocument.artLayers
  * @return {void}
@@ -113,6 +119,9 @@ function check(targets) {
       type = VALIDATION_TYPE.ERROR;
     }
 
+    //非表示レイヤーカウント
+    h = (h + !target.visible)|0;
+
     if ( hint.length ) {
       mes.push(resultToString(name, hint, type));
     }
@@ -137,6 +146,9 @@ function checkSets(target) {
     if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
       mes.push(resultToString(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN));
     }
+
+    //非表示グループカウント
+    h = (h + !buff.visible)|0;
 
     if ( buff.artLayers ) {
       Array.prototype.push.apply(artLayers, buff.artLayers);
@@ -167,7 +179,9 @@ if (documents.length !== 0 ) {
   }
 
   if ( mes.length ) {
-    "[" + mes.join(',') + "]";
+    '{hidden: "' + h + '", list:[' + mes.join(',') + ']}';
+  } else {
+    '{hidden: "' + h + '", list:[]}';
   }
 }
 

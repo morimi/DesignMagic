@@ -225,13 +225,18 @@
 
       JSXRunner.runJSX("checkLayers", {config: c.check.layers}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var array = (new Function("return " + result))();
-        if ( _.isArray(array) && array.length ) {
-          _.each(array, function(obj) {
+        var r = (new Function("return " + result))();
+
+        if ( _.isArray(r.list) && r.list.length ) {
+          _.each(r.list, function(obj) {
             $list.prepend(messageTmp(obj));
           });
         }
-        console.log( Math.abs((start - $.now()) / 1000) + 's');
+
+        $('#hidden-total').text(r.hidden);
+
+        console.log("checkLayers:" + Math.abs((start - $.now()) / 1000) + 's');
+        console.log('hidden: ' + r.hidden);
         d.resolve(c);
       });
 
