@@ -298,6 +298,7 @@
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
+    $('#hidden-total').text(0);
   }
 
 
