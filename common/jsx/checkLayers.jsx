@@ -77,10 +77,10 @@ var NAME_REGEX = {
  * @return {void}
  */
 function check(targets) {
-  var i = 0,
+  var i = 0, l = targets.length,
       nameRegex = NAME_REGEX["<%= config.namingLevel %>"];
 
-  while (i < targets.length ) {
+  while ( i < l ) {
     var target = targets[i],
         name = target.name,
         hint = [],
@@ -129,20 +129,21 @@ function check(targets) {
 function checkSets(target) {
   var i = 0, l = target.length;
 
-  while ( i < target.length ) {
-    var name = target[i].name;
+  while ( i < l ) {
+    var buff = target[i];
+    var name = buff.name;
 
     //命名
     if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
       mes.push(resultToString(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN));
     }
 
-    if (target[i].artLayers.length ){
-      Array.prototype.push.apply(artLayers, target[i].artLayers);
+    if ( buff.artLayers ) {
+      Array.prototype.push.apply(artLayers, buff.artLayers);
     }
 
-    if ( target[i].layerSets.length ) {
-      checkSets(target[i].layerSets);
+    if ( buff.layerSets ) {
+      checkSets(buff.layerSets);
     }
 
     if ( (l - 1) == i) {
