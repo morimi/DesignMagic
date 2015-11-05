@@ -195,7 +195,11 @@ body.light .message-hint {
   border-bottom: 1px solid #383838;
   display: -webkit-box;
   -webkit-box-pack: justify;
+}
 
+.btn-check,
+.btn-config {
+  font-size: 10px;
 }
 
 #footer-container {
