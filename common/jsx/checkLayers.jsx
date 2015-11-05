@@ -15,14 +15,10 @@ function resultToString(title, hint, type) {
 
   var text = '{title:"' + title + '", hint:[';
 
-  for ( var i = 0; i < hint.length; i++ ) {
-    text += '"' + hint[i] + '"';
-
-    if ( i !== (hint.length-1) ) {
-      text += ',';
-    }
+  for ( var i = 0, l = hint.length; i < l; i++ ) {
+    text += '"' + hint[i] + '"' + ',';
   }
-
+  text = text.slice(0, -1);
   text += '], type:"' + type + '"}';
 
   return  text;
@@ -54,9 +50,9 @@ var mes = [];
 
 /**
  * レイヤー配列をextendするための入れ物
- * @type {Array.<ArtLayers>}
+ * @type {Array.<Layers>}
  */
-var artLayers = [];
+var layers = [];
 
 /**
  * 命名チェックレベル毎の正規表現
@@ -65,9 +61,9 @@ var artLayers = [];
  * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
  */
 var NAME_REGEX = {
-  0 : /レイヤー(\s\d+)*|のコピー(\s\d+)*/,
-  1 : /レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/,
-  2 : /レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/
+  0 : /グループ(\s\d+)*|レイヤー(\s\d+)*|のコピー(\s\d+)*/,
+  1 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/,
+  2 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/
 };
 
 
@@ -79,7 +75,7 @@ var h = 0;
 
 /**
  * Layerのチェック
- * @param {Array.<ArtLayer>} target activeDocument.artLayers
+ * @param {Array.<Layer>} target activeDocument.layers
  * @return {void}
  */
 function check(targets) {
@@ -131,51 +127,47 @@ function check(targets) {
 }
 
 /**
- * LayerSetsのチェック
- * @param {Array.<LayerSet>} activeDocument.layerSets
- * @return {Array.<string>} メッセージの配列
+ * 現在のレイヤー構造体から平坦化した配列を返却
+ * @return {Array.<Layer>}
  */
-function checkSets(target) {
-  var i = 0, l = target.length;
+function getLayersList() {
 
-  while ( i < l ) {
-    var buff = target[i];
-    var name = buff.name;
+  var list = [];
+  function _ftn(layer) {
+    list.push(layer);
+    return true;
+  };
 
-    //命名
-    if ( /グループ(\s\d+)*|のコピー(\s\d+)*/.test(name) ) {
-      mes.push(resultToString(name, [VALIDATION_MESSAGE.NONAME], VALIDATION_TYPE.WARN));
+  function _traverse(layers) {
+    var ok = true, layer;
+    for (var i = 1, l = layers.length; i <= l && ok != false; i++) {
+      layer = layers[l - i];
+
+      if (layer.typename == 'LayerSet') {
+        ok = _ftn(layer);
+        if (ok) {
+          ok = _traverse(layer.layers);
+        }
+      } else {
+        ok = _ftn(layer);
+      }
     }
+    return ok;
+  };
 
-    //非表示グループカウント
-    h = (h + !buff.visible)|0;
+  _traverse(activeDocument.layers);
 
-    if ( buff.artLayers ) {
-      Array.prototype.push.apply(artLayers, buff.artLayers);
-    }
-
-    if ( buff.layerSets ) {
-      checkSets(buff.layerSets);
-    }
-
-    if ( (l - 1) == i) {
-      return mes;
-    }
-
-    i = (i+1)|0;
-
-  }
+  return list;
 }
 
 
 
 if (documents.length !== 0 ) {
 
-  Array.prototype.push.apply(artLayers, activeDocument.artLayers);
-  checkSets(activeDocument.layerSets);
+  layers = getLayersList();
 
-  if (artLayers.length) {
-    check(artLayers);
+  if (layers.length) {
+    check(layers);
   }
 
   if ( mes.length ) {
