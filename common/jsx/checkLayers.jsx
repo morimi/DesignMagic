@@ -18,7 +18,7 @@ function resultToString(title, hint, type) {
   for ( var i = 0, l = hint.length; i < l; i++ ) {
     text += '"' + hint[i] + '"' + ',';
   }
-  text = text.slice(0, -1);
+  text = text.slice(0, -1); //末尾の , を切る
   text += '], type:"' + type + '"}';
 
   return  text;
@@ -103,7 +103,7 @@ function check(targets) {
       default:
 
         //命名
-        if (nameRegex.test(name)) {
+        if ( nameRegex.test(name) ) {
           hint.push(VALIDATION_MESSAGE.NONAME);
         }
 
@@ -111,7 +111,7 @@ function check(targets) {
 
     //ブレンドモード（LayerSet以外をチェック）
     //※LayerSetはデフォが通過のためエラーとして判断してしまうため
-    if (target.typename != 'LayerSet' && target.blendMode !== BlendMode.NORMAL) {
+    if (target.typename !== 'LayerSet' && target.blendMode !== BlendMode.NORMAL) {
       hint.push(VALIDATION_MESSAGE.BLENDMODE);
       type = VALIDATION_TYPE.ERROR;
     }
@@ -134,27 +134,21 @@ function check(targets) {
 function getLayersList() {
 
   var list = [];
-  function _ftn(layer) {
-    list.push(layer);
-    return true;
-  };
 
   function _traverse(layers) {
-    var ok = true, layer;
-    for (var i = 1, l = layers.length; i <= l && ok != false; i++) {
-      layer = layers[l - i];
+    var i = 0, l = layers.length;
+    while ( i < l ) {
+      var layer = layers[i];
 
-      if (layer.typename == 'LayerSet') {
-        ok = _ftn(layer);
-        if (ok) {
-          ok = _traverse(layer.layers);
-        }
-      } else {
-        ok = _ftn(layer);
+      list.push(layer);
+
+      if ( layer.typename === 'LayerSet' ) {
+        _traverse(layer.layers);
       }
+
+      i = (i+1)|0;
     }
-    return ok;
-  };
+  }
 
   _traverse(activeDocument.layers);
 
@@ -167,7 +161,7 @@ if (documents.length !== 0 ) {
 
   layers = getLayersList();
 
-  if (layers.length) {
+  if ( layers.length ) {
     check(layers);
   }
 
