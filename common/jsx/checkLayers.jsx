@@ -109,8 +109,9 @@ function check(targets) {
 
     }
 
-    //ブレンドモード
-    if (target.blendMode !== BlendMode.NORMAL) {
+    //ブレンドモード（LayerSet以外をチェック）
+    //※LayerSetはデフォが通過のためエラーとして判断してしまうため
+    if (target.typename != 'LayerSet' && target.blendMode !== BlendMode.NORMAL) {
       hint.push(VALIDATION_MESSAGE.BLENDMODE);
       type = VALIDATION_TYPE.ERROR;
     }
