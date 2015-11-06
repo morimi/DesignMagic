@@ -18,6 +18,7 @@
     "files" : {
       "name": null,
       "size": 100,
+      "ratio": 2,
       "useLayerComps": true
     },
 
