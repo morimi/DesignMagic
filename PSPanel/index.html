@@ -170,6 +170,15 @@
       </dl>
     {{/if}}
 
+    {{#if check.fonts}}
+      <table>
+       <caption>Fonts</caption>
+        <tr>
+          <th scope="row">フォントの数値に<br>整数が使用されているか</th>
+          <td>{{check.fonts.absValue}}</td>
+        </tr>
+      </table>
+    {{/if}}
 
     {{#if check.effects}}
       <table>

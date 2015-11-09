@@ -31,7 +31,8 @@ function resultToString(title, hint, type) {
  */
 var VALIDATION_MESSAGE = {
   NONAME : "命名されていません",
-  BLENDMODE: "通常以外のモードに設定されています"
+  BLENDMODE: "通常以外のモードに設定されています",
+  FONTSIZE: "フォントサイズが整数ではありません"
 };
 
 /**
@@ -72,6 +73,12 @@ var NAME_REGEX = {
  */
 var h = 0;
 
+/**
+ * 設定の値
+ * フォントサイズが整数かどうかチェックする
+ */
+var CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>";
+
 
 /**
  * Layerのチェック
@@ -80,7 +87,7 @@ var h = 0;
  */
 function check(targets) {
   var i = 0, l = targets.length,
-      nameRegex = NAME_REGEX["<%= config.namingLevel %>"];
+      nameRegex = NAME_REGEX["<%= config.layers.namingLevel %>"];
 
   while ( i < l ) {
     var target = targets[i],
@@ -94,9 +101,12 @@ function check(targets) {
 
       //文字の場合
       case LayerKind.TEXT:
-//        if ( target.textItem.size < 10) {
-//          hint.push(target.textItem.size);
-//        }
+        //フォントサイズの整数を判定
+        //zoomツールで拡大縮小するとこのプロパティの値が正しくない
+        //一旦レイヤーを削除して作り直さないと正しい値に戻らない
+        if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE === 'true') {
+          hint.push(VALIDATION_MESSAGE.FONTSIZE);
+        }
 
         break;
 

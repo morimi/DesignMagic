@@ -28,6 +28,10 @@
       "blendingMode": true
     },
 
+    "fonts": {
+      "absValue": false
+    },
+
     "effects": {
       "absValue": false,
       "totalCount": -1
