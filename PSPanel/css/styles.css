@@ -42,6 +42,12 @@ a {
   font-size: 10px;
 }
 
+hr {
+  border: dashed 1px rgba(255,255,255, .5);
+  border-bottom: 0;
+  margin: 20px
+}
+
 
 #content {
   margin-right:auto;
