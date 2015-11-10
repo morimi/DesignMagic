@@ -24,6 +24,17 @@ var reportOptions = {
 
 
 /**
+ * 証明書発行
+ * @param  {String} 'cert'
+ */
+gulp.task( 'cert', function () {
+  gulp.src( '.' )
+    .pipe( exec('<%= options.path.cmd %> -selfSignedCert JP Tokyo Cyberagent MisakiMori <%= options.passsword.cert %> <%= options.path.cert %>', options) )
+    .pipe( exec.reporter(reportOptions) )
+});
+
+
+/**
  * build の後始末
  * @param  {String} 'clean'
  */
