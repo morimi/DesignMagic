@@ -10,6 +10,7 @@ Adobe Photoshop CC 用のエクステンション DesignMagic のリポジトリ
 * [機能一覧](https://ghe.ca-tools.org/design-magic/extension/wiki/03.Functions)
 * [Photoshopへの導入手順](https://ghe.ca-tools.org/design-magic/extension/wiki/04.Installation)
 * [設定ファイル](https://ghe.ca-tools.org/design-magic/extension/wiki/05.Conf)
+* [UIについて](https://ghe.ca-tools.org/design-magic/extension/wiki/06.UI)
 
 ## Links
 
