@@ -3,7 +3,11 @@
   "version": "0.0.1",
   "description": "Photoshop 2015 Validator Extension",
   "main": "PSPanel/index.html",
-  "scripts": {},
+  "scripts": {
+    "preinstall": "npm i -g gulp",
+    "build": "gulp",
+    "clean": "gulp clean"
+  },
   "repository": {
     "type": "git",
     "url": "git@ghe.ca-tools.org:mori-misaki/DesignMagic.git"
@@ -15,6 +19,8 @@
   "author": "Misaki Mori",
   "license": "MIT",
   "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-exec": "^2.1.2",
     "handlebars": "^3.0.3",
     "lodash": "^3.10.0",
     "q": "^1.4.1"
