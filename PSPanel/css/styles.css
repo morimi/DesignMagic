@@ -40,6 +40,7 @@ p {
 
 a {
   font-size: 10px;
+  color: cadetblue
 }
 
 hr {
@@ -79,7 +80,9 @@ hr {
 }
 
 #message-list,
-#config-list {
+#config-list,
+#setting-list {
+  overflow: hidden;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -135,6 +138,8 @@ dd {
   padding: .2rem .5rem;
 }
 
+
+
 .message {
   display: block;
   border-bottom: 1px solid #383838;
@@ -189,23 +194,27 @@ body.light .message {
   color: aliceblue;
 }
 .lv2 {
-  color: #acffec
+  color: #acffec;
 }
 .lv3 {
   color: #d5ff8b;
 }
 .lv4 {
-  color: #f8ff8b
+  color: #f8ff8b;
 }
 .lv5 {
-  color: #ffd16e
+  color: #ffd16e;
 }
 .lv6 {
-  color: #ff7145
+  color: #ff7145;
 }
 .lv7 {
   background: red;
   color: #fff;
+}
+
+#setting-list p {
+  margin: 10px;
 }
 
 body.darker .message-hint,

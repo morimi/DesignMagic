@@ -28,17 +28,19 @@
   var messageTmp = Handlebars.compile($('#message-template').html()),
       configTmp = Handlebars.compile($('#config-template').html()),
       infoTmp = Handlebars.compile($('#info-template').html()),
-      consoleTmp = Handlebars.compile($('#console-template').html());
+      consoleTmp = Handlebars.compile($('#console-template').html()),
+      settingTmp = Handlebars.compile($('#setting-template').html());
 
 
   // 設定ファイルを外部から取得する
   function loadConfig() {
     var d = Q.defer();
+    var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
 
-    if (!conf.url) {
+    if (!url) {
 
-      $console.html('デフォルト設定を利用しています');
-      d.resolve(conf);
+      $console.html('URLが設定されていません');
+      d.resolve(null);
 
     } else if ( confCache ) {
 
@@ -46,12 +48,13 @@
 
     } else {
 
-     var req = http.get(conf.url, function (res) {
+     var req = http.get(url, function (res) {
         if (res.statusCode == '200') {
           res.setEncoding('utf8');
           res.on('data', function (data) {
             data = JSON.parse(data);
             data = _.defaults(data, conf);
+            data.url = url;
 
             $console.html(data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました');
 
@@ -70,7 +73,7 @@
 
     }
 
-    return d.promise
+    return d.promise;
   };
 
   /**
@@ -78,36 +81,16 @@
    * @param {Object} c config object
    */
   function displayConfig(c) {
+    var d = Q.defer();
     if ( _.isObject(c) ) {
-      $config.append(configTmp(c));
+      $config.empty().append(configTmp(c));
+    } else {
+      $config.empty().append(settingTmp());
     }
+    d.resolve(c);
+    return d.promise;
   }
 
-  /**
-   * ドキュメントモードのチェック
-   */
-  function checkDocumentMode(c) {
-    var d = Q.defer();
-
-    if (conf.check.config.documentMode) {
-
-      JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var obj = (new Function("return " + result))();
-        if (_.isObject(obj)) {
-          $list.append(messageTmp(obj));
-        }
-        d.resolve(c);
-      });
-
-    } else {
-
-      d.resolve(c);
-
-    }
-
-      return d.promise
-  };
 
   /**
    * 単位チェック
@@ -135,6 +118,36 @@
     return d.promise
 
   };
+
+
+  /**
+   * ドキュメントモードのチェック
+   */
+  function checkDocumentMode(c) {
+    var d = Q.defer();
+
+    if (conf.check.config.documentMode) {
+
+      JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
+        //http://hamalog.tumblr.com/post/4047826621/json-javascript
+        var obj = (new Function("return " + result))();
+        if (_.isObject(obj) && obj.title) {
+          $list.append(messageTmp(obj));
+          d.resolve(c);
+        } else {
+          d.reject(c);
+        }
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+      return d.promise
+  };
+
 
   /**
    * ファイル名チェック
@@ -336,9 +349,9 @@
 
     Q.fcall(loadConfig)
      .then(displayConfig)
-     .done(function() {
-      $list.append(infoTmp());
-      $loader.hide();
+     .done(function(c) {
+        $list.append(infoTmp({conf: c}));
+        $loader.hide();
     });
 
   }
@@ -353,10 +366,15 @@
     $('#error-total').text(0);
     $('#warn-total').text(0);
     $('#hidden-total').text(0);
+    $loader.hide();
   }
 
 
+  /**
+   * Checkボタン押したとき
+   */
   $('.btn-check').on('click', function() {
+
     $list.empty();
     $config.hide();
     $loader.show();
@@ -364,13 +382,17 @@
     var start = $.now();
 
     Q.fcall(loadConfig)
-     .then(checkDocumentMode)
      .then(checkRulerUnits)
+     .then(checkDocumentMode)
      .then(checkFileName)
      .then(checkFileSize)
      .then(checkLayerComps)
      .then(checkDocumentRatio)
      .then(checkLayers)
+     .fail(function() {
+      countResult();
+      $loader.hide();
+    })
      .done(function() {
       displayResult(start);
       $loader.hide();
@@ -378,9 +400,39 @@
   });
 
 
+  /**
+   * Configボタン押したとき
+   */
   $('.btn-config').on('click', function() {
     $config.toggle();
   });
+
+
+  /**
+   * 設定ボタン押したとき
+   */
+  $('#config-container').on('click', '.js-btn-setting', function() {
+    var input_url = $('#input-config-url').val();
+
+    if ( _.isString(input_url) ) {
+      window.localStorage.setItem('com.cyberagent.designmagic:conf.url', input_url);
+      Q.fcall(loadConfig)
+       .then(displayConfig)
+       .done(function() {
+        $list.append(infoTmp());
+        $loader.hide();
+      });
+    }
+  })
+  .on('click', '.js-change-config-url', function() {
+      $config.empty().append(settingTmp());
+  })
+  .on('click', '.js-btn-cancel', function() {
+    if ( _.isObject(confCache) ) {
+      $config.empty().append(configTmp(confCache));
+    }
+  });
+
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
