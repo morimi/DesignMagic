@@ -36,7 +36,8 @@ var VALIDATION_MESSAGE = {
   NONAME : "命名されていません",
   BLENDMODE: "通常以外のモードに設定されています",
   FONT_ABSVALUE: "フォントサイズが整数ではありません",
-  FONT_MINSIZE : "フォントサイズが規定(<%= config.fonts.minSize %>px)より小さく設定されています"
+  FONT_MINSIZE : "フォントサイズが規定(<%= config.fonts.minSize %>px)より小さく設定されています",
+  FONT_EMPTY : "テキストレイヤーの内容がありません"
 };
 
 /**
@@ -108,15 +109,22 @@ function check(targets) {
 
       //文字の場合
       case LayerKind.TEXT:
-        //フォントサイズの整数を判定
-        //zoomツールで拡大縮小するとこのプロパティの値が正しくない
-        //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-        if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE === 'true') {
-          hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
-        }
 
-        if( target.textItem.size <  CONF_FONTS_MINSIZE) {
-          hint.push(VALIDATION_MESSAGE.FONT_MINSIZE);
+        if ( target.textItem.contents ) {
+          //フォントサイズの整数を判定
+          //zoomツールで拡大縮小するとこのプロパティの値が正しくない
+          //一旦レイヤーを削除して作り直さないと正しい値に戻らない
+          if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE === 'true') {
+            hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
+          }
+
+          if( target.textItem.size <  CONF_FONTS_MINSIZE) {
+            hint.push(VALIDATION_MESSAGE.FONT_MINSIZE);
+          }
+        } else {
+          //内容がないよう
+          hint.push(VALIDATION_MESSAGE.FONT_EMPTY);
+          type = VALIDATION_TYPE.ERROR;
         }
 
         break;
