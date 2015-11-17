@@ -8,9 +8,10 @@ try {
  * @param {string} title
  * @param {Array} hint
  * @param {string} type
+ * @param {string} kind LayerKind
  * @return {string} stringifyした文字列
  */
-function resultToString(title, hint, type) {
+function resultToString(title, hint, type, kind) {
   //return JSON.stringify(this.data); JSON使えないよ
 
   var text = '{title:"' + title + '", hint:[';
@@ -19,7 +20,9 @@ function resultToString(title, hint, type) {
     text += '"' + hint[i] + '"' + ',';
   }
   text = text.slice(0, -1); //末尾の , を切る
-  text += '], type:"' + type + '"}';
+  text += '], type:"' + type + '",'
+  text += 'kind: "' + kind + '",'
+  text += '}';
 
   return  text;
 
@@ -32,7 +35,8 @@ function resultToString(title, hint, type) {
 var VALIDATION_MESSAGE = {
   NONAME : "命名されていません",
   BLENDMODE: "通常以外のモードに設定されています",
-  FONTSIZE: "フォントサイズが整数ではありません"
+  FONT_ABSVALUE: "フォントサイズが整数ではありません",
+  FONT_MINSIZE : "フォントサイズが規定(<%= config.fonts.minSize %>px)より小さく設定されています"
 };
 
 /**
@@ -75,9 +79,11 @@ var h = 0;
 
 /**
  * 設定の値
- * フォントサイズが整数かどうかチェックする
  */
-var CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>";
+    //フォントサイズが整数かどうかチェックする
+var CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>",
+    //最小サイズ
+    CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>");
 
 
 /**
@@ -93,11 +99,12 @@ function check(targets) {
     var target = targets[i],
         name = target.name,
         hint = [],
-        type = VALIDATION_TYPE.WARN;
+        type = VALIDATION_TYPE.WARN,
+        kind = target.kind;
 
 
     //内容による分岐
-    switch ( target.kind ) {
+    switch ( kind ) {
 
       //文字の場合
       case LayerKind.TEXT:
@@ -105,7 +112,11 @@ function check(targets) {
         //zoomツールで拡大縮小するとこのプロパティの値が正しくない
         //一旦レイヤーを削除して作り直さないと正しい値に戻らない
         if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE === 'true') {
-          hint.push(VALIDATION_MESSAGE.FONTSIZE);
+          hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
+        }
+
+        if( target.textItem.size <  CONF_FONTS_MINSIZE) {
+          hint.push(VALIDATION_MESSAGE.FONT_MINSIZE);
         }
 
         break;
@@ -130,7 +141,7 @@ function check(targets) {
     h = (h + !target.visible)|0;
 
     if ( hint.length ) {
-      mes.push(resultToString(name, hint, type));
+      mes.push(resultToString(name, hint, type, (kind || target.typename)));
     }
 
     i = (i+1)|0;
