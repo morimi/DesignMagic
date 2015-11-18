@@ -262,9 +262,10 @@
   function checkLayers(c) {
     var d = Q.defer();
 
-    if (c.check.layers.name || c.check.layers.blendingMode) {
+    //この条件無限に増えそうな予感する
+    if (c.check.layers.name || c.check.layers.blendingMode || c.check.fonts.absValue) {
 
-      JSXRunner.runJSX("checkLayers", {config: c.check.layers}, function (result) {
+      JSXRunner.runJSX("checkLayers", {config: c.check}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
         var r = (new Function("return " + result))();
 

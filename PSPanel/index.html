@@ -54,7 +54,10 @@
   <li class="message" data-type="{{type}}">
     <div class="message-wrapper">
       <p class="message-title">
-        <img src="images/icon/{{type}}.png" width="14" height="14" class="icon {{type}}" alt="{{type}}">
+        <img src="images/icon/{{type}}.png" width="14" height="14" class="icon {{type}}">
+        {{#if kind}}
+        <img src="images/icon/{{kind}}.png" width="14" height="14" class="icon kind">
+        {{/if}}
         {{#if parent}}<span class="parent">[{{parent}}] </span>{{/if}}
         <span class="title">{{title}}</span>
       </p>
@@ -170,6 +173,15 @@
       </dl>
     {{/if}}
 
+    {{#if check.fonts}}
+      <table>
+       <caption>Fonts</caption>
+        <tr>
+          <th scope="row">フォントの数値に<br>整数が使用されているか</th>
+          <td>{{check.fonts.absValue}}</td>
+        </tr>
+      </table>
+    {{/if}}
 
     {{#if check.effects}}
       <table>

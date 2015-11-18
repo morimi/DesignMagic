@@ -24,8 +24,13 @@
 
     "layers": {
       "name": true,
-      "namingLevel": 1,
+      "namingLevel": 2,
       "blendingMode": true
+    },
+
+    "fonts": {
+      "absValue": true,
+      "minSize": 10
     },
 
     "effects": {
