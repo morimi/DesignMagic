@@ -73,7 +73,11 @@
 
 <script id="info-template" type="text/x-handlebars-template">
 <li class="validation-info">
-  Checkボタンを押すとバリデーションを実行します
+  {{#if conf.name}}
+    <p>Checkボタンを押すとバリデーションを実行します</p>
+  {{else}}
+    <p>上にあるConfigボタンを押して、<br>設定ファイルのURLを入力してください</p>
+  {{/if}}
 </li>
 </script>
 
@@ -89,10 +93,12 @@
         <th scope="row">Name</th>
         <td>{{name}}</td>
       </tr>
+      {{#if url}}
       <tr>
-        <th scope="row">URL</th>
+        <th scope="row">URL <a href="#" class="js-change-config-url">(変更)</a></th>
         <td>{{url}}</td>
       </tr>
+      {{/if}}
     </table>
 
     {{#if check.config}}
@@ -189,6 +195,20 @@
     </dl>
   </div>
 </script>
+
+<script id="setting-template" type="text/x-handlebars-template">
+  <div id="setting-list">
+    <div id="setting-form">
+     <p>ConfigファイルのURLを入力してください</p>
+      <p>URL:<input type="text" id="input-config-url" style="width:100%"></p>
+      <p>
+      <button class="js-btn-cancel" type="button">キャンセル</button>
+      <button class="js-btn-setting" type="button">設定する</button>
+      </p>
+    </div>
+  </div>
+</script>
+
 
   <script src="js/libs/CSInterface.js"></script>
   <script>
