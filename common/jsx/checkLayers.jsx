@@ -81,9 +81,13 @@ var h = 0;
 /**
  * 設定の値
  */
-    //フォントサイズが整数かどうかチェックする
-var CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>",
-    //最小サイズ
+    //命名 (boolean -> string)
+var CONF_LAYERS_NAME = "<%= config.layers.name %>" === 'true',
+    //ブレンドモード (boolean -> string)
+    CONF_LAYERS_BLENDMODE = "<%= config.layers.blendingMode %>" === 'true',
+    //フォントサイズが整数かどうかチェックする (boolean -> string)
+    CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>" === 'true',
+    //最小サイズ (number)
     CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>");
 
 
@@ -114,7 +118,7 @@ function check(targets) {
           //フォントサイズの整数を判定
           //zoomツールで拡大縮小するとこのプロパティの値が正しくない
           //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-          if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE === 'true') {
+          if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE) {
             hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
           }
 
@@ -132,7 +136,7 @@ function check(targets) {
       default:
 
         //命名
-        if ( nameRegex.test(name) ) {
+        if ( nameRegex.test(name) && CONF_LAYERS_NAME) {
           hint.push(VALIDATION_MESSAGE.NONAME);
         }
 
@@ -140,7 +144,7 @@ function check(targets) {
 
     //ブレンドモード（LayerSet以外をチェック）
     //※LayerSetはデフォが通過のためエラーとして判断してしまうため
-    if (target.typename !== 'LayerSet' && target.blendMode !== BlendMode.NORMAL) {
+    if (target.typename !== 'LayerSet' && target.blendMode !== BlendMode.NORMAL && CONF_LAYERS_BLENDMODE) {
       hint.push(VALIDATION_MESSAGE.BLENDMODE);
       type = VALIDATION_TYPE.ERROR;
     }

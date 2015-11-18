@@ -42,7 +42,7 @@
       $console.html('URLが設定されていません');
       d.resolve(null);
 
-    } else if ( confCache ) {
+    } else if ( confCache && confCache.url === url ) {
 
       d.resolve(confCache);
 
@@ -56,7 +56,7 @@
             data = _.defaults(data, conf);
             data.url = url;
 
-            $console.html(data.name+'の設定ファイル(v'+ data.version +')の取得に成功しました');
+            $console.html(data.name+'の設定ファイル取得に成功しました');
 
             confCache = data;
 
@@ -262,8 +262,7 @@
   function checkLayers(c) {
     var d = Q.defer();
 
-    //この条件無限に増えそうな予感する
-    if (c.check.layers.name || c.check.layers.blendingMode || c.check.fonts.absValue) {
+    if ( _.isObject(c.check.layers) && _.isObject(c.check.fonts) ) {
 
       JSXRunner.runJSX("checkLayers", {config: c.check}, function (result) {
         //http://hamalog.tumblr.com/post/4047826621/json-javascript
@@ -391,8 +390,6 @@
      .then(checkDocumentRatio)
      .then(checkLayers)
      .fail(function() {
-      displayResult();
-      $loader.hide();
     })
      .done(function() {
       displayResult(start);
@@ -419,8 +416,8 @@
       window.localStorage.setItem('com.cyberagent.designmagic:conf.url', input_url);
       Q.fcall(loadConfig)
        .then(displayConfig)
-       .done(function() {
-        $list.append(infoTmp());
+       .done(function(c) {
+        $list.empty().append(infoTmp({conf: c}));
         $loader.hide();
       });
     }
