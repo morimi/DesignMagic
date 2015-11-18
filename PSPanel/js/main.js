@@ -27,7 +27,8 @@
 
   var messageTmp = Handlebars.compile($('#message-template').html()),
       configTmp = Handlebars.compile($('#config-template').html()),
-      infoTmp = Handlebars.compile($('#info-template').html());
+      infoTmp = Handlebars.compile($('#info-template').html()),
+      consoleTmp = Handlebars.compile($('#console-template').html());
 
 
   // 設定ファイルを外部から取得する
@@ -247,7 +248,6 @@
    */
   function checkLayers(c) {
     var d = Q.defer();
-    var start = $.now();
 
     if (c.check.layers.name || c.check.layers.blendingMode) {
 
@@ -263,8 +263,6 @@
 
         $('#hidden-total').text(r.hidden);
 
-        console.log("checkLayers:" + Math.abs((start - $.now()) / 1000) + 's');
-        console.log('hidden: ' + r.hidden);
         d.resolve(c);
       });
 
@@ -282,23 +280,38 @@
   /**
    * エラー総数の表示
    */
-  function countResult(val){
+  function countResult(start){
 
     var errorNum = $list.find('.icon.error').length,
         warnNum  = $list.find('.icon.warn').length;
+
+    var content = {
+      time:  Math.abs((start - $.now()) / 1000) + 's',
+      message: null,
+      lv: 0
+    };
+
+    if (( errorNum > 30 ) || ( warnNum > 120 )) content.lv = 7;
+    else if (( errorNum > 20 ) || ( warnNum > 90 )) content.lv = 6;
+    else if  (( errorNum > 10 ) || ( warnNum > 60 )) content.lv = 5;
+    else if  (( errorNum > 5 ) || ( warnNum > 30 )) content.lv = 4;
+    else if  (( errorNum > 1 ) || ( warnNum > 20 )) content.lv = 3;
+    else if  ( warnNum > 10 ) content.lv = 2;
+    else if  ( warnNum > 0 )  content.lv = 1;
 
     //エラーカウント
     $('#error-total').text(errorNum);
     $('#warn-total').text(warnNum);
 
     if ( errorNum > 0 ) {
-      $console.html('<p>エラーの内容を確認してください...</p>');
+      content.message = 'エラーの内容を確認してください';
     } else if (warnNum > 0) {
-      $console.html('<p>いくつか注意点があるようです...</p>');
+      content.message = 'いくつか注意点があるようです...';
     } else {
-      $console.html('<p>╭( ･ㅂ･)و ̑̑ ｸﾞｯ</p>');
+      content.message = '╭( ･ㅂ･)و ̑̑ ｸﾞｯ';
     }
 
+    $console.empty().append(consoleTmp(content));
     console.log('╭( ･ㅂ･)و ̑̑ done!');
 
   }
@@ -335,6 +348,8 @@
     $config.hide();
     $loader.show();
 
+    var start = $.now();
+
     Q.fcall(loadConfig)
      .then(checkDocumentMode)
      .then(checkRulerUnits)
@@ -344,7 +359,7 @@
      .then(checkDocumentRatio)
      .then(checkLayers)
      .done(function() {
-      countResult();
+      countResult(start);
       $loader.hide();
     });
   });

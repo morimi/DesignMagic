@@ -175,6 +175,37 @@ body.light .message {
   color: #999;
 }
 
+.time {
+  margin-right: 2em;
+  background: #333;
+  color: #fff;
+  padding: .3rem .5rem;
+  border-radius: .3rem;
+}
+
+.lv1 {
+  color: aliceblue;
+}
+.lv2 {
+  color: #acffec
+}
+.lv3 {
+  color: #d5ff8b;
+}
+.lv4 {
+  color: #f8ff8b
+}
+.lv5 {
+  color: #ffd16e
+}
+.lv7 {
+  color: #ff7145
+}
+.lv8 {
+  background: red;
+  color: #fff;
+}
+
 body.darker .message-hint,
 body.dark .message-hint {
     color: #888888;

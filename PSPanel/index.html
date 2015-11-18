@@ -65,6 +65,12 @@
   </li>
 </script>
 
+
+<script id="console-template" type="text/x-handlebars-template">
+<p>{{#if time}}<span class="time lv{{lv}}">{{time}}</span>{{/if}}<span class="console-message">{{message}}</span></p>
+</script>
+
+
 <script id="info-template" type="text/x-handlebars-template">
 <li class="validation-info">
   Checkボタンを押すとバリデーションを実行します
