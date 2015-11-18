@@ -175,6 +175,7 @@ body.light .message {
   color: #999;
 }
 
+/* 計測時間 */
 .time {
   margin-right: 2em;
   background: #333;
@@ -183,6 +184,7 @@ body.light .message {
   border-radius: .3rem;
 }
 
+/* レベルカラーリング */
 .lv1 {
   color: aliceblue;
 }
