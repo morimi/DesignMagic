@@ -204,6 +204,17 @@
     <hr>
 
     <dl>
+      <dt>オプション</dt>
+      <dd>
+        <label class="topcoat-checkbox">
+          <input type="checkbox" class="js-is-autocheck">
+          <div class="topcoat-checkbox__checkmark"></div>
+          保存したとき自動でチェックする
+        </label>
+      </dd>
+    </dl>
+
+    <dl>
       <dt>アイコンの説明</dt>
       <dd><img src="images/icon/error.png" width="14" height="14" class="icon" alt=""> エラー（修正しないとヤバい）</dd>
       <dd><img src="images/icon/warn.png" width="14" height="14" class="icon" alt=""> 注意（修正が望ましい）</dd>
@@ -216,10 +227,10 @@
   <div id="setting-list">
     <div id="setting-form">
      <p>ConfigファイルのURLを入力してください</p>
-      <p>URL:<input type="text" id="input-config-url" style="width:100%"></p>
+      <p>URL:<input type="text" class="topcoat-text-input--large" id="input-config-url" style="width:100%"></p>
       <p>
-      <button class="js-btn-cancel" type="button">キャンセル</button>
-      <button class="js-btn-setting" type="button">設定する</button>
+      <button class="js-btn-cancel topcoat-button--large" type="button">キャンセル</button>
+      <button class="js-btn-setting topcoat-button--large" type="button">設定する</button>
       </p>
     </div>
   </div>
