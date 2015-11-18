@@ -27,7 +27,8 @@
 
   var messageTmp = Handlebars.compile($('#message-template').html()),
       configTmp = Handlebars.compile($('#config-template').html()),
-      infoTmp = Handlebars.compile($('#info-template').html());
+      infoTmp = Handlebars.compile($('#info-template').html()),
+      consoleTmp = Handlebars.compile($('#console-template').html());
 
 
   // 設定ファイルを外部から取得する
@@ -247,7 +248,6 @@
    */
   function checkLayers(c) {
     var d = Q.defer();
-    var start = $.now();
 
     if (c.check.layers.name || c.check.layers.blendingMode) {
 
@@ -263,8 +263,6 @@
 
         $('#hidden-total').text(r.hidden);
 
-        console.log("checkLayers:" + Math.abs((start - $.now()) / 1000) + 's');
-        console.log('hidden: ' + r.hidden);
         d.resolve(c);
       });
 
@@ -280,25 +278,53 @@
 
 
   /**
-   * エラー総数の表示
+   * エラーと注意の総数から罪の重さを量る
+   * @param {number} errorNum エラー総数
+   * @param {number} warnNum 注意総数
+   * @return {number} 0 - 7 （罪の重さを8段階で返す）
    */
-  function countResult(val){
+  function _calcGuilty(errorNum, warnNum) {
+    var g = 0;
+
+    if (( errorNum > 20 ) || ( warnNum > 120 )) g = 7;
+    else if (( errorNum > 15 ) || ( warnNum > 90 )) g = 6;
+    else if  (( errorNum > 10 ) || ( warnNum > 60 )) g = 5;
+    else if  (( errorNum > 5 ) || ( warnNum > 30 )) g = 4;
+    else if  (( errorNum > 1 ) || ( warnNum > 20 )) g = 3;
+    else if  ( warnNum > 10 ) g = 2;
+    else if  ( warnNum > 0 )  g = 1;
+
+    return g;
+  }
+
+
+  /**
+   * エラー・注意総数の表示、コンソールの表示
+   */
+  function displayResult(start){
 
     var errorNum = $list.find('.icon.error').length,
         warnNum  = $list.find('.icon.warn').length;
+
+    var content = {
+      time:  Math.abs((start - $.now()) / 1000) + 's',
+      message: null,
+      lv: _calcGuilty(errorNum, warnNum)
+    };
+
+    if ( errorNum > 0 ) {
+      content.message = 'エラーの内容を確認してください';
+    } else if (warnNum > 0) {
+      content.message = 'いくつか注意点があるようです...';
+    } else {
+      content.message = '╭( ･ㅂ･)و ̑̑ ｸﾞｯ';
+    }
 
     //エラーカウント
     $('#error-total').text(errorNum);
     $('#warn-total').text(warnNum);
 
-    if ( errorNum > 0 ) {
-      $console.html('<p>エラーの内容を確認してください...</p>');
-    } else if (warnNum > 0) {
-      $console.html('<p>いくつか注意点があるようです...</p>');
-    } else {
-      $console.html('<p>╭( ･ㅂ･)و ̑̑ ｸﾞｯ</p>');
-    }
-
+    $console.empty().append(consoleTmp(content));
     console.log('╭( ･ㅂ･)و ̑̑ done!');
 
   }
@@ -335,6 +361,8 @@
     $config.hide();
     $loader.show();
 
+    var start = $.now();
+
     Q.fcall(loadConfig)
      .then(checkDocumentMode)
      .then(checkRulerUnits)
@@ -344,7 +372,7 @@
      .then(checkDocumentRatio)
      .then(checkLayers)
      .done(function() {
-      countResult();
+      displayResult(start);
       $loader.hide();
     });
   });
