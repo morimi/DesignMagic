@@ -82,11 +82,13 @@
    */
   function displayConfig(c) {
     var d = Q.defer();
+
     if ( _.isObject(c) ) {
       $config.empty().append(configTmp(c));
     } else {
       $config.empty().append(settingTmp());
     }
+
     d.resolve(c);
     return d.promise;
   }
@@ -350,6 +352,7 @@
     Q.fcall(loadConfig)
      .then(displayConfig)
      .done(function(c) {
+        setEventListeners();
         $list.append(infoTmp({conf: c}));
         $loader.hide();
     });
@@ -367,14 +370,15 @@
     $('#warn-total').text(0);
     $('#hidden-total').text(0);
     $loader.hide();
+
   }
 
 
   /**
-   * Checkボタン押したとき
+   * Check
    */
-  $('.btn-check').on('click', function() {
 
+  function check() {
     $list.empty();
     $config.hide();
     $loader.show();
@@ -395,7 +399,26 @@
       displayResult(start);
       $loader.hide();
     });
-  });
+  }
+
+  function setEventListeners() {
+
+    //ドキュメント保存したときの自動チェック
+    var autocheck = window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true';
+
+    $('.js-is-autocheck').attr('checked', autocheck);
+
+    if ( autocheck ) {
+      csInterface.addEventListener( 'documentAfterSave' , check);
+    }
+
+  }
+
+
+  /**
+   * Checkボタン押したとき
+   */
+  $('.btn-check').on('click', check);
 
 
   /**
@@ -429,6 +452,17 @@
     if ( _.isObject(confCache) ) {
       $config.empty().append(configTmp(confCache));
     }
+  })
+  .on('change', '.js-is-autocheck', function() { //ドキュメント保存したときの自動チェック
+    var autocheck = $(this).is(':checked');
+
+    window.localStorage.setItem('com.cyberagent.designmagic:autocheck', autocheck);
+
+    if ( autocheck ) {
+      csInterface.addEventListener( 'documentAfterSave' , check);
+    } else {
+      csInterface.removeEventListener( 'documentAfterSave' , check);
+    }
   });
 
 
@@ -437,7 +471,6 @@
 
   //ドキュメント閉じた時
   csInterface.addEventListener( 'documentAfterDeactivate' , reset);
-
 
 
 }());
