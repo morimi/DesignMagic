@@ -401,6 +401,9 @@
     });
   }
 
+  /**
+   * csInterface イベントリスナーの設定
+   */
   function setEventListeners() {
 
     //ドキュメント保存したときの自動チェック
