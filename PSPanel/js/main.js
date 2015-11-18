@@ -391,7 +391,7 @@
      .then(checkDocumentRatio)
      .then(checkLayers)
      .fail(function() {
-      countResult();
+      displayResult();
       $loader.hide();
     })
      .done(function() {
