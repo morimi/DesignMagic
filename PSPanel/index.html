@@ -8,6 +8,7 @@
 <link  id="scrollbars" rel="stylesheet" href="css/scrollbars.css"/>
 
 <title></title>
+
 </head>
 
 <body class="hostElt">
@@ -16,14 +17,14 @@
     <div id="validation">
       <div id="title-container">
         <div class="panel-hd panel-header">
-          <img src="images/icon/error.png" width="14" height="14" class="icon" alt=""> <span id="error-total">0</span>
-          <img src="images/icon/warn.png" width="14" height="14" class="icon" alt=""> <span id="warn-total">0</span>
+          <img src="images/icon/dark/error.png" width="14" height="14" class="icon" alt=""> <span id="error-total">0</span>
+          <img src="images/icon/dark/warn.png" width="14" height="14" class="icon" alt=""> <span id="warn-total">0</span>
 
-          <img src="images/icon/eye.png" width="14" height="14" class="icon" alt=""> <span id="hidden-total">0</span>
+          <img src="images/icon/dark/eye.png" width="14" height="14" class="icon" alt=""> <span id="hidden-total">0</span>
           <div id="status">
 
           </div>
-          <img src="images/icon/loader.gif" alt="" id="icon-loader">
+          <img src="images/icon/dark/loader.gif" alt="" id="icon-loader">
           <div class="topcoat-button btn-check">
             Check
           </div>
@@ -54,9 +55,9 @@
   <li class="message" data-type="{{type}}">
     <div class="message-wrapper">
       <p class="message-title">
-        <img src="images/icon/{{type}}.png" width="14" height="14" class="icon {{type}}">
+        <img src="images/icon/{{theme}}/{{type}}.png" width="14" height="14" class="icon {{type}}">
         {{#if kind}}
-        <img src="images/icon/{{kind}}.png" width="14" height="14" class="icon kind">
+        <img src="images/icon/{{theme}}/{{kind}}.png" width="14" height="14" class="icon kind">
         {{/if}}
         {{#if parent}}<span class="parent">[{{parent}}] </span>{{/if}}
         <span class="title">{{title}}</span>
@@ -216,9 +217,9 @@
 
     <dl>
       <dt>アイコンの説明</dt>
-      <dd><img src="images/icon/error.png" width="14" height="14" class="icon" alt=""> エラー（修正しないとヤバい）</dd>
-      <dd><img src="images/icon/warn.png" width="14" height="14" class="icon" alt=""> 注意（修正が望ましい）</dd>
-      <dd><img src="images/icon/eye.png" width="14" height="14" class="icon" alt=""> 非表示レイヤー・グループの数</dd>
+      <dd><img src="images/icon/dark/error.png" width="14" height="14" class="icon" alt=""> エラー（修正しないとヤバい）</dd>
+      <dd><img src="images/icon/dark/warn.png" width="14" height="14" class="icon" alt=""> 注意（修正が望ましい）</dd>
+      <dd><img src="images/icon/dark/eye.png" width="14" height="14" class="icon" alt=""> 非表示レイヤー・グループの数</dd>
     </dl>
   </div>
 </script>

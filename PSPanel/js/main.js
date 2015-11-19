@@ -93,6 +93,18 @@
     return d.promise;
   }
 
+  /**
+   * string を objectに変換
+   * UIテーマ(dark, light)を追加する
+   * http://hamalog.tumblr.com/post/4047826621/json-javascript
+   * @param {string} str
+   * @return {Object}
+   */
+  function _stringToObject(str) {
+    var obj = (new Function("return " + str))();
+    obj.theme = themeManager.getThemeColorType();
+    return obj;
+  }
 
   /**
    * 単位チェック
@@ -103,8 +115,8 @@
     if (conf.check.config.rulerUnits) {
 
       JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
@@ -117,7 +129,7 @@
 
     }
 
-    return d.promise
+    return d.promise;
 
   };
 
@@ -131,8 +143,8 @@
     if (conf.check.config.documentMode) {
 
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj) && obj.title) {
           $list.append(messageTmp(obj));
           d.resolve(c);
@@ -147,7 +159,7 @@
 
     }
 
-      return d.promise
+      return d.promise;
   };
 
 
@@ -160,8 +172,8 @@
     if (_.isArray(conf.check.files.name)) {
 
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
@@ -188,8 +200,8 @@
     if ( _.isNumber(c.check.files.size) ) {
 
       JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-       var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
@@ -214,8 +226,8 @@
     if ( c.check.files.useLayerComps ) {
 
       JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-       var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
@@ -241,8 +253,8 @@
     if ( c.check.files.ratio ) {
 
       JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-       var obj = (new Function("return " + result))();
+
+        var obj = _stringToObject(result);
         if (_.isObject(obj)) {
           $list.append(messageTmp(obj));
         }
@@ -267,11 +279,12 @@
     if ( _.isObject(c.check.layers) && _.isObject(c.check.fonts) ) {
 
       JSXRunner.runJSX("checkLayers", {config: c.check}, function (result) {
-        //http://hamalog.tumblr.com/post/4047826621/json-javascript
-        var r = (new Function("return " + result))();
+
+        var r = _stringToObject(result);
 
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
+            obj.theme = r.theme;
             $list.prepend(messageTmp(obj));
           });
         }
