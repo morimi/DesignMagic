@@ -73,40 +73,6 @@ var themeManager = (function () {
 
       var $body = $("body");
 
-        var panelBgColor = appSkinInfo.panelBackgroundColor.color;
-        var bgdColor = toHex(panelBgColor);
-
-        var darkBgdColor =  toHex(panelBgColor, 20);
-
-        var fontColor = "F0F0F0";
-        if (panelBgColor.red > 122) {
-            fontColor = "000000";
-        }
-        var lightBgdColor = toHex(panelBgColor, -100);
-//
-        var styleId = "hostStyle";
-//
-        addRule(styleId, ".hostElt", "background-color:" + "#" + bgdColor);
-        addRule(styleId, ".hostElt", "font-size:" + appSkinInfo.baseFontSize + "px;");
-        addRule(styleId, ".hostElt", "font-family:" + appSkinInfo.baseFontFamily);
-        addRule(styleId, ".hostElt", "color:" + "#" + fontColor);
-
-        addRule(styleId, ".hostBgd", "background-color:" + "#" + bgdColor);
-        addRule(styleId, ".hostBgdDark", "background-color: " + "#" + darkBgdColor);
-        addRule(styleId, ".hostBgdLight", "background-color: " + "#" + lightBgdColor);
-        addRule(styleId, ".hostFontSize", "font-size:" + appSkinInfo.baseFontSize + "px;");
-        addRule(styleId, ".hostFontFamily", "font-family:" + appSkinInfo.baseFontFamily);
-        addRule(styleId, ".hostFontColor", "color:" + "#" + fontColor);
-
-        addRule(styleId, ".hostFont", "font-size:" + appSkinInfo.baseFontSize + "px;");
-        addRule(styleId, ".hostFont", "font-family:" + appSkinInfo.baseFontFamily);
-        addRule(styleId, ".hostFont", "color:" + "#" + fontColor);
-
-        addRule(styleId, ".hostButton", "background-color:" + "#" + darkBgdColor);
-        addRule(styleId, ".hostButton:hover", "background-color:" + "#" + bgdColor);
-        addRule(styleId, ".hostButton:active", "background-color:" + "#" + darkBgdColor);
-        addRule(styleId, ".hostButton", "border-color: " + "#" + lightBgdColor);
-
         var rgbBgColor = appSkinInfo.panelBackgroundColor.color,
         cssBgColor = "#" + toHex(rgbBgColor);
 
