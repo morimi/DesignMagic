@@ -50,55 +50,6 @@ hr {
 }
 
 
-#content {
-  margin-right:auto;
-  margin-left:auto;
-  vertical-align:middle;
-  width:100%;
-  height: 100%;
-}
-
-#validation {
-  height: 100%;
-}
-
-#title-container {
-  overflow: hidden;
-}
-
-#validation-container,
-#config-container {
-  height: calc(100% - 52px);
-}
-
-#config-container {
-  display: none;
-  position: absolute;
-  top:28px;
-  left:0;
-  width: 100%;
-}
-
-#message-list,
-#config-list,
-#setting-list {
-  overflow: hidden;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 100%;
-  overflow-y: scroll;
-  background: #464646;
-}
-
-#footer-container {
-}
-
-#console {
-  font-size: 9px;
-}
-
-
 table {
   border-collapse: collapse;
   border: solid 1px #666;
@@ -139,21 +90,127 @@ dd {
 }
 
 
+/* body>#content */
+#content {
+  margin-right:auto;
+  margin-left:auto;
+  vertical-align:middle;
+  width:100%;
+  height: 100%;
+}
 
+/*
+ #content>#validation
+*/
+#validation {
+  height: 100%;
+}
+
+/*
+ Header
+ #validation>#title-container
+*/
+#title-container {
+  overflow: hidden;
+}
+
+body.darker #title-container {
+  border-bottom: 1px solid #000;
+}
+
+
+/*
+ #validation>#validation-container
+ #validation>#config-container
+*/
+#validation-container,
+#config-container {
+  height: calc(100% - 52px);
+}
+
+#config-container {
+  display: none;
+  position: absolute;
+  top:29px;
+  left:0;
+  width: 100%;
+}
+
+/*
+ #validation-container>#message-list
+ #config-container>#config-list
+ #config-container>#setting-list
+*/
+
+.list {
+  overflow: hidden;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  overflow-y: scroll;
+  background: #464646;
+}
+
+body.darker .list{
+  background: #2b2b2b;
+}
+
+body.light .list{
+  background: #a4a4a4;
+}
+
+body.lighter .list{
+  background: #c6c6c6;
+}
+
+/*
+  #validation>#footer-container
+*/
+#footer-container {
+}
+
+body.darker #footer-container {
+  border-top: 1px solid #000;
+}
+
+body.light #footer-container {
+  border-top: 1px solid #7f7f7f;
+}
+
+body.light #footer-container {
+  border-top: 1px solid #9e9e9e;
+}
+9e9e9e
+/*
+ #footer-container>#console
+*/
+
+#console {
+  font-size: 9px;
+}
+
+/*
+ valiation result message
+*/
 .message {
   display: block;
   border-bottom: 1px solid #383838;
   background: #535353;
 }
 
-body.darker .message,
-body.dark .message {
-  border-bottom-color: #383838;
-}
 
-body.lighter .message,
+body.darker .message {
+  background: #343434;
+  border-bottom-color: #111;
+}
 body.light .message {
-  border-bottom-color: #222222;
+  background: #b8b8b8;
+  border-bottom-color: #7f7f7f;
+}
+body.lighter .message {
+  background: #d6d6d6;
+  border-bottom-color: #9e9e9e;
 }
 
 .message-wrapper {
@@ -178,6 +235,10 @@ body.light .message {
   text-align: center;
   font-size: 10px;
   color: #999;
+}
+
+body.light .validation-info {
+  color: #404040
 }
 
 /* 計測時間 */
