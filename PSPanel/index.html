@@ -78,9 +78,9 @@
 <script id="info-template" type="text/x-handlebars-template">
 <li class="validation-info">
   {{#if conf.name}}
-    <p>Checkボタンを押すとバリデーションを実行します</p>
+    <p>{{Strings.Pr_READY_TO_VALIDATION}}</p>
   {{else}}
-    <p>上にあるConfigボタンを押して、<br>設定ファイルのURLを入力してください</p>
+    <p>{{Strings.Pr_SETTING_TO_URL}}</p>
   {{/if}}
 </li>
 </script>
@@ -88,7 +88,7 @@
 <script id="config-template" type="text/x-handlebars-template">
   <div id="config-list" class="list">
     <table>
-     <caption>設定</caption>
+     <caption>{{Strings.Pr_TITLE_CONFIG}}</caption>
       <tr>
         <th scope="row">Version</th>
         <td>{{version}}</td>
@@ -109,19 +109,19 @@
       <table>
        <caption>Config</caption>
         <tr>
-          <th scope="row">規定のカラーモードであるか</th>
+          <th scope="row">{{Strings.Pr_CONFIG_DOCUMENT_MODE}}</th>
           <td>{{check.config.documentMode}}</td>
         </tr>
         <tr>
-          <th scope="row">規定のカラーモード</th>
+          <th scope="row">{{Strings.Pr_CONFIG_DOCUMENT_MODE_TYPE}}</th>
           <td>{{check.config.documentModeType}}</td>
         </tr>
         <tr>
-          <th scope="row">規定の単位であるかチェックする</th>
+          <th scope="row">{{Strings.Pr_CONFIG_RULER_UNITS}}</th>
           <td>{{check.config.rulerUnits}}</td>
         </tr>
         <tr>
-          <th scope="row">規定の単位</th>
+          <th scope="row">{{Strings.Pr_CONFIG_RULER_UNITS_TYPE}}</th>
           <td>{{check.config.rulserUnitsType}}</td>
         </tr>
       </table>

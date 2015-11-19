@@ -13,7 +13,9 @@
       Q           = require("Q"),
       http        = require('http'),
       JSXRunner   = require("../common/JSXRunner"),
+      Strings     = require("./js/LocStrings"),
       conf   = require("../conf.json");
+
 
   //conf cache
   var confCache = null;
@@ -55,6 +57,7 @@
             data = JSON.parse(data);
             data = _.defaults(data, conf);
             data.url = url;
+            data.Strings = Strings;
 
             $console.html(data.name+'の設定ファイル取得に成功しました');
 
@@ -94,7 +97,7 @@
   }
 
   /**
-   * string を objectに変換
+   * string を テンプレート用のobjectに変換
    * UIテーマ(dark, light)を追加する
    * http://hamalog.tumblr.com/post/4047826621/json-javascript
    * @param {string} str
@@ -102,7 +105,12 @@
    */
   function _stringToObject(str) {
     var obj = (new Function("return " + str))();
-    obj.theme = themeManager.getThemeColorType();
+
+    obj = _.extend({
+        theme: themeManager.getThemeColorType(),
+        Strings: Strings
+     }, obj || {});
+
     return obj;
   }
 
@@ -366,7 +374,7 @@
      .then(displayConfig)
      .done(function(c) {
         setEventListeners();
-        $list.append(infoTmp({conf: c}));
+        $list.append(infoTmp({conf: c, Strings: Strings}));
         $loader.hide();
     });
 
@@ -377,7 +385,7 @@
    */
   function reset() {
     $config.hide();
-    $list.empty().append(infoTmp());
+    $list.empty().append(infoTmp({Strings: Strings}));
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
