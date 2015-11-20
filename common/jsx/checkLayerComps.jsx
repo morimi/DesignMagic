@@ -15,19 +15,19 @@ if (documents.length > 0 ) {
       }
     }
 
-    if ( n !== undefined ) {
+    if ( n !== undefined ) { //valid
 
-      '{title: "レイヤーカンプが設定されています", hint: ["「' + n + '」が選択されています"], type: "valid"}';
+      '{value: "' + n + '", type: "valid"}';
 
-    } else {
+    } else { //選択されてない
 
-      '{title: "レイヤーカンプが設定されています", hint: ["選択中のレイヤーカンプがありません"], type: "valid"}';
+      '{value: "0", type: "valid"}';
 
     }
 
   } else {
 
-    '{title: "レイヤーカンプが設定されていません", hint: ["「レイヤーカンプ」パネルで設定できます"], type: "warn"}';
+    '{value: "0", type: "warn"}';
 
   }
 }

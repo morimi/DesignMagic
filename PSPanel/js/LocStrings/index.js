@@ -31,7 +31,6 @@ function formatStr(str) {
     // arguments[0] is the base string, so we need to adjust index values here
     var args = [].slice.call(arguments, 1);
     return str.replace(/\{(\d+)\}/g, function (match, num) {
-      console.log(str, match, num, args[num])
         return typeof args[num] !== "undefined" ? args[num] : match;
     });
 }

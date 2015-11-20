@@ -13,8 +13,7 @@
       Q           = require("Q"),
       http        = require('http'),
       JSXRunner   = require("../common/JSXRunner"),
-      Strings     = require("./js/LocStrings"),
-      conf   = require("../conf.json");
+      Strings     = require("./js/LocStrings");
 
 
   //conf cache
@@ -33,6 +32,15 @@
       consoleTmp = Handlebars.compile($('#console-template').html()),
       settingTmp = Handlebars.compile($('#setting-template').html());
 
+  var RULERUNITS_LABEL = {
+    CM: 'cm',
+    INCHES: 'inch',
+    MM: 'mm',
+    PERCENT: '%',
+    PICAS: 'pica',
+    POINTS: 'pt',
+    PIXELS: 'px'
+  };
 
   // 設定ファイルを外部から取得する
   function loadConfig() {
@@ -55,7 +63,6 @@
           res.setEncoding('utf8');
           res.on('data', function (data) {
             data = JSON.parse(data);
-            data = _.defaults(data, conf);
             data.url = url;
             data.Strings = Strings;
 
@@ -69,6 +76,7 @@
       });
 
       req.on('error', function (res) {
+        var conf   = require("../conf.json")
         $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
         confCache = conf;
         d.resolve(conf);
@@ -96,7 +104,11 @@
       $config.empty().append(configTmp(c));
 
     } else {
-      $config.empty().append(settingTmp());
+
+      $config.empty().append(settingTmp({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }));
     }
 
     d.resolve(c);
@@ -121,15 +133,16 @@
     return obj;
   }
 
-var LABEL = {
-  CM: 'cm',
-  INCHES: 'inch',
-  MM: 'mm',
-  PERCENT: '%',
-  PICAS: 'pica',
-  POINTS: 'pt',
-  PIXELS: 'px'
-};
+
+  /**
+   * LocalStrings通したバリデーションメッセージ作成
+   * @param {string} rule 'RULERUNITS' 全部大文字のルール
+   * @param {string} type 'error','valid','warn'
+   */
+  function _getValidationMessage(rule, type) {
+    return Strings['Pr_' + type.toUpperCase() + '_' + rule];
+  }
+
 
   /**
    * 単位チェック
@@ -137,21 +150,24 @@ var LABEL = {
   function checkRulerUnits(c) {
     var d = Q.defer();
 
-    if (conf.check.config.rulerUnits) {
+    if (c.check.config.rulerUnits) {
 
-      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config, Strings: Strings}, function (result) {
+      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
 
-        var obj = _stringToObject(result);
+        var obj = _stringToObject(result),
+            label =  RULERUNITS_LABEL[c.check.config.rulserUnitsType],
+            unit = RULERUNITS_LABEL[obj.value.replace('Units.', '')];
 
         if (_.isObject(obj)) {
-          obj.title = Strings.formatStr(Strings['Pr_' + obj.type.toUpperCase() + '_RULERUNITS'], LABEL[c.check.config.rulserUnitsType]);
+          obj.title = Strings.formatStr(_getValidationMessage('RULERUNITS', obj.type), unit);
 
           if ( obj.type === 'error') {
-            obj.hint = Strings.formatStr(Strings.Pr_HINT_RULERUNITS, LABEL[c.check.config.rulserUnitsType]);
+            obj.hint = [_getValidationMessage('RULERUNITS', 'hint', label)];
           }
 
           $list.append(messageTmp(obj));
         }
+
         d.resolve(c);
       });
 
@@ -165,21 +181,28 @@ var LABEL = {
 
   };
 
-
   /**
    * ドキュメントモードのチェック
    */
   function checkDocumentMode(c) {
     var d = Q.defer();
 
-    if (conf.check.config.documentMode) {
+    if (c.check.config.documentMode) {
 
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj) && obj.title) {
+        if (_.isObject(obj) && obj.type) {
+          obj.value = obj.value.replace("DocumentMode.","");
+          obj.title = Strings.formatStr(_getValidationMessage('DOCUMENTMODE', obj.type), obj.value);
+
+          if ( obj.type === 'error' ) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTMODE', 'hint'), label)];
+          }
+
           $list.append(messageTmp(obj));
           d.resolve(c);
+
         } else {
           d.reject(c);
         }
@@ -201,12 +224,18 @@ var LABEL = {
   function checkFileName(c) {
     var d = Q.defer();
 
-    if (_.isArray(conf.check.files.name)) {
-
+    if (_.isArray(c.check.files.name)) {
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type ) {
+
+          obj.title = _getValidationMessage('DOCUMENTNAME', obj.type);
+
+          if ( obj.type === 'error' ) {
+            obj.hint = [_getValidationMessage('DOCUMENTNAME', 'hint')];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -234,9 +263,18 @@ var LABEL = {
       JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type) {
+
+          obj.title = Strings.formatStr(_getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
+
+          if ( obj.type !== 'valid' ) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
+          }
+
           $list.append(messageTmp(obj));
+
         }
+
         d.resolve(c);
       });
 
@@ -261,6 +299,19 @@ var LABEL = {
 
         var obj = _stringToObject(result);
         if (_.isObject(obj)) {
+          var value = parseInt(obj.value);
+
+          obj.title = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'valid'), obj.value)];
+
+
+          if ( 0 < value ) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'validhint'), obj.value)];
+          } else if (obj.type === 'valid' && !value) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
+          } else {
+            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'warn'), obj.value)];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -287,7 +338,14 @@ var LABEL = {
       JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type ) {
+          var unit =  RULERUNITS_LABEL[c.check.config.rulserUnitsType];
+          obj.title = _getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
+
+          if ( obj.type === 'error') {
+            obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -489,16 +547,17 @@ var LABEL = {
       Q.fcall(loadConfig)
        .then(displayConfig)
        .done(function(c) {
-        $list.empty().append(infoTmp({conf: c}));
+        $list.empty().append(infoTmp({conf: c, Strings:Strings}));
         $loader.hide();
       });
     }
   })
   .on('click', '.js-change-config-url', function() {
-      $config.empty().append(settingTmp());
+      $config.empty().append(settingTmp({Strings:Strings}));
   })
   .on('click', '.js-btn-cancel', function() {
     if ( _.isObject(confCache) ) {
+      confCache.Strings = Strings;
       $config.empty().append(configTmp(confCache));
     }
   })

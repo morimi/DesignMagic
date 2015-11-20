@@ -7,10 +7,10 @@ try {
 
 if (preferences.rulerUnits !== Units["<%= config.rulserUnitsType %>"] ) {
 
-  '{unit: "' + preferences.rulerUnits + '", type: "error"}';
+  '{value: "' + preferences.rulerUnits + '", type: "error"}';
 
 } else {
-  '{unit: "' + preferences.rulerUnits + '", type: "valid"}';
+  '{value: "' + preferences.rulerUnits + '", type: "valid"}';
 }
 
 } catch(e) {
