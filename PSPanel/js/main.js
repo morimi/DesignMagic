@@ -41,7 +41,7 @@
 
     if (!url) {
 
-      $console.html('URLが設定されていません');
+      $console.html(Strings.Pr_MESSAGE_NOT_SETTING_URL);
       d.resolve(null);
 
     } else if ( confCache && confCache.url === url ) {
@@ -59,7 +59,7 @@
             data.url = url;
             data.Strings = Strings;
 
-            $console.html(data.name+'の設定ファイル取得に成功しました');
+            $console.html(Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
 
             confCache = data;
 
@@ -69,7 +69,7 @@
       });
 
       req.on('error', function (res) {
-        $console.html('デフォルト設定を利用しています');
+        $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
         confCache = conf;
         d.resolve(conf);
       });
@@ -87,7 +87,14 @@
     var d = Q.defer();
 
     if ( _.isObject(c) ) {
+
+      c = _.extend({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }, c );
+
       $config.empty().append(configTmp(c));
+
     } else {
       $config.empty().append(settingTmp());
     }
@@ -114,6 +121,16 @@
     return obj;
   }
 
+var LABEL = {
+  CM: 'cm',
+  INCHES: 'inch',
+  MM: 'mm',
+  PERCENT: '%',
+  PICAS: 'pica',
+  POINTS: 'pt',
+  PIXELS: 'px'
+};
+
   /**
    * 単位チェック
    */
@@ -122,10 +139,17 @@
 
     if (conf.check.config.rulerUnits) {
 
-      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
+      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config, Strings: Strings}, function (result) {
 
         var obj = _stringToObject(result);
+
         if (_.isObject(obj)) {
+          obj.title = Strings.formatStr(Strings['Pr_' + obj.type.toUpperCase() + '_RULERUNITS'], LABEL[c.check.config.rulserUnitsType]);
+
+          if ( obj.type === 'error') {
+            obj.hint = Strings.formatStr(Strings.Pr_HINT_RULERUNITS, LABEL[c.check.config.rulserUnitsType]);
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -349,11 +373,13 @@
     };
 
     if ( errorNum > 0 ) {
-      content.message = 'エラーの内容を確認してください';
+      //エラーの内容を確認してください
+      content.message = Strings.Pr_MESSAGE_CHECK_ERROR;
     } else if (warnNum > 0) {
-      content.message = 'いくつか注意点があるようです...';
+      //いくつか注意点があるようです
+      content.message = Strings.Pr_MESSAGE_CHECK_WARN;
     } else {
-      content.message = '╭( ･ㅂ･)و ̑̑ ｸﾞｯ';
+      content.message = Strings.Pr_MESSAGE_CHECK_SUCCESS;
     }
 
     //エラーカウント
@@ -361,7 +387,6 @@
     $('#warn-total').text(warnNum);
 
     $console.empty().append(consoleTmp(content));
-    console.log('╭( ･ㅂ･)و ̑̑ done!');
 
   }
 
