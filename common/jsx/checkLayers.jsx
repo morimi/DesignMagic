@@ -67,9 +67,9 @@ var layers = [];
  * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
  */
 var NAME_REGEX = {
-  0 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_0 %>'),
-  1 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_1 %>'),
-  2 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_2 %>')
+  0 : /<%= Strings.Pr_LAYER_NAME_REGEX_0 %>/,
+  1 : /<%= Strings.Pr_LAYER_NAME_REGEX_1 %>/,
+  2 : /<%= Strings.Pr_LAYER_NAME_REGEX_2 %>/
 };
 
 
@@ -113,18 +113,22 @@ function check(targets) {
 
       //文字の場合
       case LayerKind.TEXT:
+        var textItem = target.textItem;
 
-        if ( target.textItem.contents ) {
+        if ( textItem.contents ) {
+          var size = textItem.size.value;
+
           //フォントサイズの整数を判定
           //zoomツールで拡大縮小するとこのプロパティの値が正しくない
           //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-          if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE) {
+          if ( /\./.test(size) && CONF_FONTS_ABSVALUE) {
             hint.push(VALIDATION_HINT.FONT_ABSVALUE);
           }
 
-          if( target.textItem.size <  CONF_FONTS_MINSIZE) {
+          if( size <  CONF_FONTS_MINSIZE) {
             hint.push(VALIDATION_HINT.FONT_MINSIZE);
           }
+
         } else {
           //内容がないよう
           hint.push(VALIDATION_HINT.FONT_EMPTY);
