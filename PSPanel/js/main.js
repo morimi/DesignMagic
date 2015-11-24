@@ -368,12 +368,13 @@
 
     if ( _.isObject(c.check.layers) && _.isObject(c.check.fonts) ) {
 
-      JSXRunner.runJSX("checkLayers", {config: c.check}, function (result) {
+      JSXRunner.runJSX("checkLayers", {config: c.check, Strings: Strings}, function (result) {
 
         var r = _stringToObject(result);
 
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
+            console.log(obj.regex)
             obj.theme = r.theme;
 
             _.each(obj.hint, function(h, i) {

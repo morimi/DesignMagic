@@ -67,9 +67,9 @@ var layers = [];
  * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
  */
 var NAME_REGEX = {
-  0 : /グループ(\s\d+)*|レイヤー(\s\d+)*|のコピー(\s\d+)*/,
-  1 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/,
-  2 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/
+  0 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_0 %>'),
+  1 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_1 %>'),
+  2 : new RegExp('<%= Strings.Pr_LAYER_NAME_REGEX_2 %>')
 };
 
 
