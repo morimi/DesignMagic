@@ -30,14 +30,14 @@ function resultToString(title, hint, type, kind) {
 
 
 /**
- * メッセージ
+ * メッセージ用コード
  */
-var VALIDATION_MESSAGE = {
-  NONAME : "命名されていません",
-  BLENDMODE: "通常以外のモードに設定されています",
-  FONT_ABSVALUE: "フォントサイズが整数ではありません",
-  FONT_MINSIZE : "フォントサイズが規定(<%= config.fonts.minSize %>px)より小さく設定されています",
-  FONT_EMPTY : "テキストレイヤーの内容がありません"
+var VALIDATION_HINT = {
+  NONAME : "NONAME",
+  BLENDMODE: "BLENDMODE",
+  FONT_ABSVALUE: "FONT_ABSVALUE",
+  FONT_MINSIZE : "FONT_MINSIZE",
+  FONT_EMPTY : "FONT_EMPTY"
 };
 
 /**
@@ -119,15 +119,15 @@ function check(targets) {
           //zoomツールで拡大縮小するとこのプロパティの値が正しくない
           //一旦レイヤーを削除して作り直さないと正しい値に戻らない
           if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE) {
-            hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
+            hint.push(VALIDATION_HINT.FONT_ABSVALUE);
           }
 
           if( target.textItem.size <  CONF_FONTS_MINSIZE) {
-            hint.push(VALIDATION_MESSAGE.FONT_MINSIZE);
+            hint.push(VALIDATION_HINT.FONT_MINSIZE);
           }
         } else {
           //内容がないよう
-          hint.push(VALIDATION_MESSAGE.FONT_EMPTY);
+          hint.push(VALIDATION_HINT.FONT_EMPTY);
           type = VALIDATION_TYPE.ERROR;
         }
 
@@ -137,7 +137,7 @@ function check(targets) {
 
         //命名
         if ( nameRegex.test(name) && CONF_LAYERS_NAME) {
-          hint.push(VALIDATION_MESSAGE.NONAME);
+          hint.push(VALIDATION_HINT.NONAME);
         }
 
     }
@@ -145,7 +145,7 @@ function check(targets) {
     //ブレンドモード（LayerSet以外をチェック）
     //※LayerSetはデフォが通過のためエラーとして判断してしまうため
     if (target.typename !== 'LayerSet' && target.blendMode !== BlendMode.NORMAL && CONF_LAYERS_BLENDMODE) {
-      hint.push(VALIDATION_MESSAGE.BLENDMODE);
+      hint.push(VALIDATION_HINT.BLENDMODE);
       type = VALIDATION_TYPE.ERROR;
     }
 

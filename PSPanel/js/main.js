@@ -375,6 +375,18 @@
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
             obj.theme = r.theme;
+
+            _.each(obj.hint, function(h, i) {
+              switch(h) {
+                case 'FONT_MINSIZE':
+                  obj.hint[i] = Strings.formatStr(_getValidationMessage(h + '_LAYERS', 'hint'), c.check.fonts.minSize + RULERUNITS_LABEL[c.check.config.rulserUnitsType]);
+                  break;
+                default:
+                  obj.hint[i] = _getValidationMessage(h + '_LAYERS', 'hint');
+              }
+
+            });
+
             $list.prepend(messageTmp(obj));
           });
         }
