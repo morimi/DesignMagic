@@ -374,7 +374,6 @@
 
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
-            console.log(obj.regex)
             obj.theme = r.theme;
 
             _.each(obj.hint, function(h, i) {
