@@ -480,7 +480,7 @@
    */
   function reset() {
     $config.hide();
-    $list.empty().append(infoTmp({Strings: Strings}));
+    $list.empty().append(infoTmp({conf: confCache, Strings: Strings}));
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
