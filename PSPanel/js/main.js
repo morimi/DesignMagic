@@ -102,7 +102,9 @@
    */
   function _stringToObject(str) {
     var obj = (new Function("return " + str))();
-    obj.theme = themeManager.getThemeColorType();
+    if ( _.isObject(obj) ) {
+      obj.theme = themeManager.getThemeColorType();
+    }
     return obj;
   }
 
