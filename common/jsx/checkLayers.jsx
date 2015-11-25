@@ -116,17 +116,26 @@ function check(targets) {
         var textItem = target.textItem;
 
         if ( textItem.contents ) {
-          var size = textItem.size.value;
 
-          //フォントサイズの整数を判定
-          //zoomツールで拡大縮小するとこのプロパティの値が正しくない
-          //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-          if ( /\./.test(size) && CONF_FONTS_ABSVALUE) {
-            hint.push(VALIDATION_HINT.FONT_ABSVALUE);
-          }
+          try {
+            var size = textItem.size.value;
 
-          if( size <  CONF_FONTS_MINSIZE) {
-            hint.push(VALIDATION_HINT.FONT_MINSIZE);
+            //フォントサイズの整数を判定
+            //zoomツールで拡大縮小するとこのプロパティの値が正しくない
+            //一旦レイヤーを削除して作り直さないと正しい値に戻らない
+            if ( /\./.test(size) && CONF_FONTS_ABSVALUE) {
+              hint.push(VALIDATION_HINT.FONT_ABSVALUE);
+            }
+
+            if( size <  CONF_FONTS_MINSIZE) {
+              hint.push(VALIDATION_HINT.FONT_MINSIZE);
+            }
+          } catch(e) {
+            //fontsize 12（初期設定）でテキストレイヤーを作った場合
+            //textItem.sizeの値に何かが起きる模様（setterがバグってる？）
+            //一度フォントサイズを操作すればエラーは出なくなるが、そのままだと
+            //textItem.sizeとソースに書いただけで↓のエラーが出るため、tryで無かったことにする
+            //INFO:CONSOLE(2)] "Uncaught SyntaxError: Unexpected token ILLEGAL"
           }
 
         } else {
