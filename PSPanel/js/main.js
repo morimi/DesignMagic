@@ -301,15 +301,11 @@
         if (_.isObject(obj)) {
           var value = parseInt(obj.value);
 
-          obj.title = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'valid'), obj.value)];
+          obj.title = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
 
 
-          if ( 0 < value ) {
-            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'validhint'), obj.value)];
-          } else if (obj.type === 'valid' && !value) {
+          if (obj.type === 'valid' && !value) {
             obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
-          } else {
-            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'warn'), obj.value)];
           }
 
           $list.append(messageTmp(obj));
