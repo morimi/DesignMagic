@@ -579,6 +579,10 @@
     } else {
       csInterface.removeEventListener( 'documentAfterSave' , check);
     }
+  })
+  .on('click', '.js-btn-reset', function () {
+    window.localStorage.clear();
+    $config.empty().append(settingTmp({Strings:Strings}));
   });
 
 
