@@ -13,7 +13,8 @@
       Q           = require("Q"),
       http        = require('http'),
       JSXRunner   = require("../common/JSXRunner"),
-      conf   = require("../conf.json");
+      Strings     = require("./js/LocStrings");
+
 
   //conf cache
   var confCache = null;
@@ -31,6 +32,15 @@
       consoleTmp = Handlebars.compile($('#console-template').html()),
       settingTmp = Handlebars.compile($('#setting-template').html());
 
+  var RULERUNITS_LABEL = {
+    CM: 'cm',
+    INCHES: 'inch',
+    MM: 'mm',
+    PERCENT: '%',
+    PICAS: 'pica',
+    POINTS: 'pt',
+    PIXELS: 'px'
+  };
 
   // 設定ファイルを外部から取得する
   function loadConfig() {
@@ -39,7 +49,7 @@
 
     if (!url) {
 
-      $console.html('URLが設定されていません');
+      $console.html(Strings.Pr_MESSAGE_NOT_SETTING_URL);
       d.resolve(null);
 
     } else if ( confCache && confCache.url === url ) {
@@ -53,10 +63,10 @@
           res.setEncoding('utf8');
           res.on('data', function (data) {
             data = JSON.parse(data);
-            data = _.defaults(data, conf);
             data.url = url;
+            data.Strings = Strings;
 
-            $console.html(data.name+'の設定ファイル取得に成功しました');
+            $console.html(Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
 
             confCache = data;
 
@@ -66,7 +76,8 @@
       });
 
       req.on('error', function (res) {
-        $console.html('デフォルト設定を利用しています');
+        var conf   = require("../conf.json")
+        $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
         confCache = conf;
         d.resolve(conf);
       });
@@ -84,9 +95,20 @@
     var d = Q.defer();
 
     if ( _.isObject(c) ) {
+
+      c = _.extend({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }, c );
+
       $config.empty().append(configTmp(c));
+
     } else {
-      $config.empty().append(settingTmp());
+
+      $config.empty().append(settingTmp({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }));
     }
 
     d.resolve(c);
@@ -94,7 +116,7 @@
   }
 
   /**
-   * string を objectに変換
+   * string を テンプレート用のobjectに変換
    * UIテーマ(dark, light)を追加する
    * http://hamalog.tumblr.com/post/4047826621/json-javascript
    * @param {string} str
@@ -102,11 +124,25 @@
    */
   function _stringToObject(str) {
     var obj = (new Function("return " + str))();
-    if ( _.isObject(obj) ) {
-      obj.theme = themeManager.getThemeColorType();
-    }
+
+    obj = _.extend({
+        theme: themeManager.getThemeColorType(),
+        Strings: Strings
+     }, obj || {});
+
     return obj;
   }
+
+
+  /**
+   * LocalStrings通したバリデーションメッセージ作成
+   * @param {string} rule 'RULERUNITS' 全部大文字のルール
+   * @param {string} type 'error','valid','warn'
+   */
+  function _getValidationMessage(rule, type) {
+    return Strings['Pr_' + type.toUpperCase() + '_' + rule];
+  }
+
 
   /**
    * 単位チェック
@@ -114,14 +150,24 @@
   function checkRulerUnits(c) {
     var d = Q.defer();
 
-    if (conf.check.config.rulerUnits) {
+    if (c.check.config.rulerUnits) {
 
       JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
 
-        var obj = _stringToObject(result);
+        var obj = _stringToObject(result),
+            label =  RULERUNITS_LABEL[c.check.config.rulserUnitsType],
+            unit = RULERUNITS_LABEL[obj.value.replace('Units.', '')];
+
         if (_.isObject(obj)) {
+          obj.title = Strings.formatStr(_getValidationMessage('RULERUNITS', obj.type), unit);
+
+          if ( obj.type === 'error') {
+            obj.hint = [_getValidationMessage('RULERUNITS', 'hint', label)];
+          }
+
           $list.append(messageTmp(obj));
         }
+
         d.resolve(c);
       });
 
@@ -135,21 +181,28 @@
 
   };
 
-
   /**
    * ドキュメントモードのチェック
    */
   function checkDocumentMode(c) {
     var d = Q.defer();
 
-    if (conf.check.config.documentMode) {
+    if (c.check.config.documentMode) {
 
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj) && obj.title) {
+        if (_.isObject(obj) && obj.type) {
+          obj.value = obj.value.replace("DocumentMode.","");
+          obj.title = Strings.formatStr(_getValidationMessage('DOCUMENTMODE', obj.type), obj.value);
+
+          if ( obj.type === 'error' ) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTMODE', 'hint'), label)];
+          }
+
           $list.append(messageTmp(obj));
           d.resolve(c);
+
         } else {
           d.reject(c);
         }
@@ -171,12 +224,18 @@
   function checkFileName(c) {
     var d = Q.defer();
 
-    if (_.isArray(conf.check.files.name)) {
-
+    if (_.isArray(c.check.files.name)) {
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type ) {
+
+          obj.title = _getValidationMessage('DOCUMENTNAME', obj.type);
+
+          if ( obj.type === 'error' ) {
+            obj.hint = [_getValidationMessage('DOCUMENTNAME', 'hint')];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -204,9 +263,18 @@
       JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type) {
+
+          obj.title = Strings.formatStr(_getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
+
+          if ( obj.type !== 'valid' ) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
+          }
+
           $list.append(messageTmp(obj));
+
         }
+
         d.resolve(c);
       });
 
@@ -231,6 +299,15 @@
 
         var obj = _stringToObject(result);
         if (_.isObject(obj)) {
+          var value = parseInt(obj.value);
+
+          obj.title = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
+
+
+          if (obj.type === 'valid' && !value) {
+            obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -257,7 +334,14 @@
       JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
 
         var obj = _stringToObject(result);
-        if (_.isObject(obj)) {
+        if (_.isObject(obj) && obj.type ) {
+          var unit =  RULERUNITS_LABEL[c.check.config.rulserUnitsType];
+          obj.title = _getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
+
+          if ( obj.type === 'error') {
+            obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
+          }
+
           $list.append(messageTmp(obj));
         }
         d.resolve(c);
@@ -280,13 +364,25 @@
 
     if ( _.isObject(c.check.layers) && _.isObject(c.check.fonts) ) {
 
-      JSXRunner.runJSX("checkLayers", {config: c.check}, function (result) {
+      JSXRunner.runJSX("checkLayers", {config: c.check, Strings: Strings}, function (result) {
 
         var r = _stringToObject(result);
 
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
             obj.theme = r.theme;
+
+            _.each(obj.hint, function(h, i) {
+              switch(h) {
+                case 'FONT_MINSIZE':
+                  obj.hint[i] = Strings.formatStr(_getValidationMessage(h + '_LAYERS', 'hint'), c.check.fonts.minSize + RULERUNITS_LABEL[c.check.config.rulserUnitsType]);
+                  break;
+                default:
+                  obj.hint[i] = _getValidationMessage(h + '_LAYERS', 'hint');
+              }
+
+            });
+
             $list.prepend(messageTmp(obj));
           });
         }
@@ -343,11 +439,13 @@
     };
 
     if ( errorNum > 0 ) {
-      content.message = 'エラーの内容を確認してください';
+      //エラーの内容を確認してください
+      content.message = Strings.Pr_MESSAGE_CHECK_ERROR;
     } else if (warnNum > 0) {
-      content.message = 'いくつか注意点があるようです...';
+      //いくつか注意点があるようです
+      content.message = Strings.Pr_MESSAGE_CHECK_WARN;
     } else {
-      content.message = '╭( ･ㅂ･)و ̑̑ ｸﾞｯ';
+      content.message = Strings.Pr_MESSAGE_CHECK_SUCCESS;
     }
 
     //エラーカウント
@@ -355,7 +453,6 @@
     $('#warn-total').text(warnNum);
 
     $console.empty().append(consoleTmp(content));
-    console.log('╭( ･ㅂ･)و ̑̑ done!');
 
   }
 
@@ -368,7 +465,7 @@
      .then(displayConfig)
      .done(function(c) {
         setEventListeners();
-        $list.append(infoTmp({conf: c}));
+        $list.append(infoTmp({conf: c, Strings: Strings}));
         $loader.hide();
     });
 
@@ -379,7 +476,7 @@
    */
   function reset() {
     $config.hide();
-    $list.empty().append(infoTmp());
+    $list.empty().append(infoTmp({conf: confCache, Strings: Strings}));
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
@@ -458,16 +555,17 @@
       Q.fcall(loadConfig)
        .then(displayConfig)
        .done(function(c) {
-        $list.empty().append(infoTmp({conf: c}));
+        $list.empty().append(infoTmp({conf: c, Strings:Strings}));
         $loader.hide();
       });
     }
   })
   .on('click', '.js-change-config-url', function() {
-      $config.empty().append(settingTmp());
+      $config.empty().append(settingTmp({Strings:Strings}));
   })
   .on('click', '.js-btn-cancel', function() {
     if ( _.isObject(confCache) ) {
+      confCache.Strings = Strings;
       $config.empty().append(configTmp(confCache));
     }
   })

@@ -14,11 +14,11 @@ function check() {
 
   if (! name.match(reg3)) {
 
-    return '{title: "ファイル名が命名規則と一致しません", hint: "' + reg3 +' に当てはまるよう変更してください", type: "error"}';
+    return '{type: "error"}';
 
   } else {
 
-    return '{title: "ファイル名は規定に沿って設定されています", hint: "", type: "valid"}';
+    return '{type: "valid"}';
 
   }
 

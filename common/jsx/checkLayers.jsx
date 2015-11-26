@@ -30,14 +30,14 @@ function resultToString(title, hint, type, kind) {
 
 
 /**
- * メッセージ
+ * メッセージ用コード
  */
-var VALIDATION_MESSAGE = {
-  NONAME : "命名されていません",
-  BLENDMODE: "通常以外のモードに設定されています",
-  FONT_ABSVALUE: "フォントサイズが整数ではありません",
-  FONT_MINSIZE : "フォントサイズが規定(<%= config.fonts.minSize %>px)より小さく設定されています",
-  FONT_EMPTY : "テキストレイヤーの内容がありません"
+var VALIDATION_HINT = {
+  NONAME : "NONAME",
+  BLENDMODE: "BLENDMODE",
+  FONT_ABSVALUE: "FONT_ABSVALUE",
+  FONT_MINSIZE : "FONT_MINSIZE",
+  FONT_EMPTY : "FONT_EMPTY"
 };
 
 /**
@@ -67,9 +67,9 @@ var layers = [];
  * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
  */
 var NAME_REGEX = {
-  0 : /グループ(\s\d+)*|レイヤー(\s\d+)*|のコピー(\s\d+)*/,
-  1 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|のコピー(\s\d+)*/,
-  2 : /グループ(\s\d+)*|レイヤー(\s\d+)*|シェイプ(\s\d+)*|多角形(\s\d+)*|楕円形(\s\d+)*|長方形(\s\d+)*|角丸長方形(\s\d+)*|のコピー(\s\d+)*/
+  0 : /<%= Strings.Pr_LAYER_NAME_REGEX_0 %>/,
+  1 : /<%= Strings.Pr_LAYER_NAME_REGEX_1 %>/,
+  2 : /<%= Strings.Pr_LAYER_NAME_REGEX_2 %>/
 };
 
 
@@ -113,21 +113,34 @@ function check(targets) {
 
       //文字の場合
       case LayerKind.TEXT:
+        var textItem = target.textItem;
 
-        if ( target.textItem.contents ) {
-          //フォントサイズの整数を判定
-          //zoomツールで拡大縮小するとこのプロパティの値が正しくない
-          //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-          if ( /\./.test(target.textItem.size) && CONF_FONTS_ABSVALUE) {
-            hint.push(VALIDATION_MESSAGE.FONT_ABSVALUE);
+        if ( textItem.contents ) {
+
+          try {
+            var size = textItem.size.value;
+
+            //フォントサイズの整数を判定
+            //zoomツールで拡大縮小するとこのプロパティの値が正しくない
+            //一旦レイヤーを削除して作り直さないと正しい値に戻らない
+            if ( /\./.test(size) && CONF_FONTS_ABSVALUE) {
+              hint.push(VALIDATION_HINT.FONT_ABSVALUE);
+            }
+
+            if( size <  CONF_FONTS_MINSIZE) {
+              hint.push(VALIDATION_HINT.FONT_MINSIZE);
+            }
+          } catch(e) {
+            //fontsize 12（初期設定）でテキストレイヤーを作った場合
+            //textItem.sizeの値に何かが起きる模様（setterがバグってる？）
+            //一度フォントサイズを操作すればエラーは出なくなるが、そのままだと
+            //textItem.sizeとソースに書いただけで↓のエラーが出るため、tryで無かったことにする
+            //INFO:CONSOLE(2)] "Uncaught SyntaxError: Unexpected token ILLEGAL"
           }
 
-          if( target.textItem.size <  CONF_FONTS_MINSIZE) {
-            hint.push(VALIDATION_MESSAGE.FONT_MINSIZE);
-          }
         } else {
           //内容がないよう
-          hint.push(VALIDATION_MESSAGE.FONT_EMPTY);
+          hint.push(VALIDATION_HINT.FONT_EMPTY);
           type = VALIDATION_TYPE.ERROR;
         }
 
@@ -137,7 +150,7 @@ function check(targets) {
 
         //命名
         if ( nameRegex.test(name) && CONF_LAYERS_NAME) {
-          hint.push(VALIDATION_MESSAGE.NONAME);
+          hint.push(VALIDATION_HINT.NONAME);
         }
 
     }
@@ -145,7 +158,7 @@ function check(targets) {
     //ブレンドモード（LayerSet以外をチェック）
     //※LayerSetはデフォが通過のためエラーとして判断してしまうため
     if (target.typename !== 'LayerSet' && target.blendMode !== BlendMode.NORMAL && CONF_LAYERS_BLENDMODE) {
-      hint.push(VALIDATION_MESSAGE.BLENDMODE);
+      hint.push(VALIDATION_HINT.BLENDMODE);
       type = VALIDATION_TYPE.ERROR;
     }
 

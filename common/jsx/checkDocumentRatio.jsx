@@ -17,11 +17,11 @@ var RATIO = parseFloat('<%= config.ratio %>'),
 if ( documents.length > 0 ) {
   if ( activeDocument.width !== value ) {
 
-    '{title: "カンバスサイズが規定と異なっています", hint: ["幅を「' + value + 'px」に設定してください"], type: "error"}';
+    '{value: "' + activeDocument.width + '", type: "error"}';
 
   } else {
 
-    '{title: "カンバスサイズは規定通りに設定されています", hint: [], type: "valid"}';
+    '{value: "' + activeDocument.width + '", type: "valid"}';
 
   }
 }

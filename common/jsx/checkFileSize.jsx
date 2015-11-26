@@ -10,12 +10,10 @@ if (documents.length > 0 ) {
   var limit = Math.abs('<%= config.size %>');
 
   if ( limit && size > limit ) {
-    '{title: "ファイルサイズが規定を超えています", hint: ["規定:' + limit + 'MB　現在:' + size + 'MB"], type: "warn"}';
+    '{limit: "' + limit + '", value:"' + size + '", type: "warn"}';
 
   } else if ( limit && size < limit ){
-    '{title: "ファイルサイズは規定の範囲内です", hint: ["規定:' + limit + 'MB　現在:' + size + 'MB"], type: "valid"}';
-  } else {
-    '{title: "ファイルサイズは ' + size + 'MB です", hint: "", type: "valid"}';
+    '{limit: "' + limit + '", value:"' + size + '", type: "valid"}';
   }
 }
 
