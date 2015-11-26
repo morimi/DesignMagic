@@ -106,15 +106,17 @@ var RULERUNITS = {
   'Units.PIXELS': 'px'
 };
 
+
 /**
  * テキストレイヤーの拡大率を得る
  * @param {string} direction 縦または横を指定 'yy' or 'xx'
  * @return {number} 拡大率
  * @see https://forums.adobe.com/thread/1954020
  */
-function _getTextScale(direction) {
+function _getTextScale(direction, layer) {
   var ref = new ActionReference();
-  ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
+  ref.putIdentifier(charIDToTypeID('Lyr '), layer.id);
+
   var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
   if (desc.hasKey(stringIDToTypeID('transform'))) {
     var transform = desc.getObjectValue(stringIDToTypeID('transform'));
@@ -134,7 +136,7 @@ function setTextSize(layer, size) {
   function cTID(s) { return app.charIDToTypeID(s); };
   function sTID(s) { return app.stringIDToTypeID(s); };
 
-  app.activeDocument.activeLayer = layer;
+  activeDocument.activeLayer = layer;
 
   var ref = new ActionReference();
   var desc47 = new ActionDescriptor();
@@ -163,7 +165,6 @@ function setTextSize(layer, size) {
   //バグってて反映されない
   layer.textItem.size = new UnitValue(size, RULERUNITS[preferences.typeUnits]);
 
-  activeDocument.activeLayer = SELECTED_LAYER;
 }
 
 /**
@@ -173,16 +174,14 @@ function setTextSize(layer, size) {
  * @see https://forums.adobe.com/thread/1954020
  */
 function getTextSize(layer) {
-  app.activeDocument.activeLayer = layer;
 
   var text_item = layer.textItem;
   var pixels = text_item.size.value;
-  var scale = _getTextScale('yy');
-
-  activeDocument.activeLayer = SELECTED_LAYER;
+  var scale = _getTextScale('yy', layer);
 
   return Math.round((pixels * scale) * 100) / 100;
 }
+
 
 /**
  * Layerのチェック
@@ -315,6 +314,8 @@ if (documents.length !== 0 ) {
   if ( layers.length ) {
     check(layers);
   }
+
+  activeDocument.activeLayer = SELECTED_LAYER;
 
   if ( mes.length ) {
     '{hidden: "' + h + '", list:[' + mes.join(',') + ']}';
