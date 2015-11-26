@@ -107,6 +107,15 @@ dd {
 }
 
 /*
+ #content>#resetButton
+*/
+#resetButton {
+  display: block;
+  margin: 1rem auto;
+  width: 80%;
+}
+
+/*
  Header
  #validation>#title-container
 */
