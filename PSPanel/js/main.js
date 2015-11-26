@@ -42,7 +42,7 @@
     PIXELS: 'px'
   };
 
-  // 設定ファイルを外部から取得する
+  // 設定ファイルを取得する
   function loadConfig() {
     var d = Q.defer();
     var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
@@ -527,6 +527,13 @@
       csInterface.addEventListener( 'documentAfterSave' , check);
     }
 
+    //少数点を含むフォントサイズを自動的に丸める
+    var autoFontSizeAbs =  window.localStorage.getItem('com.cyberagent.designmagic:autoFontSizeAbs') === 'true';
+
+    $('.js-is-autoFontSizeAbs').attr('checked', autoFontSizeAbs);
+
+    confCache.check.fonts['autoFontSizeAbs'] = autoFontSizeAbs;
+
   }
 
 
@@ -570,19 +577,28 @@
     }
   })
   .on('change', '.js-is-autocheck', function() { //ドキュメント保存したときの自動チェック
-    var autocheck = $(this).is(':checked');
+    var checked = $(this).is(':checked');
 
-    window.localStorage.setItem('com.cyberagent.designmagic:autocheck', autocheck);
+    window.localStorage.setItem('com.cyberagent.designmagic:autocheck', checked);
 
-    if ( autocheck ) {
+    if ( checked ) {
       csInterface.addEventListener( 'documentAfterSave' , check);
     } else {
       csInterface.removeEventListener( 'documentAfterSave' , check);
     }
   })
+
   .on('click', '.js-btn-reset', function () {
     window.localStorage.clear();
     $config.empty().append(settingTmp({Strings:Strings}));
+  })
+  .on('change', '.js-is-autoFontSizeAbs', function() { //少数点を含むフォントサイズを自動的に丸める
+    var checked = $(this).is(':checked');
+
+    window.localStorage.setItem('com.cyberagent.designmagic:autoFontSizeAbs', checked);
+
+    confCache.check.fonts.autoFontSizeAbs = checked;
+
   });
 
 

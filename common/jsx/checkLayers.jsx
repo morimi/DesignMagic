@@ -28,6 +28,7 @@ function resultToString(title, hint, type, kind) {
 
 };
 
+var SELECTED_LAYER = activeDocument.activeLayer;
 
 /**
  * メッセージ用コード
@@ -87,9 +88,101 @@ var CONF_LAYERS_NAME = "<%= config.layers.name %>" === 'true',
     CONF_LAYERS_BLENDMODE = "<%= config.layers.blendingMode %>" === 'true',
     //フォントサイズが整数かどうかチェックする (boolean -> string)
     CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>" === 'true',
+    //少数点を含むフォントサイズを自動的に丸める
+    CONF_FONTS_AUTOFONTSIZEABS = "<%= config.fonts.autoFontSizeAbs %>" === 'true',
     //最小サイズ (number)
     CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>");
 
+/**
+ *
+ */
+var RULERUNITS = {
+  'Units.CM': 'cm',
+  'Units.INCHES': 'inch',
+  'Units.MM': 'mm',
+  'Units.PERCENT': '%',
+  'Units.PICAS': 'pica',
+  'Units.POINTS': 'pt',
+  'Units.PIXELS': 'px'
+};
+
+/**
+ * テキストレイヤーの拡大率を得る
+ * @param {string} direction 縦または横を指定 'yy' or 'xx'
+ * @return {number} 拡大率
+ * @see https://forums.adobe.com/thread/1954020
+ */
+function _getTextScale(direction) {
+  var ref = new ActionReference();
+  ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
+  var desc = executeActionGet(ref).getObjectValue(stringIDToTypeID('textKey'));
+  if (desc.hasKey(stringIDToTypeID('transform'))) {
+    var transform = desc.getObjectValue(stringIDToTypeID('transform'));
+    var mFactor = transform.getUnitDoubleValue (stringIDToTypeID(direction));
+    return mFactor;
+  }
+  return 1;
+}
+
+/**
+ * テキストパネルにフォントサイズをセットする
+ * @param {Layer} layer テキストレイヤーオブジェクト
+ * @param {number} size フォントサイズ
+ * @see https://forums.adobe.com/thread/1954020
+ */
+function setTextSize(layer, size) {
+  function cTID(s) { return app.charIDToTypeID(s); };
+  function sTID(s) { return app.stringIDToTypeID(s); };
+
+  app.activeDocument.activeLayer = layer;
+
+  var ref = new ActionReference();
+  var desc47 = new ActionDescriptor();
+  var desc48 = new ActionDescriptor();
+
+  ref.putProperty( cTID( "Prpr" ), cTID( "TxtS" ) );
+  ref.putEnumerated( cTID( "TxLr" ), cTID( "Ordn" ), cTID( "Trgt" ) );
+  desc47.putReference( cTID( "null" ), ref );
+
+  desc48.putInteger( sTID( "textOverrideFeatureName" ), 808465458 );
+  desc48.putInteger( sTID( "typeStyleOperationType" ), 3 );
+
+  var unit = "#Pxl";
+
+  if ( preferences.typeUnits === Units.POINTS ) {
+    unit = '#Pnt';
+  } else if ( preferences.typeUnits === Units.MM ) {
+    unit = '#Mlm';
+  }
+
+  desc48.putUnitDouble( cTID( "Sz  " ), cTID( unit ), size );
+  desc47.putObject( cTID( "T   " ), cTID( "TxtS" ), desc48 );
+
+  executeAction( cTID( "setd" ), desc47, DialogModes.NO );
+
+  //バグってて反映されない
+  layer.textItem.size = new UnitValue(size, RULERUNITS[preferences.typeUnits]);
+
+  activeDocument.activeLayer = SELECTED_LAYER;
+}
+
+/**
+ * 拡大率を考慮したフォントサイズを得る（文字パネルと同じ値）
+ * @param {Layer} layer テキストレイヤーオブジェクト
+ * @return {number} フォントサイズ
+ * @see https://forums.adobe.com/thread/1954020
+ */
+function getTextSize(layer) {
+  app.activeDocument.activeLayer = layer;
+
+  var text_item = layer.textItem;
+  var pixels = text_item.size.value;
+  var scale = _getTextScale('yy');
+
+  activeDocument.activeLayer = SELECTED_LAYER;
+
+  return Math.round((pixels * scale) * 100) / 100;
+}
 
 /**
  * Layerのチェック
@@ -107,7 +200,6 @@ function check(targets) {
         type = VALIDATION_TYPE.WARN,
         kind = target.kind;
 
-
     //内容による分岐
     switch ( kind ) {
 
@@ -118,18 +210,30 @@ function check(targets) {
         if ( textItem.contents ) {
 
           try {
-            var size = textItem.size.value;
+
+            var size = getTextSize(target);
 
             //フォントサイズの整数を判定
             //zoomツールで拡大縮小するとこのプロパティの値が正しくない
-            //一旦レイヤーを削除して作り直さないと正しい値に戻らない
-            if ( /\./.test(size) && CONF_FONTS_ABSVALUE) {
-              hint.push(VALIDATION_HINT.FONT_ABSVALUE);
+            //（textItem.sizeバグのため一旦レイヤーを削除して作り直さないと正しい値に戻らない）
+            if ( /\./.test(size) && CONF_FONTS_ABSVALUE ) {
+
+              //少数点を含むフォントサイズを自動的に丸めるか
+              if ( CONF_FONTS_AUTOFONTSIZEABS ) {
+
+                setTextSize(target, Math.round(size));
+
+              } else {
+
+                hint.push(VALIDATION_HINT.FONT_ABSVALUE);
+
+              }
             }
 
             if( size <  CONF_FONTS_MINSIZE) {
               hint.push(VALIDATION_HINT.FONT_MINSIZE);
             }
+
           } catch(e) {
             //fontsize 12（初期設定）でテキストレイヤーを作った場合
             //textItem.sizeの値に何かが起きる模様（setterがバグってる？）
@@ -205,6 +309,7 @@ function getLayersList() {
 
 if (documents.length !== 0 ) {
 
+
   layers = getLayersList();
 
   if ( layers.length ) {
@@ -213,9 +318,12 @@ if (documents.length !== 0 ) {
 
   if ( mes.length ) {
     '{hidden: "' + h + '", list:[' + mes.join(',') + ']}';
+
   } else {
     '{hidden: "' + h + '", list:[]}';
   }
+
+
 }
 
 } catch(e) {
