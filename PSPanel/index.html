@@ -120,7 +120,15 @@
         </tr>
         <tr>
           <th scope="row">{{Strings.Pr_CONFIG_RULER_UNITS_TYPE}}</th>
-          <td>{{check.config.rulserUnitsType}}</td>
+          <td>{{check.config.rulerUnitsType}}</td>
+        </tr>
+        <tr>
+          <th scope="row">{{Strings.Pr_CONFIG_TYPE_UNITS}}</th>
+          <td>{{check.config.typeUnits}}</td>
+        </tr>
+        <tr>
+          <th scope="row">{{Strings.Pr_CONFIG_TYPE_UNITS_TYPE}}</th>
+          <td>{{check.config.typeUnitsType}}</td>
         </tr>
       </table>
     {{/if}}
@@ -159,7 +167,7 @@
           <td>{{check.layers.namingLevel}}</td>
         </tr>
         <tr>
-          <th scope="row">{{String.Pr_CONFIG_LAYERS_BLENDINGMODE}}</th>
+          <th scope="row">{{{Strings.Pr_CONFIG_LAYERS_BLENDINGMODE}}}</th>
           <td>{{check.layers.blendingMode}}</td>
         </tr>
       </table>
@@ -195,6 +203,13 @@
           <input type="checkbox" class="js-is-autocheck">
           <div class="topcoat-checkbox__checkmark"></div>
           {{Strings.Pr_CONFIG_OPTION_AUTOSAVE}}
+        </label>
+      </dd>
+      <dd>
+        <label class="topcoat-checkbox">
+          <input type="checkbox" class="js-is-autoFontSizeAbs">
+          <div class="topcoat-checkbox__checkmark"></div>
+          {{Strings.Pr_CONFIG_OPTION_AUTOFONTSIZEABS}}
         </label>
       </dd>
     </dl>
