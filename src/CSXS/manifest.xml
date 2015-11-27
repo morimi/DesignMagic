@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ExtensionManifest Version="5.0" ExtensionBundleId="com.cyberagent.designmagic" ExtensionBundleVersion="1.0.0"
+<ExtensionManifest Version="5.0" ExtensionBundleId="com.cyberagent.designmagic" ExtensionBundleVersion="0.3.0"
 		ExtensionBundleName="DesignMagic" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<ExtensionList>
-		<Extension Id="com.cyberagent.designmagic" Version="1.0" />
+		<Extension Id="com.cyberagent.designmagic" Version="0.3.0" />
 	</ExtensionList>
 	<ExecutionEnvironment>
 		<HostList>
@@ -15,7 +15,7 @@
             <!-- Illustrator -->
             <!-- <Host Name="ILST" Version="[18.0,18.9]" />-->
             <!-- InDesign -->
-            <!-- <Host Name="IDSN" Version="[10.0,10.9]" /> -->          
+            <!-- <Host Name="IDSN" Version="[10.0,10.9]" /> -->
             <!-- Premiere -->
             <!-- <Host Name="PPRO" Version="[8.0,8.9]" /> -->
             <!-- AfterEffects -->
@@ -59,7 +59,7 @@
                             <Height>550</Height>
                             <Width>400</Width>
                         </MaxSize>-->
-                        
+
 					</Geometry>
 					<Icons>
 						<Icon Type="Normal">./PSPanel/icons/iconNormal.png</Icon>
@@ -67,7 +67,7 @@
 						<Icon Type="Disabled">./PSPanel/icons/iconDisabled.png</Icon>
 						<Icon Type="DarkNormal">./PSPanel/icons/iconDarkNormal.png</Icon>
 						<Icon Type="DarkRollOver">./PSPanel/icons/iconDarkRollover.png</Icon>
-					</Icons>					
+					</Icons>
 				</UI>
 			</DispatchInfo>
 		</Extension>
