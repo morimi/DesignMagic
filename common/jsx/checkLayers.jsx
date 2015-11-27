@@ -229,7 +229,7 @@ function check(targets) {
               }
             }
 
-            if( size <  CONF_FONTS_MINSIZE) {
+            if( (size <  CONF_FONTS_MINSIZE) && (0 < CONF_FONTS_MINSIZE) ) {
               hint.push(VALIDATION_HINT.FONT_MINSIZE);
             }
 

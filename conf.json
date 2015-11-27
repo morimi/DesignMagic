@@ -1,36 +1,36 @@
 {
 
-  "version": "0.0.0",
+  "version": "0.3.0",
 
-  "name": "デフォルト",
-
-  "url": null,
+  "name": "デフォルト（同梱）",
 
   "check" : {
 
     "config": {
-      "documentMode": true,
-      "documentModeType": "RGB",
-      "rulerUnits": true,
-      "rulserUnitsType" : "PIXELS"
+      "documentMode": false,
+      "documentModeType": "",
+      "rulerUnits": false,
+      "rulerUnitsType" : "",
+      "typeUnits": false,
+      "typeUnitsType" : ""
     },
 
     "files" : {
-      "name": null,
-      "size": 100,
-      "ratio": 2,
-      "useLayerComps": true
+      "name": false,
+      "size": false,
+      "ratio": false,
+      "useLayerComps": false
     },
 
     "layers": {
-      "name": true,
-      "namingLevel": 2,
-      "blendingMode": true
+      "name": false,
+      "namingLevel": 0,
+      "blendingMode": false
     },
 
     "fonts": {
-      "absValue": true,
-      "minSize": 10
+      "absValue": false,
+      "minSize": -1
     },
 
     "effects": {

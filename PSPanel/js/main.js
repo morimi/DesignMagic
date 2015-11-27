@@ -32,7 +32,7 @@
       consoleTmp = Handlebars.compile($('#console-template').html()),
       settingTmp = Handlebars.compile($('#setting-template').html());
 
-  var RULERUNITS_LABEL = {
+  var UNITS_LABEL = {
     CM: 'cm',
     INCHES: 'inch',
     MM: 'mm',
@@ -46,6 +46,7 @@
   function loadConfig() {
     var d = Q.defer();
     var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
+    var conf   = require("../conf.json");
 
     if (!url) {
 
@@ -58,11 +59,18 @@
 
     } else {
 
+      var handleError = function (res) {
+        $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
+        confCache = conf;
+        d.resolve(conf);
+      };
+
      var req = http.get(url, function (res) {
         if (res.statusCode == '200') {
           res.setEncoding('utf8');
           res.on('data', function (data) {
             data = JSON.parse(data);
+            data = _.defaultsDeep(data, conf);
             data.url = url;
             data.Strings = Strings;
 
@@ -73,14 +81,13 @@
             d.resolve(data);
           });
         }
+
+        if (res.statusCode == '403') {
+          handleError();
+        }
       });
 
-      req.on('error', function (res) {
-        var conf   = require("../conf.json")
-        $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
-        confCache = conf;
-        d.resolve(conf);
-      });
+      req.on('error', handleError);
 
     }
 
@@ -147,25 +154,35 @@
   /**
    * 単位チェック
    */
-  function checkRulerUnits(c) {
+  function checkUnits(c) {
     var d = Q.defer();
 
-    if (c.check.config.rulerUnits) {
+    if (c.check.config.rulerUnits || c.check.config.typeUnits) {
 
-      JSXRunner.runJSX("checkRulerUnits", {config: c.check.config}, function (result) {
+      JSXRunner.runJSX("checkUnits", {config: c.check.config}, function (result) {
 
-        var obj = _stringToObject(result),
-            label =  RULERUNITS_LABEL[c.check.config.rulserUnitsType],
-            unit = RULERUNITS_LABEL[obj.value.replace('Units.', '')];
+        var obj = _stringToObject(result);
 
-        if (_.isObject(obj)) {
-          obj.title = Strings.formatStr(_getValidationMessage('RULERUNITS', obj.type), unit);
+        if (_.isObject(obj) && obj.list.length) {
 
-          if ( obj.type === 'error') {
-            obj.hint = [_getValidationMessage('RULERUNITS', 'hint', label)];
-          }
+          _.each(obj.list, function(r, i) {
 
-          $list.append(messageTmp(obj));
+            var label =  UNITS_LABEL[c.check.config[_.camelCase(r.name) + 'Type']],
+                unit = UNITS_LABEL[r.value.replace(/(Units|TypeUnits)\./, '')];
+
+            r.title = Strings.formatStr(_getValidationMessage(r.name, r.type), unit);
+
+            if ( r.type === 'error') {
+              r.hint = [_getValidationMessage(r.name, 'hint', label)];
+            }
+
+            r.theme = obj.theme;
+            r.Strings = obj.Strings;
+
+            $list.append(messageTmp(r));
+
+          });
+
         }
 
         d.resolve(c);
@@ -335,7 +352,7 @@
 
         var obj = _stringToObject(result);
         if (_.isObject(obj) && obj.type ) {
-          var unit =  RULERUNITS_LABEL[c.check.config.rulserUnitsType];
+          var unit =  UNITS_LABEL[c.check.config.rulserUnitsType];
           obj.title = _getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
 
           if ( obj.type === 'error') {
@@ -375,7 +392,7 @@
             _.each(obj.hint, function(h, i) {
               switch(h) {
                 case 'FONT_MINSIZE':
-                  obj.hint[i] = Strings.formatStr(_getValidationMessage(h + '_LAYERS', 'hint'), c.check.fonts.minSize + RULERUNITS_LABEL[c.check.config.rulserUnitsType]);
+                  obj.hint[i] = Strings.formatStr(_getValidationMessage(h + '_LAYERS', 'hint'), c.check.fonts.minSize + UNITS_LABEL[c.check.config.rulserUnitsType]);
                   break;
                 default:
                   obj.hint[i] = _getValidationMessage(h + '_LAYERS', 'hint');
@@ -498,7 +515,7 @@
     var start = $.now();
 
     Q.fcall(loadConfig)
-     .then(checkRulerUnits)
+     .then(checkUnits)
      .then(checkDocumentMode)
      .then(checkFileName)
      .then(checkFileSize)
