@@ -81,7 +81,7 @@ gulp.task( 'build-clean', function (callback) {
  * DesignMagic.zxp を生成する
  * @param  {String} 'build'
  */
-gulp.task( 'build', function () {
+gulp.task( 'createzxp', function () {
   return gulp.src( '.' )
     .pipe( exec('mkdir <%= options.path.build %>', options) )
     .pipe( exec('<%= options.path.cmd %> -sign "<%= options.path.src %>" <%= options.path.zxp %> <%= options.path.cert %> <%= options.passsword.cert %>', options) )
@@ -94,6 +94,6 @@ gulp.task( 'build', function () {
  * @param  {String} 'default'
  * @param  {Array}
  */
-gulp.task( 'build', ['build-clean', 'build'] );
+gulp.task( 'build', ['build-clean', 'createzxp'] );
 gulp.task( 'clean', ['build-clean', 'src-ndm-clean'] );
 gulp.task( 'ndm', ['src-ndm-clean', 'src-ndm-copy'] );
