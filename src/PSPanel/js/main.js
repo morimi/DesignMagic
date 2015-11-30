@@ -624,12 +624,23 @@
   });
 
 
+  /**
+   * パネルからのレイヤー名変更するクラス
+   * @since version 0.4.0
+   */
   var ChangeLayerName = function() {
     this.$el = null;
     this.$title = null;
     this.newName = null;
   };
 
+  /**
+   * バリデーションメッセージがクリックされた時の処理
+   * selectLayer.jsxにレイヤーIDとレイヤー名を渡して実行する
+   * @param {HTML Object} el クリックされたバリデーションメッセージ要素
+   * @since version 0.4.0
+   * @return {void}
+   */
   ChangeLayerName.prototype.onClickMessage = function onClickMessage(el) {
     this.$el = $(el);
 
@@ -653,6 +664,12 @@
 
   };
 
+  /**
+   * バリデーションメッセージのtitle要素がダブルクリックされた時の処理
+   * title要素を隠し、入力フォームを挿入して表示する
+   * @since version 0.4.0
+   * @return {void}
+   */
   ChangeLayerName.prototype.onDbClickMessage = function onDbClickMessage() {
     this.tmpl = Handlebars.compile($('#changeLayerName-template').html());
 
@@ -665,6 +682,12 @@
 
   };
 
+  /**
+   * 変更処理
+   * changeLayerName.jsxに新しいレイヤー名を渡して実行する
+   * @since version 0.4.0
+   * @return {void}
+   */
   ChangeLayerName.prototype.change = function change() {
     var $input = this.$el.find('.js-inputLayerName');
     var $btn = this.$el.find('.js-changeLayerName');
@@ -680,9 +703,10 @@
 
     JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
 
+      //編集済みクラス付与
       self.$el.removeClass('select').addClass('modified');
 
-      //アイコンをvalidにする
+      //アイコンをvalidにする(templateにした方がいいかもしれない)
       self.$el.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
 
       //titleを入れ替える
@@ -695,6 +719,7 @@
       $input.remove();
       $btn.remove();
 
+      //スライドアニメ
       self.$el.delay(3000).slideUp('slow', function(e) {
         $(this).removeClass('modified').remove();
       })

@@ -1,6 +1,6 @@
 try {
 
-  function execute() {
+  function changeLayerName() {
     function cTID(s) { return app.charIDToTypeID(s); };
     function sTID(s) { return app.stringIDToTypeID(s); };
 
@@ -19,7 +19,7 @@ try {
 
   if (documents.length !== 0 ) {
 
-    execute();
+    changeLayerName();
 
   }
 
