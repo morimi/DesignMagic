@@ -151,25 +151,30 @@ body.darker #title-container {
  #config-container>#setting-list
 */
 
-.list {
+#validation-container,
+#config-container {
   overflow: hidden;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  height: 100%;
   overflow-y: scroll;
   background: #464646;
 }
 
-body.darker .list{
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+
+
+body.darker #validation-container{
   background: #2b2b2b;
 }
 
-body.light .list{
+body.light #validation-container{
   background: #a4a4a4;
 }
 
-body.lighter .list{
+body.lighter #validation-container{
   background: #c6c6c6;
 }
 
@@ -206,6 +211,14 @@ body.light #footer-container {
   display: block;
   border-bottom: 1px solid #383838;
   background: #535353;
+}
+
+.message.select {
+  background: #636363;
+}
+
+.message.modified {
+  background: #6a8d9f;
 }
 
 

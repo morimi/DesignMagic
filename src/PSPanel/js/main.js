@@ -21,7 +21,9 @@
 
   //Elements
   var $content = $('#content'),
-      $list = $('#message-list'),
+      $vContainer = $('#validation-container'),
+      $listLayers = $('#message-list-layers'),
+      $listOthers = $('#message-list-others'),
       $config = $('#config-container'),
       $console = $('#console'),
       $loader = $('#icon-loader');
@@ -179,7 +181,7 @@
             r.theme = obj.theme;
             r.Strings = obj.Strings;
 
-            $list.append(messageTmp(r));
+            $listOthers.append(messageTmp(r));
 
           });
 
@@ -217,7 +219,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTMODE', 'hint'), label)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
           d.resolve(c);
 
         } else {
@@ -253,7 +255,7 @@
             obj.hint = [_getValidationMessage('DOCUMENTNAME', 'hint')];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -288,7 +290,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
 
         }
 
@@ -325,7 +327,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -359,7 +361,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -400,7 +402,7 @@
 
             });
 
-            $list.prepend(messageTmp(obj));
+            $listLayers.append(messageTmp(obj));
           });
         }
 
@@ -446,8 +448,8 @@
    */
   function displayResult(start){
 
-    var errorNum = $list.find('.icon.error').length,
-        warnNum  = $list.find('.icon.warn').length;
+    var errorNum = $vContainer.find('.icon.error').length,
+        warnNum  = $vContainer.find('.icon.warn').length;
 
     var content = {
       time:  Math.abs((start - $.now()) / 1000) + 's',
@@ -482,7 +484,7 @@
      .then(displayConfig)
      .done(function(c) {
         setEventListeners();
-        $list.append(infoTmp({conf: c, Strings: Strings}));
+        $listOthers.append(infoTmp({conf: c, Strings: Strings}));
         $loader.hide();
     });
 
@@ -493,7 +495,8 @@
    */
   function reset() {
     $config.hide();
-    $list.empty().append(infoTmp({conf: confCache, Strings: Strings}));
+    $listLayers.empty();
+    $listOthers.empty().append(infoTmp({conf: confCache, Strings: Strings}));
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
@@ -508,7 +511,8 @@
    */
 
   function check() {
-    $list.empty();
+    $listLayers.empty();
+    $listOthers.empty();
     $config.hide();
     $loader.show();
 
@@ -579,7 +583,8 @@
       Q.fcall(loadConfig)
        .then(displayConfig)
        .done(function(c) {
-        $list.empty().append(infoTmp({conf: c, Strings:Strings}));
+        $listLayers.empty();
+        $listOthers.empty().append(infoTmp({conf: c, Strings:Strings}));
         $loader.hide();
       });
     }
@@ -617,6 +622,136 @@
     confCache.check.fonts.autoFontSizeAbs = checked;
 
   });
+
+
+  var ChangeLayerName = function() {
+    this.$el = null;
+    this.$title = null;
+    this.newName = null;
+  };
+
+  ChangeLayerName.prototype.onClickMessage = function onClickMessage(el) {
+    this.$el = $(el);
+
+    if ( this.$el.hasClass('select') ){
+      return;
+    }
+
+    this.$title = this.$el.find('.title');
+
+    var data = {
+      id: this.$el.attr('data-id'),
+      name: this.$title.text()
+    };
+
+    $vContainer.find('.select').removeClass('select');
+    this.$el.addClass('select');
+
+    JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
+     // console.log(result)
+    });
+
+  };
+
+  ChangeLayerName.prototype.onDbClickMessage = function onDbClickMessage() {
+    this.tmpl = Handlebars.compile($('#changeLayerName-template').html());
+
+    if ( !this.$el.hasClass('select') ) {
+      return
+    }
+
+    this.$title.hide();
+    this.$title.after( this.tmpl(this.$title.text()) );
+
+  };
+
+  ChangeLayerName.prototype.change = function change() {
+    var $input = this.$el.find('.js-inputLayerName');
+    var $btn = this.$el.find('.js-changeLayerName');
+
+    this.newName = $input.val();
+    console.log('[ChangeLayerName] newName = ' + this.newName);
+
+    var data = {
+      name: this.newName
+    };
+
+    var self = this;
+
+    JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
+
+      self.$el.removeClass('select').addClass('modified');
+
+      //アイコンをvalidにする
+      self.$el.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+
+      //titleを入れ替える
+      self.$title.text(self.newName).show();
+
+      //hintを消す
+      self.$el.find('.message-hint').remove();
+
+      //フォーム要素を消す
+      $input.remove();
+      $btn.remove();
+
+      self.$el.delay(3000).slideUp('slow', function(e) {
+        $(this).removeClass('modified').remove();
+      })
+
+    });
+
+
+  };
+
+  var _changeLayerName = new ChangeLayerName();
+
+  $vContainer.on('click', '.message', function() {
+    _changeLayerName.onClickMessage(this)
+  })
+    .on('dblclick', '.title', function() {
+    _changeLayerName.onDbClickMessage()
+  })
+    .on('click', '.js-changeLayerName', function() {
+    _changeLayerName.change()
+  });
+
+//
+//  $vContainer.on('click', '.message', function(e) {
+//    var $this = $(this);
+//
+//    if ( $this.hasClass('select') ) {
+//      return;
+//    }
+//
+//    var data = {
+//      id: $this.attr('data-id'),
+//      name: $this.find('.title').text()
+//    };
+//
+//    $vContainer.find('.select').removeClass('select');
+//    $this.addClass('select');
+//
+//    JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
+//     // console.log(result)
+//    });
+//  })
+//  .on('dblclick', '.message', function() {
+//    var $this = $(this),
+//        $title = $this.find('.title');
+//
+//    if ( !$this.hasClass('select') ) {
+//      return;
+//    }
+//
+//    $title.replaceWith( '<input type="text" class="js-inputLayerName" placeholder="' + $title.text() + '"><button type="button" class="js-changeLayerName">OK</button>');
+//
+//
+//  })
+//  .on('click', 'js-changeLayerName', function() {
+//
+//  });
+
 
 
   //素のinit()ではaddClassが想定通り動かんので
