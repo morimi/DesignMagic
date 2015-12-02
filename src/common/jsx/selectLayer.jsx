@@ -1,3 +1,11 @@
+/**
+ * @fileoverview レイヤー/グループを選択する
+ * idとレイヤー名を使用する
+ * data = { name: string, id: number }
+ * @since version 0.4.0
+ */
+
+
 try {
 
   function selectLayer() {

@@ -1,3 +1,8 @@
+/**
+ * @fileoverview レイヤー/グループ名の変更処理をする
+ * @since version 0.4.0
+ */
+
 try {
 
   function changeLayerName() {
