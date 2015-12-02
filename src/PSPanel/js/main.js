@@ -701,7 +701,7 @@
 
     var newName = $input.val();
 
-    if ( ! newName ) {
+    if ( !$parent.hasClass('select') || ! newName ) {
       return;
     }
 
