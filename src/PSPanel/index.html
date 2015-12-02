@@ -51,6 +51,7 @@
 
   </div>
 
+<!--バリデーションメッセージ-->
 <script id="message-template" type="text/x-handlebars-template">
   <li class="message" data-type="{{type}}">
     <div class="message-wrapper">
@@ -85,6 +86,7 @@
 </li>
 </script>
 
+<!--コンフィグ-->
 <script id="config-template" type="text/x-handlebars-template">
   <div id="config-list" class="list">
     <table>
@@ -225,15 +227,19 @@
   </div>
 </script>
 
+<!--設定変更-->
 <script id="setting-template" type="text/x-handlebars-template">
   <div id="setting-list" class="list">
     <div id="setting-form">
      <p>{{Strings.Pr_INPUT_TO_CONFIG_URL}}</p>
       <p>URL:<input type="text" class="topcoat-text-input--large" id="input-config-url" style="width:100%"></p>
+      <p>{{Strings.Pr_SELECT_LOCAL_CONFIG_FILE}}</p>
+      <p><input type="file" accept="application/json" class="topcoat-text-input--large" id="select-config-file" style="width:100%"></p>
       <p>
       <button class="js-btn-cancel topcoat-button--large" type="button">{{Strings.Pr_BUTTON_CANCEL}}</button>
-      <button class="js-btn-setting topcoat-button--large" type="button">{{Strings.Pr_BUTTON_SETTING}}</button>
+      <button class="topcoat-button--large js-btn-setting" type="button">{{Strings.Pr_BUTTON_SETTING}}</button>
       </p>
+      <p style="margin-top: 20px"><button id="resetButton" class="js-btn-reset topcoat-button--large" type="button">{{Strings.Pr_BUTTON_RESET}}</button></p>
     </div>
   </div>
 </script>

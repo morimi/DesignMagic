@@ -16,6 +16,8 @@
       Strings     = require("./js/LocStrings");
 
 
+  //default conf.json
+  var conf   = require("../conf.json");
   //conf cache
   var confCache = null;
 
@@ -42,30 +44,91 @@
     PIXELS: 'px'
   };
 
+  //ローカルで読み込んだファイルの一時格納場所
+  var LOCAL_CONFIG_FILE = null;
+
+
+  function handleLoadConfigError(res) {
+    $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
+    confCache = conf;
+    d.resolve(conf);
+  };
+
+  /**
+   * ローカルのconfファイルを読み込む
+   */
+  function loadLocalConfig (d) {
+
+    var reader = new FileReader();
+
+    reader.onload = function(e) {
+      switch (e.target.readyState) {
+        case FileReader.DONE : // DONE == 2
+          var result = e.target.result;
+          var data = JSON.parse(result);
+          window.localStorage.setItem('com.cyberagent.designmagic:conf.url', 'localhost');
+          window.localStorage.setItem('com.cyberagent.designmagic:conf.result', result);
+          data = _.defaultsDeep(data, conf);
+          data.url = 'localhost';
+          data.Strings = Strings;
+          confCache = data;
+          LOCAL_CONFIG_FILE = null;
+          $console.html(Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
+
+          d.resolve(data);
+        break;
+
+      }
+    };
+
+    reader.onerror = handleLoadConfigError;
+
+    reader.readAsText(LOCAL_CONFIG_FILE);
+
+
+  }
+
   // 設定ファイルを取得する
   function loadConfig() {
     var d = Q.defer();
     var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
-    var conf   = require("../conf.json");
+    var localData = window.localStorage.getItem('com.cyberagent.designmagic:conf.result');
 
-    if (!url) {
+    //urlもローカルファイルもない
+    if (!url && !LOCAL_CONFIG_FILE && !localData) {
 
-      $console.html(Strings.Pr_MESSAGE_NOT_SETTING_URL);
+      $console.html(Strings.Pr_MESSAGE_NOT_SETTING_FILE);
       d.resolve(null);
 
+    //キャッシュあった
     } else if ( confCache && confCache.url === url ) {
 
+      console.info('Find local conf.json cache');
       d.resolve(confCache);
 
+    //ストレージに保存されてた
+    } else if ( localData && (url === 'localhost') ) {
+
+        var data = JSON.parse(localData);
+        data = _.defaultsDeep(data, conf);
+        data.url = 'localhost';
+        data.Strings = Strings;
+        confCache = data;
+        $console.html(Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
+
+        d.resolve(data);
+
+    //ローカルファイルが指定された
+    } else if ( (LOCAL_CONFIG_FILE && LOCAL_CONFIG_FILE.type === 'application/json') ) {
+
+      console.info('Loading local conf.json file data');
+      loadLocalConfig(d);
+
+    //リモートのファイルが指定された
     } else {
 
-      var handleError = function (res) {
-        $console.html(Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
-        confCache = conf;
-        d.resolve(conf);
-      };
-
-     var req = http.get(url, function (res) {
+      console.info('Loading remote conf.json ....');
+      var req = http.get(url, function (res) {
         if (res.statusCode == '200') {
           res.setEncoding('utf8');
           res.on('data', function (data) {
@@ -83,11 +146,11 @@
         }
 
         if (res.statusCode == '403') {
-          handleError();
+          handleLoadConfigError();
         }
       });
 
-      req.on('error', handleError);
+      req.on('error', handleLoadConfigError);
 
     }
 
@@ -549,7 +612,9 @@
 
     $('.js-is-autoFontSizeAbs').attr('checked', autoFontSizeAbs);
 
-    confCache.check.fonts['autoFontSizeAbs'] = autoFontSizeAbs;
+    if ( _.isObject(confCache) ) {
+      confCache.check.fonts['autoFontSizeAbs'] = autoFontSizeAbs;
+    }
 
   }
 
@@ -569,20 +634,43 @@
 
 
   /**
-   * 設定ボタン押したとき
+   * 設定内のイベント
    */
-  $('#config-container').on('click', '.js-btn-setting', function() {
+  $('#config-container').on('click', '.js-btn-setting', function() {//設定ボタン押したとき
     var input_url = $('#input-config-url').val();
+    confCache = null;
 
-    if ( _.isString(input_url) ) {
+
+     if ( !input_url && !LOCAL_CONFIG_FILE ) {
+       console.log('conf.jsonのURLもローカルのconf.jsonファイルも指定されていません');
+       return;
+     }
+
+    //リモートのconfigファイル
+    if ( _.isString(input_url) && input_url.match(/^http/) ) {
+      console.info('conf.jsonのURLを新しく設定します');
       window.localStorage.setItem('com.cyberagent.designmagic:conf.url', input_url);
-      Q.fcall(loadConfig)
-       .then(displayConfig)
-       .done(function(c) {
-        $list.empty().append(infoTmp({conf: c, Strings:Strings}));
-        $loader.hide();
-      });
+      window.localStorage.removeItem('com.cyberagent.designmagic:conf.result');
+
     }
+
+    //ローカルのconfigファイル
+    if ( _.isObject(LOCAL_CONFIG_FILE) ) {
+      console.info('conf.jsonのURLをlocalhostに設定します');
+      window.localStorage.setItem('com.cyberagent.designmagic:conf.url', 'localhost');
+    }
+
+    Q.fcall(loadConfig)
+     .then(displayConfig)
+     .done(function(c) {
+      $list.empty().append(infoTmp({conf: c, Strings:Strings}));
+      $loader.hide();
+    });
+
+  })
+  .on('change', '#select-config-file', function(e) { //ローカルのconfigファイル
+    LOCAL_CONFIG_FILE = e.target.files.item(0); // FileList -> File object
+    console.info('ローカルのconf.jsonファイルが選択されました');
   })
   .on('click', '.js-change-config-url', function() {
       $config.empty().append(settingTmp({Strings:Strings}));
