@@ -28,13 +28,15 @@
       $listOthers = $('#message-list-others'),
       $config = $('#config-container'),
       $console = $('#console'),
-      $loader = $('#icon-loader');
+      $loader = $('#icon-loader'),
+      $tools = $('#tools-container');
 
   var messageTmp = Handlebars.compile($('#message-template').html()),
       configTmp = Handlebars.compile($('#config-template').html()),
       infoTmp = Handlebars.compile($('#info-template').html()),
       consoleTmp = Handlebars.compile($('#console-template').html()),
-      settingTmp = Handlebars.compile($('#setting-template').html());
+      settingTmp = Handlebars.compile($('#setting-template').html()),
+      toolsTmp = Handlebars.compile($('#tools-template').html());
 
   var UNITS_LABEL = {
     CM: 'cm',
@@ -182,6 +184,30 @@
           Strings: Strings
        }));
     }
+
+    d.resolve(c);
+    return d.promise;
+  }
+
+
+  /**
+   * ツール表示
+   * @param {Object} c config object
+   */
+  function displayTools(c) {
+    var d = Q.defer();
+
+    if ( _.isObject(c) ) {
+
+      c = _.extend({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }, c );
+
+    }
+
+    $tools.empty().append(toolsTmp(c));
+
 
     d.resolve(c);
     return d.promise;
@@ -545,6 +571,7 @@
 
     Q.fcall(loadConfig)
      .then(displayConfig)
+     .then(displayTools)
      .done(function(c) {
         setEventListeners();
         $listOthers.append(infoTmp({conf: c, Strings: Strings}));
@@ -633,9 +660,21 @@
    * Configボタン押したとき
    */
   $('.btn-config').on('click', function() {
-    $config.toggle();
+
+    $config.toggle(0, function() {
+      $tools.hide();
+    });
+
   });
 
+  /**
+   * Toolsボタン押したとき
+   */
+  $('.btn-tools').on('click', function() {
+    $tools.toggle(0, function() {
+      $config.hide();
+    });
+  });
 
   /**
    * 設定内のイベント

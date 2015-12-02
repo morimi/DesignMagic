@@ -31,10 +31,13 @@
           <div class="topcoat-button btn-config">
             Config
           </div>
+          <div class="topcoat-button btn-tools">
+            Tools
+          </div>
         </div>
       </div>
 
-      <div id="validation-container">
+      <div id="validation-container" class="container">
         <ul id="message-list-layers" class="list">
 
         </ul>
@@ -43,7 +46,10 @@
         </ul>
       </div>
 
-      <div id="config-container">
+      <div id="config-container" class="container">
+      </div>
+
+      <div id="tools-container" class="container">
       </div>
 
       <div id="footer-container" class="panel-hd">
@@ -253,6 +259,39 @@
   </div>
 </script>
 
+<script id="tools-template" type="text/x-handlebars-template">
+  <div id="tools-list" class="list">
+
+     <dl>
+       <dt class="clearfix">「のコピー」を全て削除
+         <button class="topcoat-button--large pull-r" type="button">実行する</button>
+       </dt>
+       <dd>レイヤー・グループ名に含まれる「のコピー」を全て削除します</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">フォントサイズの小数点を全て削除
+         <button class="topcoat-button--large pull-r" type="button">実行する</button>
+       </dt>
+       <dd>フォントサイズを四捨五入し、小数点を全て削除します</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">非表示レイヤーを全て削除
+         <button class="topcoat-button--large pull-r" type="button">実行する</button>
+       </dt>
+       <dd>非表示になっているレイヤー、グループを全て削除します</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">ダミーレイヤーの作成
+         <button class="topcoat-button--large pull-r" type="button">実行する</button>
+       </dt>
+       <dd>高さx幅のテキスト入りダミーレイヤーを作成します</dd>
+     </dl>
+
+  </div>
+</script>
 
   <script src="js/libs/CSInterface.js"></script>
   <script>

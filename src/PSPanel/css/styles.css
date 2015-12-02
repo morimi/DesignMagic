@@ -132,12 +132,12 @@ body.darker #title-container {
  #validation>#validation-container
  #validation>#config-container
 */
-#validation-container,
-#config-container {
+.container {
   height: calc(100% - 52px);
 }
 
-#config-container {
+#config-container,
+#tools-container{
   display: none;
   position: absolute;
   top:29px;
@@ -152,7 +152,8 @@ body.darker #title-container {
 */
 
 #validation-container,
-#config-container {
+#config-container,
+#tools-container {
   overflow: hidden;
   overflow-y: scroll;
   background: #464646;
@@ -296,8 +297,29 @@ body.light .validation-info {
   color: #fff;
 }
 
-#setting-list p {
+#setting-list p ,
+#tools-list > p {
   margin: 10px;
+}
+
+
+.clearfix:before,
+.clearfix:after {
+	content: " ";
+	display: table;
+}
+
+.clearfix:after {
+	clear: both;
+}
+
+.clearfix {
+	*zoom: 1;
+}
+
+
+.pull-r {
+  float:right;
 }
 
 body.darker .message-hint,
@@ -329,7 +351,8 @@ body.light .message-hint {
 }
 
 .btn-check,
-.btn-config {
+.btn-config,
+.btn-tools {
   font-size: 10px;
 }
 
