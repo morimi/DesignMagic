@@ -23,7 +23,9 @@
 
   //Elements
   var $content = $('#content'),
-      $list = $('#message-list'),
+      $vContainer = $('#validation-container'),
+      $listLayers = $('#message-list-layers'),
+      $listOthers = $('#message-list-others'),
       $config = $('#config-container'),
       $console = $('#console'),
       $loader = $('#icon-loader');
@@ -242,7 +244,7 @@
             r.theme = obj.theme;
             r.Strings = obj.Strings;
 
-            $list.append(messageTmp(r));
+            $listOthers.append(messageTmp(r));
 
           });
 
@@ -280,7 +282,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTMODE', 'hint'), label)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
           d.resolve(c);
 
         } else {
@@ -316,7 +318,7 @@
             obj.hint = [_getValidationMessage('DOCUMENTNAME', 'hint')];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -351,7 +353,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
 
         }
 
@@ -388,7 +390,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -422,7 +424,7 @@
             obj.hint = [Strings.formatStr(_getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
           }
 
-          $list.append(messageTmp(obj));
+          $listOthers.append(messageTmp(obj));
         }
         d.resolve(c);
       });
@@ -463,7 +465,7 @@
 
             });
 
-            $list.prepend(messageTmp(obj));
+            $listLayers.append(messageTmp(obj));
           });
         }
 
@@ -509,8 +511,8 @@
    */
   function displayResult(start){
 
-    var errorNum = $list.find('.icon.error').length,
-        warnNum  = $list.find('.icon.warn').length;
+    var errorNum = $vContainer.find('.icon.error').length,
+        warnNum  = $vContainer.find('.icon.warn').length;
 
     var content = {
       time:  Math.abs((start - $.now()) / 1000) + 's',
@@ -545,7 +547,7 @@
      .then(displayConfig)
      .done(function(c) {
         setEventListeners();
-        $list.append(infoTmp({conf: c, Strings: Strings}));
+        $listOthers.append(infoTmp({conf: c, Strings: Strings}));
         $loader.hide();
     });
 
@@ -556,7 +558,8 @@
    */
   function reset() {
     $config.hide();
-    $list.empty().append(infoTmp({conf: confCache, Strings: Strings}));
+    $listLayers.empty();
+    $listOthers.empty().append(infoTmp({conf: confCache, Strings: Strings}));
     $console.empty();
     $('#error-total').text(0);
     $('#warn-total').text(0);
@@ -571,7 +574,8 @@
    */
 
   function check() {
-    $list.empty();
+    $listLayers.empty();
+    $listOthers.empty();
     $config.hide();
     $loader.show();
 
@@ -705,6 +709,151 @@
     confCache.check.fonts.autoFontSizeAbs = checked;
 
   });
+
+
+  /**
+   * パネルからのレイヤー名変更するクラス
+   * @since version 0.4.0
+   */
+  var ChangeLayerName = function(el) {};
+
+  /**
+   * バリデーションメッセージがクリックされた時の処理
+   * selectLayer.jsxにレイヤーIDとレイヤー名を渡して実行する
+   * @param {HTML Object} el クリックされたバリデーションメッセージ要素
+   * @since version 0.4.0
+   * @return {void}
+   */
+  ChangeLayerName.prototype.onClickMessage = function () {
+    var $this = $(this);
+
+    if ( $this.hasClass('select') ){
+      return;
+    }
+
+    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage');
+
+    var $title = $this.find('.title');
+
+    var data = {
+      id: $this.attr('data-id'),
+      name: $title.text()
+    };
+
+    $vContainer.find('.select').removeClass('select');
+    $this.addClass('select');
+
+    JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
+     // console.log(result)
+    });
+
+  };
+
+  /**
+   * バリデーションメッセージのtitle要素がダブルクリックされた時の処理
+   * title要素を隠し、入力フォームを挿入して表示する
+   * @since version 0.4.0
+   * @return {void}
+   */
+  ChangeLayerName.prototype.onDbClickMessage = function () {
+    var $this = $(this); //.title
+    var $parents = $this.parents('.message');
+
+    if ( !$this.parents('.message').hasClass('select') ) {
+      return;
+    }
+
+    var tmpl = Handlebars.compile($('#changeLayerName-template').html());
+
+    console.log('( ˘ω˘ )　ChangeLayerName.onDbClickMessage');
+
+    $this.after( tmpl($this.text()) );
+    $parents.find('.js-inputLayerName').focus();
+    $this.hide();
+
+  };
+
+  /**
+   * 変更処理
+   * changeLayerName.jsxに新しいレイヤー名を渡して実行する
+   * @since version 0.4.0
+   * @return {void}
+   */
+  ChangeLayerName.prototype.change = function change() {
+    var $this = $(this); //js-changeLayerName
+    var $parent = $this.parents('.message');
+    var $form = $this.parent('.js-changeLayerName');
+    var $input = $form.find('.js-inputLayerName');
+    var $title = $parent.find('.title');
+
+    var newName = $input.val();
+
+    if ( !$parent.hasClass('select') || ! newName ) {
+      return;
+    }
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName);
+
+    var data = {
+      name: newName
+    };
+
+
+    JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
+
+      //編集済みクラス付与
+      $parent.removeClass('select').addClass('modified');
+
+      //アイコンをvalidにする(templateにした方がいいかもしれない)
+      $parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+
+      //titleを入れ替える
+      $title.text(newName).show();
+
+      //hintを消す
+      $parent.find('.message-hint').remove();
+
+      //フォーム要素を消す
+      $form.remove();
+
+      //スライドアニメ
+      $parent.delay(3000).slideUp('slow', function(e) {
+        $(this).removeClass('modified').remove();
+      })
+
+    });
+
+
+  };
+
+  /**
+   * 変更キャンセル
+   * @since version 0.4.0
+   * @return {void}
+   */
+  ChangeLayerName.prototype.cancel = function cancel() {
+    var $this = $(this); //.js-cancelLayerName
+    var $parent = $this.parents('.message');
+
+    if ( !$parent.hasClass('select') ) {
+      return;
+    }
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.cancel');
+
+    $parent.find('.title').show();//titleをもどす
+    $parent.find('.js-changeLayerName').remove();
+    $parent.removeClass('select');
+  };
+
+  var _changeLayerName = new ChangeLayerName();
+
+  $vContainer
+    .on('click', '.message', _changeLayerName.onClickMessage)
+    .on('dblclick', '.title', _changeLayerName.onDbClickMessage)
+    .on('click', '.js-changeLayerName', _changeLayerName.change)
+    .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
+
 
 
   //素のinit()ではaddClassが想定通り動かんので

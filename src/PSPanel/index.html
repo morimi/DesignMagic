@@ -35,7 +35,10 @@
       </div>
 
       <div id="validation-container">
-        <ul id="message-list" class="list">
+        <ul id="message-list-layers" class="list">
+
+        </ul>
+        <ul id="message-list-others" class="list">
 
         </ul>
       </div>
@@ -53,10 +56,10 @@
 
 <!--バリデーションメッセージ-->
 <script id="message-template" type="text/x-handlebars-template">
-  <li class="message" data-type="{{type}}">
+  <li class="message" data-type="{{type}}" data-id="{{id}}">
     <div class="message-wrapper">
       <p class="message-title">
-        <img src="images/icon/{{theme}}/{{type}}.png" width="14" height="14" class="icon {{type}}">
+        <img src="images/icon/{{theme}}/{{type}}.png" width="14" height="14" class="icon {{type}} alert">
         {{#if kind}}
         <img src="images/icon/{{theme}}/{{kind}}.png" width="14" height="14" class="icon kind">
         {{/if}}
@@ -68,6 +71,12 @@
       {{/each}}
     </div>
   </li>
+</script>
+
+<script id="changeLayerName-template" type="text/x-handlebars-template">
+  <span class="js-changeLayerName"><input type="text" class="js-inputLayerName" placeholder="{{title}}">
+  <button type="button" class="js-changeLayerName">OK</button>
+  <button type="button" class="js-cancelLayerName">X</button></span>
 </script>
 
 
