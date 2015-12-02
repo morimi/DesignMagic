@@ -628,11 +628,7 @@
    * パネルからのレイヤー名変更するクラス
    * @since version 0.4.0
    */
-  var ChangeLayerName = function() {
-    this.$el = null;
-    this.$title = null;
-    this.newName = null;
-  };
+  var ChangeLayerName = function(el) {};
 
   /**
    * バリデーションメッセージがクリックされた時の処理
@@ -641,22 +637,24 @@
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.onClickMessage = function onClickMessage(el) {
-    this.$el = $(el);
+  ChangeLayerName.prototype.onClickMessage = function () {
+    var $this = $(this);
 
-    if ( this.$el.hasClass('select') ){
+    if ( $this.hasClass('select') ){
       return;
     }
 
-    this.$title = this.$el.find('.title');
+    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage');
+
+    var $title = $this.find('.title');
 
     var data = {
-      id: this.$el.attr('data-id'),
-      name: this.$title.text()
+      id: $this.attr('data-id'),
+      name: $title.text()
     };
 
     $vContainer.find('.select').removeClass('select');
-    this.$el.addClass('select');
+    $this.addClass('select');
 
     JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
      // console.log(result)
@@ -670,15 +668,21 @@
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.onDbClickMessage = function onDbClickMessage() {
-    this.tmpl = Handlebars.compile($('#changeLayerName-template').html());
+  ChangeLayerName.prototype.onDbClickMessage = function () {
+    var $this = $(this); //.title
+    var $parents = $this.parents('.message');
 
-    if ( !this.$el.hasClass('select') ) {
-      return
+    if ( !$this.parents('.message').hasClass('select') ) {
+      return;
     }
 
-    this.$title.hide();
-    this.$title.after( this.tmpl(this.$title.text()) );
+    var tmpl = Handlebars.compile($('#changeLayerName-template').html());
+
+    console.log('( ˘ω˘ )　ChangeLayerName.onDbClickMessage');
+
+    $this.after( tmpl($this.text()) );
+    $parents.find('.js-inputLayerName').focus();
+    $this.hide();
 
   };
 
@@ -689,38 +693,44 @@
    * @return {void}
    */
   ChangeLayerName.prototype.change = function change() {
-    var $input = this.$el.find('.js-inputLayerName');
-    var $btn = this.$el.find('.js-changeLayerName');
+    var $this = $(this); //js-changeLayerName
+    var $parent = $this.parents('.message');
+    var $form = $this.parent('.js-changeLayerName');
+    var $input = $form.find('.js-inputLayerName');
+    var $title = $parent.find('.title');
 
-    this.newName = $input.val();
-    console.log('[ChangeLayerName] newName = ' + this.newName);
+    var newName = $input.val();
+
+    if ( ! newName ) {
+      return;
+    }
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName);
 
     var data = {
-      name: this.newName
+      name: newName
     };
 
-    var self = this;
 
     JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
 
       //編集済みクラス付与
-      self.$el.removeClass('select').addClass('modified');
+      $parent.removeClass('select').addClass('modified');
 
       //アイコンをvalidにする(templateにした方がいいかもしれない)
-      self.$el.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+      $parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
 
       //titleを入れ替える
-      self.$title.text(self.newName).show();
+      $title.text(newName).show();
 
       //hintを消す
-      self.$el.find('.message-hint').remove();
+      $parent.find('.message-hint').remove();
 
       //フォーム要素を消す
-      $input.remove();
-      $btn.remove();
+      $form.remove();
 
       //スライドアニメ
-      self.$el.delay(3000).slideUp('slow', function(e) {
+      $parent.delay(3000).slideUp('slow', function(e) {
         $(this).removeClass('modified').remove();
       })
 
@@ -729,53 +739,33 @@
 
   };
 
+  /**
+   * 変更キャンセル
+   * @since version 0.4.0
+   * @return {void}
+   */
+  ChangeLayerName.prototype.cancel = function cancel() {
+    var $this = $(this); //.js-cancelLayerName
+    var $parent = $this.parents('.message');
+
+    if ( !$parent.hasClass('select') ) {
+      return;
+    }
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.cancel');
+
+    $parent.find('.title').show();//titleをもどす
+    $parent.find('.js-changeLayerName').remove();
+    $parent.removeClass('select');
+  };
+
   var _changeLayerName = new ChangeLayerName();
 
-  $vContainer.on('click', '.message', function() {
-    _changeLayerName.onClickMessage(this)
-  })
-    .on('dblclick', '.title', function() {
-    _changeLayerName.onDbClickMessage()
-  })
-    .on('click', '.js-changeLayerName', function() {
-    _changeLayerName.change()
-  });
-
-//
-//  $vContainer.on('click', '.message', function(e) {
-//    var $this = $(this);
-//
-//    if ( $this.hasClass('select') ) {
-//      return;
-//    }
-//
-//    var data = {
-//      id: $this.attr('data-id'),
-//      name: $this.find('.title').text()
-//    };
-//
-//    $vContainer.find('.select').removeClass('select');
-//    $this.addClass('select');
-//
-//    JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
-//     // console.log(result)
-//    });
-//  })
-//  .on('dblclick', '.message', function() {
-//    var $this = $(this),
-//        $title = $this.find('.title');
-//
-//    if ( !$this.hasClass('select') ) {
-//      return;
-//    }
-//
-//    $title.replaceWith( '<input type="text" class="js-inputLayerName" placeholder="' + $title.text() + '"><button type="button" class="js-changeLayerName">OK</button>');
-//
-//
-//  })
-//  .on('click', 'js-changeLayerName', function() {
-//
-//  });
+  $vContainer
+    .on('click', '.message', _changeLayerName.onClickMessage)
+    .on('dblclick', '.title', _changeLayerName.onDbClickMessage)
+    .on('click', '.js-changeLayerName', _changeLayerName.change)
+    .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
 
 
 
