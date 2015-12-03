@@ -894,6 +894,11 @@
     .on('click', '.js-changeLayerName', _changeLayerName.change)
     .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
 
+
+  /********************************************************
+   * ツールパネル
+   *******************************************************/
+
   /**
    * ダミーレイヤーの作成
    * @since version 0.5.0
@@ -903,6 +908,19 @@
 
       JSXRunner.runJSX("createDummyLayer", null, function (result) {
         console.log('（＾ω＾）createDummyLayer:complete');
+      });
+
+  })
+
+  /**
+   * 「のコピー」を全て削除
+   * @since version 0.5.0
+   */
+  .on('click', '.js-tools-deleteCopyText', function() {
+    console.log('(・∀・)deleteCopyText');
+
+      JSXRunner.runJSX("deleteCopyText", null, function (result) {
+        console.log('(・∀・)deleteCopyText:complete');
       });
 
   });
