@@ -676,10 +676,11 @@
     });
   });
 
+
   /**
    * 設定内のイベント
    */
-  $('#config-container').on('click', '.js-btn-setting', function() {//設定ボタン押したとき
+  $config.on('click', '.js-btn-setting', function() { //設定ボタン押したとき
     var input_url = $('#input-config-url').val();
     confCache = null;
 
@@ -893,7 +894,18 @@
     .on('click', '.js-changeLayerName', _changeLayerName.change)
     .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
 
+  /**
+   * ダミーレイヤーの作成
+   * @since version 0.5.0
+   */
+  $tools.on('click', '.js-tools-createDummyLayer', function() {
+    console.log('（＾ω＾）createDummyLayer');
 
+      JSXRunner.runJSX("createDummyLayer", null, function (result) {
+        console.log('（＾ω＾）createDummyLayer:complete');
+      });
+
+  });
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
