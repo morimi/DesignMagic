@@ -938,13 +938,19 @@
             mes;
 
         if ( obj.type === "console") {
-            if (obj.value === 'complete' && obj.total) {
-              mes = Strings.formatStr(_getValidationMessage('DELETECOPYTEXT', obj.value), obj.total);
-            } else if (obj.value === 'complete' && !obj.total) {
-              mes = _getValidationMessage('DELETECOPYTEXT', obj.value);
-            } else {
-                mes = _getValidationMessage('TOOLS', 'error');
-            }
+
+          var total = parseInt(obj.total);
+
+          if (obj.value === 'complete' && 0 < total) {
+            mes = Strings.formatStr(_getValidationMessage('DELETECOPYTEXT', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETECOPYTEXT', 'notfound');
+
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
 
           var content = {
             time:  Math.abs((start - $.now()) / 1000) + 's',
@@ -990,6 +996,51 @@
           };
 
           console.log('٩(ˊᗜˋ*)وdeleteFontFloat:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
+      });
+
+  })
+
+  /**
+   * 非表示レイヤーの削除
+   * @since version 0.5.0
+   */
+  .on('click', '.js-tools-deleteHiddenLayer', function() {
+    var start = $.now();
+    console.log('(´∀｀) deleteHiddenLayer');
+    $console.html(Strings.Pr_START_DELETEHIDDENLAYER);
+    $loader.show();
+
+      JSXRunner.runJSX("deleteHiddenLayer", {Strings: Strings}, function (result) {
+        var obj = _stringToObject(result),
+            mes;
+
+
+        if ( obj.type === "console") {
+
+          var total = parseInt(obj.total);
+
+          if (obj.value === 'complete' && 0 < total) {
+
+            mes = Strings.formatStr(_getValidationMessage('DELETEHIDDENLAYER', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETEHIDDENLAYER', 'notfound');
+
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes ,
+            lv: 0
+          };
+
+          console.log('٩(ˊᗜˋ*)deleteHiddenLayer:' + obj.value);
           $console.empty().append(consoleTmp(content));
           $loader.hide();
         }
