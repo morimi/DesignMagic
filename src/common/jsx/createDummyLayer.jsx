@@ -3,13 +3,20 @@
  * @since version 0.5.0
  * http://chuwa.iobb.net/tech/JavaScriptToolsGuideCC_.pdf
  */
+
 (function() {
+
+try {
 
   var _width = 100;
   var _height = 100;
+  var _name = _width + 'x' + _height + 'px';
   var _bgColor = "989ea9";
   var _textColor = "000000";
   var _fontStyle = 'ArialMT';
+  var _shapeId;
+  var _layerRef;
+  var _resultValue;
 
   //backgroundColor(0～255)
   //http://curryegg.blog.shinobi.jp/scriptui/
@@ -254,11 +261,12 @@
       _bgColor = bgColor.text;
       _textColor = textColor.text;
 
-      return createDummyLayer();
+      createDummyLayer();
     };
 
     cancelBtn.onClick = function() {
       win.close();
+      _resultValue = 'cancel';
     };
 
 
@@ -278,6 +286,7 @@
       var desc296 = new ActionDescriptor();
       var ref130 = new ActionReference();
       ref130.putClass( sTID( "contentLayer" ) );
+      //ref130.putName( cTID( "Lyr " ), _name);
       desc296.putReference( cTID( "null" ), ref130 );
 
       var desc297 = new ActionDescriptor();
@@ -343,12 +352,17 @@
   //    desc297.putObject( sTID( "strokeStyle" ), sTID( "strokeStyle" ), desc301 );
 
       desc296.putObject( cTID( "Usng" ), sTID( "contentLayer" ), desc297 );
+      desc296.putInteger( cTID( "LyrI" ), 17301 );
       executeAction( cTID( "Mk  " ), desc296, DialogModes.NO );
 
       rasterizeLayer();
+      changeLayerName(_name);
 
-      //_shapeId = getActiveLayerId();
+      _shapeId = getActiveLayerId();
 
+      selectLayer(_shapeId, _name);
+
+      _layerRef = activeDocument.activeLayer;
 
   }
 
@@ -363,12 +377,33 @@
   }
 
   /**
+   * レイヤーを選択する
+   * @param {number} id
+   * @param {string} name
+   */
+  function selectLayer(id, name) {
+    var desc = new ActionDescriptor();
+    var ref = new ActionReference();
+    var list = new ActionList();
+
+    ref.putName( cTID( "Lyr " ), name);
+    desc.putReference( cTID( "null" ), ref );
+    desc.putBoolean( cTID( "MkVs" ), false );
+
+    list.putInteger( parseInt( id ) );
+    desc.putList( cTID( "LyrI" ), list );
+    executeAction(  cTID( "slct" ), desc, DialogModes.NO );
+  }
+
+  /**
    * テキストレイヤーを作成する
    */
   function createTextLayer() {
+
     var layer = activeDocument.artLayers.add();
+
     layer.kind = LayerKind.TEXT;
-    layer.name = 'Dummy_'+ _width + 'x' + _height + 'px';
+    layer.name = 'Dummy_'+ _name;
     layer.blendMode = BlendMode.NORMAL;
 
     var textColor = new SolidColor;
@@ -390,6 +425,7 @@
     layer.textItem.justification = Justification.CENTER;
 
     layer.rasterize(RasterizeType.TEXTCONTENTS);
+    layer.move(_layerRef, ElementPlacement.PLACEBEFORE);
     layer.merge();
 
     //_textId = getActiveLayerId();
@@ -410,49 +446,54 @@
     desc54.putString( cTID( "Nm  " ), name );
     desc.putObject( cTID( "T   " ), cTID( "Lyr " ), desc54 );
     executeAction( cTID( "setd" ), desc, DialogModes.NO );
-
   }
 
   /**
    * レイヤーをラスタライズする
    */
   function rasterizeLayer() {
-      var desc814 = new ActionDescriptor();
-      var ref493 = new ActionReference();
-      ref493.putEnumerated( cTID( "Lyr " ), cTID( "Ordn" ), cTID( "Trgt" ) );
-      desc814.putReference( cTID( "null" ), ref493 );
-      executeAction( sTID( "rasterizeLayer" ), desc814, DialogModes.NO );
+    var desc814 = new ActionDescriptor();
+    var ref493 = new ActionReference();
+    ref493.putEnumerated( cTID( "Lyr " ), cTID( "Ordn" ), cTID( "Trgt" ) );
+    desc814.putReference( cTID( "null" ), ref493 );
+    executeAction( sTID( "rasterizeLayer" ), desc814, DialogModes.NO );
   }
 
   function getActiveLayerId() {
-      var ref = new ActionReference();
-      ref.putProperty( charIDToTypeID("Prpr") , charIDToTypeID( "LyrI" ));
-      ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
-      return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
+    var ref = new ActionReference();
+    ref.putProperty( charIDToTypeID("Prpr") , charIDToTypeID( "LyrI" ));
+    ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
+    return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
   }
 
 
+  /**
+   * ダミー作成実行関数
+   */
   function createDummyLayer() {
 
-    createSolidLayer();
-    createTextLayer();
+    activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_1_CREATEDUMMYLAYER %>", "createSolidLayer()");
+    activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_2_CREATEDUMMYLAYER %>", "createTextLayer()");
+    activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_3_CREATEDUMMYLAYER %>", "changeLayerName('Dummy_" + _name + "')");
 
-    changeLayerName('Dummy_'+ _width + 'x' + _height + 'px');
+    _resultValue = 'complete';
 
-    return '{message: "ダミーレイヤーを作成しました", type: "console"}';
   }
 
-  try {
+  if (documents.length > 0 ) {
 
+    createDialog();
 
-    if (documents.length > 0 ) {
-      return createDialog();
-    }
+  return '{value:"' + _resultValue + '", type: "console"}';
 
-  } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+  } else {
+
+   return '{value:"nodocument", type: "console"}';
+
   }
+
+} catch(e) {
+  return '{errorType: "jsx", errorMessage: "' + e + '"}';
+}
 
 })();
-
-

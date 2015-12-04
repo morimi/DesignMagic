@@ -222,13 +222,6 @@
           {{Strings.Pr_CONFIG_OPTION_AUTOSAVE}}
         </label>
       </dd>
-      <dd>
-        <label class="topcoat-checkbox">
-          <input type="checkbox" class="js-is-autoFontSizeAbs">
-          <div class="topcoat-checkbox__checkmark"></div>
-          {{Strings.Pr_CONFIG_OPTION_AUTOFONTSIZEABS}}
-        </label>
-      </dd>
     </dl>
 
     <dl>
@@ -261,7 +254,6 @@
 
 <script id="tools-template" type="text/x-handlebars-template">
   <div id="tools-list" class="list">
-
      <dl>
        <dt class="clearfix">「のコピー」を全て削除
          <button class="topcoat-button--large pull-r js-tools-deleteCopyText" type="button">実行する</button>
@@ -270,8 +262,8 @@
      </dl>
 
      <dl>
-       <dt class="clearfix">フォントサイズの小数点を全て削除
-         <button class="topcoat-button--large pull-r" type="button">実行する</button>
+       <dt class="clearfix">フォントの値に含まれる小数点を削除
+         <button class="topcoat-button--large pull-r js-tools-deleteFontFloat" type="button">実行する</button>
        </dt>
        <dd>フォントサイズを四捨五入し、小数点を全て削除します</dd>
      </dl>

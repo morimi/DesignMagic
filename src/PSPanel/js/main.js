@@ -638,15 +638,6 @@
       csInterface.addEventListener( 'documentAfterSave' , check);
     }
 
-    //少数点を含むフォントサイズを自動的に丸める
-    var autoFontSizeAbs =  window.localStorage.getItem('com.cyberagent.designmagic:autoFontSizeAbs') === 'true';
-
-    $('.js-is-autoFontSizeAbs').attr('checked', autoFontSizeAbs);
-
-    if ( _.isObject(confCache) ) {
-      confCache.check.fonts['autoFontSizeAbs'] = autoFontSizeAbs;
-    }
-
   }
 
 
@@ -740,14 +731,6 @@
   .on('click', '.js-btn-reset', function () {
     window.localStorage.clear();
     $config.empty().append(settingTmp({Strings:Strings}));
-  })
-  .on('change', '.js-is-autoFontSizeAbs', function() { //少数点を含むフォントサイズを自動的に丸める
-    var checked = $(this).is(':checked');
-
-    window.localStorage.setItem('com.cyberagent.designmagic:autoFontSizeAbs', checked);
-
-    confCache.check.fonts.autoFontSizeAbs = checked;
-
   });
 
 
@@ -904,10 +887,34 @@
    * @since version 0.5.0
    */
   $tools.on('click', '.js-tools-createDummyLayer', function() {
+    var start = $.now();
     console.log('（＾ω＾）createDummyLayer');
+    $console.html(Strings.Pr_START_CREATEDUMMYLAYER);
+    $loader.show();
 
-      JSXRunner.runJSX("createDummyLayer", null, function (result) {
-        console.log('（＾ω＾）createDummyLayer:complete');
+      JSXRunner.runJSX("createDummyLayer", {Strings: Strings}, function (result) {
+          var obj = _stringToObject(result),
+              mes;
+
+          if ( obj.type === "console") {
+
+            if (obj.value) {
+                mes = _getValidationMessage('CREATEDUMMYLAYER', obj.value);
+            } else {
+                mes = _getValidationMessage('TOOLS', 'error');
+            }
+
+            var content = {
+              time:  Math.abs((start - $.now()) / 1000) + 's',
+              message: mes,
+              lv: 0
+            };
+
+            console.log('（＾ω＾）createDummyLayer:' + obj.value);
+            $console.empty().append(consoleTmp(content));
+            $loader.hide();
+          }
+
       });
 
   })
@@ -917,10 +924,75 @@
    * @since version 0.5.0
    */
   .on('click', '.js-tools-deleteCopyText', function() {
-    console.log('(・∀・)deleteCopyText');
+    var start = $.now();
 
-      JSXRunner.runJSX("deleteCopyText", null, function (result) {
-        console.log('(・∀・)deleteCopyText:complete');
+    console.log('(・∀・)deleteCopyText');
+    $console.html(Strings.Pr_START_DELETECOPYTEXT);
+    $loader.show();
+
+    $console.empty().append(consoleTmp(content));
+
+      JSXRunner.runJSX("deleteCopyText", {Strings: Strings}, function (result) {
+
+        var obj = _stringToObject(result),
+            mes;
+
+        if ( obj.type === "console") {
+            if (obj.value === 'complete' && obj.total) {
+              mes = Strings.formatStr(_getValidationMessage('DELETECOPYTEXT', obj.value), obj.total);
+            } else if (obj.value === 'complete' && !obj.total) {
+              mes = _getValidationMessage('DELETECOPYTEXT', obj.value);
+            } else {
+                mes = _getValidationMessage('TOOLS', 'error');
+            }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes,
+            lv: 0
+          };
+
+          console.log('(・∀・)deleteCopyText:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
+
+      });
+
+  })
+
+  /**
+   * フォントの値に含まれる小数点を削除する
+   * @since version 0.5.0
+   */
+  .on('click', '.js-tools-deleteFontFloat', function() {
+    var start = $.now();
+    console.log('٩(ˊᗜˋ*)وdeleteFontFloat');
+    $console.html(Strings.Pr_START_DELETEFONTFLOAT);
+    $loader.show();
+
+      JSXRunner.runJSX("deleteFontFloat", {Strings: Strings}, function (result) {
+        var obj = _stringToObject(result),
+            mes;
+
+        if ( obj.type === "console") {
+
+          if (obj.value) {
+              mes = _getValidationMessage('DELETEFONTFLOAT', obj.value);
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes ,
+            lv: 0
+          };
+
+          console.log('٩(ˊᗜˋ*)وdeleteFontFloat:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
       });
 
   });

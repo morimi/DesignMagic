@@ -163,6 +163,7 @@ body.darker #title-container {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow: hidden;
 }
 
 
@@ -266,7 +267,7 @@ body.light .validation-info {
 
 /* 計測時間 */
 .time {
-  margin-right: 2em;
+  margin-right: 5px;
   background: #333;
   color: #fff;
   padding: .3rem .5rem;
