@@ -12,13 +12,6 @@
      */
     var layers = [];
 
-
-    /**
-     * 処理した数
-     * @type {number}
-     */
-    var t = 0;
-
     /**
      * 現在のレイヤー構造体から平坦化した配列を返却
      * @return {Array.<Layer>}
@@ -84,7 +77,6 @@
         try {
 
           target.name = name.replace(/<%= Strings.Pr_REGEX_DELETECOPYTEXT %>/, '');
-          t = (t+1)|0;
 
         } catch(e) {
 
@@ -103,7 +95,7 @@
       if ( layers.length ) {
         activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETECOPYTEXT %>", "deleteCopyText(layers)");
 
-        return '{value:"complete", total:' + t + ', type: "console"}';
+        return '{value:"complete", total:' + layers.length + ', type: "console"}';
 
       } else {
         return '{value:"notfound", total:0, type: "console"}';

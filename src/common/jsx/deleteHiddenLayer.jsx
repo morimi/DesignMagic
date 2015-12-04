@@ -12,13 +12,6 @@
      */
     var layers = [];
 
-
-    /**
-     * 処理した数
-     * @type {number}
-     */
-    var t = 0;
-
     /**
      * 現在のレイヤー構造体から平坦化した配列を返却
      * @return {Array.<Layer>}
@@ -64,8 +57,6 @@
 
           target.remove();
 
-          t = (t+1)|0;
-
         } catch(e) {
 
         }
@@ -83,7 +74,7 @@
       if ( layers.length ) {
         activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEHIDDENLAYER %>", "deleteCopyText(layers)");
 
-        return '{value:"complete", total:' + t + ', type: "console"}';
+        return '{value:"complete", total:' + layers.length + ', type: "console"}';
 
       } else {
         return '{value:"nolayers", total:0, type: "console"}';
