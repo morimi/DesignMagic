@@ -12,11 +12,6 @@ try {
    */
   var layers = [];
 
-
-  if ( layers.length ) {
-    check(layers);
-  }
-
   /**
    * 現在のレイヤー構造体から平坦化した配列を返却
    * @return {Array.<Layer>}
@@ -57,15 +52,16 @@ try {
       var target = targets[i],
           name = target.name;
 
-      if ( target.allLocked ) {
-        continue;
-      }
+      i = (i+1)|0;
+
+//名前だしロック貫通でいい気がした
+//      if ( target.allLocked ) {
+//        continue;
+//      }
 
       if ( /のコピー(\s\d+)*/.test(name) ) {
         target.name = name.replace(/のコピー(\s\d+)*/, '');
       }
-
-      i = (i+1)|0;
     }
 
   }
@@ -73,6 +69,8 @@ try {
 
   if (documents.length !== 0 ) {
 
+    //選択されてないとエラー（ユーザーにより操作がキャンセルされました）になるため
+    //activeLayerを選択状態にしておく
     var desc = new ActionDescriptor();
     var ref = new ActionReference();
     ref.putName( charIDToTypeID( "Lyr " ), activeDocument.activeLayer.name );

@@ -134,7 +134,7 @@
 
     //文字色
     colorGroup.add("statictext", undefined, "文字色#");
-    var textColor = colorGroup.add("edittext", undefined, _bgColor);
+    var textColor = colorGroup.add("edittext", undefined, _textColor);
     textColor.preferredSize.width = 60;
 
     //スライダー
