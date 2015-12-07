@@ -69,10 +69,14 @@
 
     if (documents.length !== 0 ) {
 
+      app.displayDialogs = DialogModes.NO; //「現在使用できません」ダイアログ表示しない
+
       layers = getLayersList();
 
       if ( layers.length ) {
         activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEHIDDENLAYER %>", "deleteCopyText(layers)");
+
+        app.displayDialogs = DialogModes.ERROR;//戻しておく
 
         return '{value:"complete", total:' + layers.length + ', type: "console"}';
 
