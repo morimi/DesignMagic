@@ -884,7 +884,7 @@
 
   /**
    * ダミーレイヤーの作成
-   * @since version 0.5.0
+   * @since version 0.4.0
    */
   $tools.on('click', '.js-tools-createDummyLayer', function() {
     var start = $.now();
@@ -921,7 +921,7 @@
 
   /**
    * 「のコピー」を全て削除
-   * @since version 0.5.0
+   * @since version 0.4.0
    */
   .on('click', '.js-tools-deleteCopyText', function() {
     var start = $.now();
@@ -969,7 +969,7 @@
 
   /**
    * フォントの値に含まれる小数点を削除する
-   * @since version 0.5.0
+   * @since version 0.4.0
    */
   .on('click', '.js-tools-deleteFontFloat', function() {
     var start = $.now();
@@ -1005,7 +1005,7 @@
 
   /**
    * 非表示レイヤーの削除
-   * @since version 0.5.0
+   * @since version 0.4.0
    */
   .on('click', '.js-tools-deleteHiddenLayer', function() {
     var start = $.now();

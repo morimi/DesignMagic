@@ -1,6 +1,6 @@
 /**
  * @fileoverview フォントの値に含まれる小数点を削除する
- * @since version 0.5.0
+ * @since version 0.4.0
  */
 (function() {
 

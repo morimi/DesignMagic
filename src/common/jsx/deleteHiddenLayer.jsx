@@ -1,6 +1,6 @@
 /**
  * @fileoverview 非表示レイヤーを削除する
- * @since version 0.5.0
+ * @since version 0.4.0
  */
 (function() {
 
