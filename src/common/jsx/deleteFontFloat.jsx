@@ -14,6 +14,13 @@
 
 
     /**
+     * 処理した数
+     * @type {number}
+     */
+    var total = 0;
+
+
+    /**
      * テキストレイヤーの拡大率を得る
      * @param {string} direction 縦または横を指定 'yy' or 'xx'
      * @return {number} 拡大率
@@ -102,8 +109,8 @@
         while ( i < l ) {
           var layer = layers[i];
 
-          if ( layer.kind === LayerKind.TEXT ) {
-            list.push(layer);
+          if ( layer.kind === LayerKind.TEXT) {
+             list.push(layer);
           }
 
           if ( layer.typename === 'LayerSet' ) {
@@ -152,7 +159,12 @@
 
           var size = getTextSize(target);
 
-          setTextSize(target, Math.round(size));
+          if ( /\./.test(size) ) {
+            total = (total+1)|0;
+
+            setTextSize(target, Math.round(size));
+
+          }
 
         } catch(e) {
           //fontsize 12（初期設定）でテキストレイヤーを作った場合
@@ -175,9 +187,10 @@
 
         activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEFONTFLOAT %>", "deleteFontFloat(layers)");
 
-        return '{value:"complete", type: "console"}';
+         return '{value:"complete", total:' + total + ', type: "console"}';
+
       } else {
-        return '{value:"notfound", type: "console"}';
+        return '{value:"notfound", total:0, type: "console"}';
       }
     }
 

@@ -982,9 +982,16 @@
             mes;
 
         if ( obj.type === "console") {
+          var total = parseInt(obj.total);
 
-          if (obj.value) {
-              mes = _getValidationMessage('DELETEFONTFLOAT', obj.value);
+          if (obj.value === 'complete' && 0 < total) {
+
+            mes = Strings.formatStr(_getValidationMessage('DELETEFONTFLOAT', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETEFONTFLOAT', 'notfound');
+
           } else {
               mes = _getValidationMessage('TOOLS', 'error');
           }
