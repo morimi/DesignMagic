@@ -16,7 +16,8 @@ try {
     var ref = new ActionReference();
     var list = new ActionList();
 
-    ref.putName( cTID( "Lyr " ), "<%= data.name %>");
+    //ref.putName( cTID( "Lyr " ), "<%= data.name %>");
+    ref.putIdentifier(cTID("Lyr "), parseInt("<%= data.id %>"));
     desc.putReference( cTID( "null" ), ref );
     desc.putBoolean( cTID( "MkVs" ), false );
 
@@ -33,3 +34,9 @@ try {
 } catch(e) {
   '{errorType: "jsx", errorMessage: "' + e + '"}';
 }
+  function getActiveLayerId() {
+    var ref = new ActionReference();
+    ref.putProperty( charIDToTypeID("Prpr") , charIDToTypeID( "LyrI" ));
+    ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
+    return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
+  }

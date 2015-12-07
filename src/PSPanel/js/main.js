@@ -621,6 +621,8 @@
      .done(function() {
       displayResult(start);
       $loader.hide();
+      $config.hide();
+      $tools.hide();
     });
   }
 
@@ -638,6 +640,10 @@
       csInterface.addEventListener( 'documentAfterSave' , check);
     }
 
+    //同じ名前のレイヤー/グループを全て変更対象にする
+    var nameChangeAll =  window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
+
+    $('.js-nameChangeAll').attr('checked', nameChangeAll);
   }
 
 
@@ -727,8 +733,13 @@
       csInterface.removeEventListener( 'documentAfterSave' , check);
     }
   })
+  .on('change', '.js-nameChangeAll', function() { //同じ名前のレイヤー/グループを全て変更対象にする
+    var checked = $(this).is(':checked');
 
-  .on('click', '.js-btn-reset', function () {
+    window.localStorage.setItem('com.cyberagent.designmagic:nameChangeAll', checked);
+
+  })
+  .on('click', '.js-btn-reset', function () { //リセットボタン
     window.localStorage.clear();
     $config.empty().append(settingTmp({Strings:Strings}));
   });
@@ -754,14 +765,14 @@
       return;
     }
 
-    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage');
-
     var $title = $this.find('.title');
 
     var data = {
       id: $this.attr('data-id'),
       name: $title.text()
     };
+
+    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage: '+ data.id );
 
     $vContainer.find('.select').removeClass('select');
     $this.addClass('select');
@@ -815,39 +826,66 @@
       return;
     }
 
-    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName);
-
     var data = {
-      name: newName
+      newName: newName,
+      isAll: window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll')
+    };
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName + '... isALL? ' + data.isAll);
+
+    /**
+     * 完了アニメーション
+     */
+    var complete = function complete(parent, title, form, newName) {
+      //編集済みクラス付与
+      parent.removeClass('select').addClass('modified');
+
+      //アイコンをvalidにする(templateにした方がいいかもしれない)
+      parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+
+      //titleを入れ替える
+      title.text(newName).show();
+
+      //hintを消す
+      parent.find('.message-hint').remove();
+
+      //フォーム要素を消す
+      form.remove();
+
+      //スライドアニメ
+      parent.delay(3000).slideUp('slow', function(e) {
+        $(this).removeClass('modified').remove();
+      });
     };
 
 
-    JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
+    JSXRunner.runJSX("changeLayerName", {data: data, Strings: Strings}, function (result) {
+      var obj = _stringToObject(result);
 
-      //編集済みクラス付与
-      $parent.removeClass('select').addClass('modified');
+      //まとめて変更
+      if ( data.isAll ) {
 
-      //アイコンをvalidにする(templateにした方がいいかもしれない)
-      $parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+        complete($parent, $title, $form, newName);
 
-      //titleを入れ替える
-      $title.text(newName).show();
+        $listLayers.find('.message').each(function(i, el) {
+          var $el = $(el);
+          var $_title  = $el.find('.title');
 
-      //hintを消す
-      $parent.find('.message-hint').remove();
+          if ( $_title.text() === obj.baseName ) {
+            complete($el, $_title, $el.find('.js-changeLayerName'), newName);
+          }
 
-      //フォーム要素を消す
-      $form.remove();
+        });
 
-      //スライドアニメ
-      $parent.delay(3000).slideUp('slow', function(e) {
-        $(this).removeClass('modified').remove();
-      })
+      } else {
+        complete($parent, $title, $form, newName);
+      }
 
     });
 
 
   };
+
 
   /**
    * 変更キャンセル
