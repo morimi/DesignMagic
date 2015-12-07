@@ -31,10 +31,13 @@
           <div class="topcoat-button btn-config">
             Config
           </div>
+          <div class="topcoat-button btn-tools">
+            Tools
+          </div>
         </div>
       </div>
 
-      <div id="validation-container">
+      <div id="validation-container" class="container">
         <ul id="message-list-layers" class="list">
 
         </ul>
@@ -43,7 +46,10 @@
         </ul>
       </div>
 
-      <div id="config-container">
+      <div id="config-container" class="container">
+      </div>
+
+      <div id="tools-container" class="container">
       </div>
 
       <div id="footer-container" class="panel-hd">
@@ -207,6 +213,7 @@
 
     <hr>
 
+   <!--オプション-->
     <dl>
       <dt>{{Strings.Pr_CONFIG_OPTION}}</dt>
       <dd>
@@ -218,11 +225,12 @@
       </dd>
       <dd>
         <label class="topcoat-checkbox">
-          <input type="checkbox" class="js-is-autoFontSizeAbs">
+          <input type="checkbox" class="js-nameChangeAll">
           <div class="topcoat-checkbox__checkmark"></div>
-          {{Strings.Pr_CONFIG_OPTION_AUTOFONTSIZEABS}}
+          同じ名前のレイヤー/グループを全て変更対象にする
         </label>
       </dd>
+
     </dl>
 
     <dl>
@@ -253,6 +261,39 @@
   </div>
 </script>
 
+<script id="tools-template" type="text/x-handlebars-template">
+  <div id="tools-list" class="list">
+    <p>{{{Pr_TOOLS_ATTENTION}}}</p>
+     <dl>
+       <dt class="clearfix">{{Strings.Pr_HISTORY_DELETECOPYTEXT}}
+         <button class="topcoat-button--large pull-r js-tools-deleteCopyText" type="button">{{Strings.Pr_BUTTON_EXECUTE}}</button>
+       </dt>
+       <dd>{{{Strings.Pr_DESCRIPTION_DELETECOPYTEXT}}}</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">{{Strings.Pr_HISTORY_DELETEFONTFLOAT}}
+         <button class="topcoat-button--large pull-r js-tools-deleteFontFloat" type="button">{{Strings.Pr_BUTTON_EXECUTE}}</button>
+       </dt>
+       <dd>{{{Strings.Pr_DESCRIPTION_DELETEFONTFLOAT}}}</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">{{Strings.Pr_HISTORY_DELETEHIDDENLAYER}}
+         <button class="topcoat-button--large pull-r js-tools-deleteHiddenLayer" type="button">{{Strings.Pr_BUTTON_EXECUTE}}</button>
+       </dt>
+       <dd>{{{Strings.Pr_DESCRIPTION_DELETEHIDDENLAYER}}}</dd>
+     </dl>
+
+     <dl>
+       <dt class="clearfix">{{Strings.Pr_HISTORY_CREATEDUMMYLAYER}}
+         <button class="topcoat-button--large pull-r js-tools-createDummyLayer" type="button">{{Strings.Pr_BUTTON_EXECUTE}}</button>
+       </dt>
+       <dd>{{{Strings.Pr_DESCRIPTION_CREATEDUMMYLAYER}}}</dd>
+     </dl>
+
+  </div>
+</script>
 
   <script src="js/libs/CSInterface.js"></script>
   <script>

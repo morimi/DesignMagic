@@ -88,8 +88,6 @@ var CONF_LAYERS_NAME = "<%= config.layers.name %>" === 'true',
     CONF_LAYERS_BLENDMODE = "<%= config.layers.blendingMode %>" === 'true',
     //フォントサイズが整数かどうかチェックする (boolean -> string)
     CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>" === 'true',
-    //少数点を含むフォントサイズを自動的に丸める
-    CONF_FONTS_AUTOFONTSIZEABS = "<%= config.fonts.autoFontSizeAbs %>" === 'true',
     //最小サイズ (number)
     CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>");
 
@@ -124,47 +122,6 @@ function _getTextScale(direction, layer) {
     return mFactor;
   }
   return 1;
-}
-
-/**
- * テキストパネルにフォントサイズをセットする
- * @param {Layer} layer テキストレイヤーオブジェクト
- * @param {number} size フォントサイズ
- * @see https://forums.adobe.com/thread/1954020
- */
-function setTextSize(layer, size) {
-  function cTID(s) { return app.charIDToTypeID(s); };
-  function sTID(s) { return app.stringIDToTypeID(s); };
-
-  activeDocument.activeLayer = layer;
-
-  var ref = new ActionReference();
-  var desc47 = new ActionDescriptor();
-  var desc48 = new ActionDescriptor();
-
-  ref.putProperty( cTID( "Prpr" ), cTID( "TxtS" ) );
-  ref.putEnumerated( cTID( "TxLr" ), cTID( "Ordn" ), cTID( "Trgt" ) );
-  desc47.putReference( cTID( "null" ), ref );
-
-  desc48.putInteger( sTID( "textOverrideFeatureName" ), 808465458 );
-  desc48.putInteger( sTID( "typeStyleOperationType" ), 3 );
-
-  var unit = "#Pxl";
-
-  if ( preferences.typeUnits === Units.POINTS ) {
-    unit = '#Pnt';
-  } else if ( preferences.typeUnits === Units.MM ) {
-    unit = '#Mlm';
-  }
-
-  desc48.putUnitDouble( cTID( "Sz  " ), cTID( unit ), size );
-  desc47.putObject( cTID( "T   " ), cTID( "TxtS" ), desc48 );
-
-  executeAction( cTID( "setd" ), desc47, DialogModes.NO );
-
-  //バグってて反映されない
-  layer.textItem.size = new UnitValue(size, RULERUNITS[preferences.typeUnits]);
-
 }
 
 /**
@@ -217,16 +174,7 @@ function check(targets) {
             //（textItem.sizeバグのため一旦レイヤーを削除して作り直さないと正しい値に戻らない）
             if ( /\./.test(size) && CONF_FONTS_ABSVALUE ) {
 
-              //少数点を含むフォントサイズを自動的に丸めるか
-              if ( CONF_FONTS_AUTOFONTSIZEABS ) {
-
-                setTextSize(target, Math.round(size));
-
-              } else {
-
-                hint.push(VALIDATION_HINT.FONT_ABSVALUE);
-
-              }
+              hint.push(VALIDATION_HINT.FONT_ABSVALUE);
             }
 
             if( (size <  CONF_FONTS_MINSIZE) && (0 < CONF_FONTS_MINSIZE) ) {

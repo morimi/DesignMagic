@@ -28,13 +28,15 @@
       $listOthers = $('#message-list-others'),
       $config = $('#config-container'),
       $console = $('#console'),
-      $loader = $('#icon-loader');
+      $loader = $('#icon-loader'),
+      $tools = $('#tools-container');
 
   var messageTmp = Handlebars.compile($('#message-template').html()),
       configTmp = Handlebars.compile($('#config-template').html()),
       infoTmp = Handlebars.compile($('#info-template').html()),
       consoleTmp = Handlebars.compile($('#console-template').html()),
-      settingTmp = Handlebars.compile($('#setting-template').html());
+      settingTmp = Handlebars.compile($('#setting-template').html()),
+      toolsTmp = Handlebars.compile($('#tools-template').html());
 
   var UNITS_LABEL = {
     CM: 'cm',
@@ -182,6 +184,30 @@
           Strings: Strings
        }));
     }
+
+    d.resolve(c);
+    return d.promise;
+  }
+
+
+  /**
+   * ツール表示
+   * @param {Object} c config object
+   */
+  function displayTools(c) {
+    var d = Q.defer();
+
+    if ( _.isObject(c) ) {
+
+      c = _.extend({
+          theme: themeManager.getThemeColorType(),
+          Strings: Strings
+       }, c );
+
+    }
+
+    $tools.empty().append(toolsTmp(c));
+
 
     d.resolve(c);
     return d.promise;
@@ -545,6 +571,7 @@
 
     Q.fcall(loadConfig)
      .then(displayConfig)
+     .then(displayTools)
      .done(function(c) {
         setEventListeners();
         $listOthers.append(infoTmp({conf: c, Strings: Strings}));
@@ -594,6 +621,8 @@
      .done(function() {
       displayResult(start);
       $loader.hide();
+      $config.hide();
+      $tools.hide();
     });
   }
 
@@ -611,15 +640,10 @@
       csInterface.addEventListener( 'documentAfterSave' , check);
     }
 
-    //少数点を含むフォントサイズを自動的に丸める
-    var autoFontSizeAbs =  window.localStorage.getItem('com.cyberagent.designmagic:autoFontSizeAbs') === 'true';
+    //同じ名前のレイヤー/グループを全て変更対象にする
+    var nameChangeAll =  window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
 
-    $('.js-is-autoFontSizeAbs').attr('checked', autoFontSizeAbs);
-
-    if ( _.isObject(confCache) ) {
-      confCache.check.fonts['autoFontSizeAbs'] = autoFontSizeAbs;
-    }
-
+    $('.js-nameChangeAll').attr('checked', nameChangeAll);
   }
 
 
@@ -633,14 +657,27 @@
    * Configボタン押したとき
    */
   $('.btn-config').on('click', function() {
-    $config.toggle();
+
+    $config.toggle(0, function() {
+      $tools.hide();
+    });
+
+  });
+
+  /**
+   * Toolsボタン押したとき
+   */
+  $('.btn-tools').on('click', function() {
+    $tools.toggle(0, function() {
+      $config.hide();
+    });
   });
 
 
   /**
    * 設定内のイベント
    */
-  $('#config-container').on('click', '.js-btn-setting', function() {//設定ボタン押したとき
+  $config.on('click', '.js-btn-setting', function() { //設定ボタン押したとき
     var input_url = $('#input-config-url').val();
     confCache = null;
 
@@ -696,18 +733,15 @@
       csInterface.removeEventListener( 'documentAfterSave' , check);
     }
   })
-
-  .on('click', '.js-btn-reset', function () {
-    window.localStorage.clear();
-    $config.empty().append(settingTmp({Strings:Strings}));
-  })
-  .on('change', '.js-is-autoFontSizeAbs', function() { //少数点を含むフォントサイズを自動的に丸める
+  .on('change', '.js-nameChangeAll', function() { //同じ名前のレイヤー/グループを全て変更対象にする
     var checked = $(this).is(':checked');
 
-    window.localStorage.setItem('com.cyberagent.designmagic:autoFontSizeAbs', checked);
+    window.localStorage.setItem('com.cyberagent.designmagic:nameChangeAll', checked);
 
-    confCache.check.fonts.autoFontSizeAbs = checked;
-
+  })
+  .on('click', '.js-btn-reset', function () { //リセットボタン
+    window.localStorage.clear();
+    $config.empty().append(settingTmp({Strings:Strings}));
   });
 
 
@@ -731,14 +765,14 @@
       return;
     }
 
-    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage');
-
     var $title = $this.find('.title');
 
     var data = {
       id: $this.attr('data-id'),
       name: $title.text()
     };
+
+    console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage: '+ data.id );
 
     $vContainer.find('.select').removeClass('select');
     $this.addClass('select');
@@ -792,39 +826,66 @@
       return;
     }
 
-    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName);
-
     var data = {
-      name: newName
+      newName: newName,
+      isAll: window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll')
+    };
+
+    console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName + '... isALL? ' + data.isAll);
+
+    /**
+     * 完了アニメーション
+     */
+    var complete = function complete(parent, title, form, newName) {
+      //編集済みクラス付与
+      parent.removeClass('select').addClass('modified');
+
+      //アイコンをvalidにする(templateにした方がいいかもしれない)
+      parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+
+      //titleを入れ替える
+      title.text(newName).show();
+
+      //hintを消す
+      parent.find('.message-hint').remove();
+
+      //フォーム要素を消す
+      form.remove();
+
+      //スライドアニメ
+      parent.delay(3000).slideUp('slow', function(e) {
+        $(this).removeClass('modified').remove();
+      });
     };
 
 
-    JSXRunner.runJSX("changeLayerName", {data: data}, function (result) {
+    JSXRunner.runJSX("changeLayerName", {data: data, Strings: Strings}, function (result) {
+      var obj = _stringToObject(result);
 
-      //編集済みクラス付与
-      $parent.removeClass('select').addClass('modified');
+      //まとめて変更
+      if ( data.isAll ) {
 
-      //アイコンをvalidにする(templateにした方がいいかもしれない)
-      $parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
+        complete($parent, $title, $form, newName);
 
-      //titleを入れ替える
-      $title.text(newName).show();
+        $listLayers.find('.message').each(function(i, el) {
+          var $el = $(el);
+          var $_title  = $el.find('.title');
 
-      //hintを消す
-      $parent.find('.message-hint').remove();
+          if ( $_title.text() === obj.baseName ) {
+            complete($el, $_title, $el.find('.js-changeLayerName'), newName);
+          }
 
-      //フォーム要素を消す
-      $form.remove();
+        });
 
-      //スライドアニメ
-      $parent.delay(3000).slideUp('slow', function(e) {
-        $(this).removeClass('modified').remove();
-      })
+      } else {
+        complete($parent, $title, $form, newName);
+      }
 
     });
 
 
   };
+
 
   /**
    * 変更キャンセル
@@ -855,6 +916,182 @@
     .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
 
 
+  /********************************************************
+   * ツールパネル
+   *******************************************************/
+
+  /**
+   * ダミーレイヤーの作成
+   * @since version 0.4.0
+   */
+  $tools.on('click', '.js-tools-createDummyLayer', function() {
+    var start = $.now();
+    console.log('（＾ω＾）createDummyLayer');
+    $console.html(Strings.Pr_START_CREATEDUMMYLAYER);
+    $loader.show();
+
+      JSXRunner.runJSX("createDummyLayer", {Strings: Strings}, function (result) {
+          var obj = _stringToObject(result),
+              mes;
+
+          if ( obj.type === "console") {
+
+            if (obj.value) {
+                mes = _getValidationMessage('CREATEDUMMYLAYER', obj.value);
+            } else {
+                mes = _getValidationMessage('TOOLS', 'error');
+            }
+
+            var content = {
+              time:  Math.abs((start - $.now()) / 1000) + 's',
+              message: mes,
+              lv: 0
+            };
+
+            console.log('（＾ω＾）createDummyLayer:' + obj.value);
+            $console.empty().append(consoleTmp(content));
+            $loader.hide();
+          }
+
+      });
+
+  })
+
+  /**
+   * 「のコピー」を全て削除
+   * @since version 0.4.0
+   */
+  .on('click', '.js-tools-deleteCopyText', function() {
+    var start = $.now();
+
+    console.log('(・∀・)deleteCopyText');
+    $console.html(Strings.Pr_START_DELETECOPYTEXT);
+    $loader.show();
+
+    $console.empty().append(consoleTmp(content));
+
+      JSXRunner.runJSX("deleteCopyText", {Strings: Strings}, function (result) {
+
+        var obj = _stringToObject(result),
+            mes;
+
+        if ( obj.type === "console") {
+
+          var total = parseInt(obj.total);
+
+          if (obj.value === 'complete' && 0 < total) {
+            mes = Strings.formatStr(_getValidationMessage('DELETECOPYTEXT', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETECOPYTEXT', 'notfound');
+
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes,
+            lv: 0
+          };
+
+          console.log('(・∀・)deleteCopyText:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
+
+      });
+
+  })
+
+  /**
+   * フォントの値に含まれる小数点を削除する
+   * @since version 0.4.0
+   */
+  .on('click', '.js-tools-deleteFontFloat', function() {
+    var start = $.now();
+    console.log('٩(ˊᗜˋ*)وdeleteFontFloat');
+    $console.html(Strings.Pr_START_DELETEFONTFLOAT);
+    $loader.show();
+
+      JSXRunner.runJSX("deleteFontFloat", {Strings: Strings}, function (result) {
+        var obj = _stringToObject(result),
+            mes;
+
+        if ( obj.type === "console") {
+          var total = parseInt(obj.total);
+
+          if (obj.value === 'complete' && 0 < total) {
+
+            mes = Strings.formatStr(_getValidationMessage('DELETEFONTFLOAT', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETEFONTFLOAT', 'notfound');
+
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes ,
+            lv: 0
+          };
+
+          console.log('٩(ˊᗜˋ*)وdeleteFontFloat:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
+      });
+
+  })
+
+  /**
+   * 非表示レイヤーの削除
+   * @since version 0.4.0
+   */
+  .on('click', '.js-tools-deleteHiddenLayer', function() {
+    var start = $.now();
+    console.log('(´∀｀) deleteHiddenLayer');
+    $console.html(Strings.Pr_START_DELETEHIDDENLAYER);
+    $loader.show();
+
+      JSXRunner.runJSX("deleteHiddenLayer", {Strings: Strings}, function (result) {
+        var obj = _stringToObject(result),
+            mes;
+
+
+        if ( obj.type === "console") {
+
+          var total = parseInt(obj.total);
+
+          if (obj.value === 'complete' && 0 < total) {
+
+            mes = Strings.formatStr(_getValidationMessage('DELETEHIDDENLAYER', obj.value), total);
+
+          } else if (obj.value === 'notfound' || total === 0) {
+
+            mes = _getValidationMessage('DELETEHIDDENLAYER', 'notfound');
+
+          } else {
+              mes = _getValidationMessage('TOOLS', 'error');
+          }
+
+          var content = {
+            time:  Math.abs((start - $.now()) / 1000) + 's',
+            message: mes ,
+            lv: 0
+          };
+
+          console.log('٩(ˊᗜˋ*)deleteHiddenLayer:' + obj.value);
+          $console.empty().append(consoleTmp(content));
+          $loader.hide();
+        }
+      });
+
+  });
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
