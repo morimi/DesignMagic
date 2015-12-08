@@ -819,10 +819,9 @@
     var $form = $this.parent('.js-changeLayerName');
     var $input = $form.find('.js-inputLayerName');
     var $title = $parent.find('.title');
-
     var newName = $input.val();
 
-    if ( !$parent.hasClass('select') || ! newName ) {
+    if ( !$parent.hasClass('select') || ! newName || $parent.data('pending')) {
       return;
     }
 
@@ -830,6 +829,9 @@
       newName: newName,
       isAll: window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll')
     };
+
+    $parent.data('pending', true);
+    $input.attr('disabled', true);
 
     console.log('( ˘ω˘ )　 ChangeLayerName.change:' + newName + '... isALL? ' + data.isAll);
 
@@ -854,7 +856,8 @@
 
       //スライドアニメ
       parent.delay(3000).slideUp('slow', function(e) {
-        $(this).removeClass('modified').remove();
+        $(this).removeClass('modified').remove()
+               .data('pending', false);
       });
     };
 
@@ -907,13 +910,36 @@
     $parent.removeClass('select');
   };
 
+  /**
+   * 表示・非表示操作
+   */
+  ChangeLayerName.prototype.onClickKind = function () {
+    var $this = $(this);
+    var $parent = $this.parents('.message');
+    var action = $this.data('visible') || 'hidden';
+    console.log('onClickKind:' + $parent.attr('data-id'))
+
+    var data = {
+      id: $parent.attr('data-id'),
+      action: action
+    }
+
+    JSXRunner.runJSX("visible", {data: data}, function (result) {
+      $this.data('visible', (action === 'hidden') ? 'show':'hidden')
+           .css('opacity', (action === 'hidden') ? 0.5 : 1 );
+
+    });
+
+  };
+
   var _changeLayerName = new ChangeLayerName();
 
   $vContainer
     .on('click', '.message', _changeLayerName.onClickMessage)
     .on('dblclick', '.title', _changeLayerName.onDbClickMessage)
     .on('click', '.js-changeLayerName', _changeLayerName.change)
-    .on('click', '.js-cancelLayerName', _changeLayerName.cancel);
+    .on('click', '.js-cancelLayerName', _changeLayerName.cancel)
+    .on('click', '.icon.kind', _changeLayerName.onClickKind);
 
 
   /********************************************************
@@ -1093,11 +1119,10 @@
 
   });
 
-  //素のinit()ではaddClassが想定通り動かんので
-  $(document).ready(init);
-
   //ドキュメント閉じた時
   csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
+  //素のinit()ではaddClassが想定通り動かんので
+  $(document).ready(init);
 
 }());

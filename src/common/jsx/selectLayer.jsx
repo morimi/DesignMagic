@@ -34,9 +34,3 @@ try {
 } catch(e) {
   '{errorType: "jsx", errorMessage: "' + e + '"}';
 }
-  function getActiveLayerId() {
-    var ref = new ActionReference();
-    ref.putProperty( charIDToTypeID("Prpr") , charIDToTypeID( "LyrI" ));
-    ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
-    return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
-  }
