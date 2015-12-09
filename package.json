@@ -8,7 +8,8 @@
     "install": "gulp ndm",
     "update": "npm update; gulp ndm",
     "build": "gulp build",
-    "clean": "gulp clean"
+    "clean": "gulp clean",
+    "docs": "gulp docs"
   },
   "repository": {
     "type": "git",
