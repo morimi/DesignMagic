@@ -1,0 +1,17 @@
+{
+  "tags": {
+    "allowUnknownTags": false
+  },
+  "source": {
+    "include": [
+      "./src/common/jsx"
+    ],
+    "exclude": [
+    ]
+  },
+  "opts": {
+    "destination": "./docs/designmagic-jsx",
+    "private": false
+  },
+  "plugins": ["plugins/markdown"]
+}

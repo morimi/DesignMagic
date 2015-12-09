@@ -1,0 +1,17 @@
+{
+  "tags": {
+    "allowUnknownTags": false
+  },
+  "source": {
+    "include": [
+      "./gulpfile.js"
+    ],
+    "exclude": [
+    ]
+  },
+  "opts": {
+    "destination": "./docs/gulpfile",
+    "private": false
+  },
+  "plugins": ["plugins/markdown"]
+}

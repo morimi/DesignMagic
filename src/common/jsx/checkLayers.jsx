@@ -5,6 +5,7 @@
 try {
 
 /**
+ * @requires checkLayers.jsx
  * @param {string} title
  * @param {Array} hint
  * @param {string} type
@@ -107,6 +108,7 @@ var RULERUNITS = {
 
 /**
  * テキストレイヤーの拡大率を得る
+ * @private
  * @param {string} direction 縦または横を指定 'yy' or 'xx'
  * @return {number} 拡大率
  * @see https://forums.adobe.com/thread/1954020

@@ -754,7 +754,7 @@
   /**
    * バリデーションメッセージがクリックされた時の処理
    * selectLayer.jsxにレイヤーIDとレイヤー名を渡して実行する
-   * @param {HTML Object} el クリックされたバリデーションメッセージ要素
+   * @param {HTMLElement} el クリックされたバリデーションメッセージ要素
    * @since version 0.4.0
    * @return {void}
    */
