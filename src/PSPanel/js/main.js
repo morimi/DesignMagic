@@ -5,6 +5,7 @@
   'use strict';
 
   var csInterface = new CSInterface();
+  var extensionId =  csInterface.getExtensionID();
       //,localeStrings = csInterface.initResourceBundle();
 
   //Modules
@@ -564,10 +565,103 @@
 
   }
 
+  /**
+   * PhotoshopのHTMLパネルのコンテンツが永続する設定
+   * initで実行するとパネルを切り替えても再読み込みしなくなるので、アプリの再起動が必要
+   */
+  function setPersistent() {
+    var event = new CSEvent("com.adobe.PhotoshopPersistent", "APPLICATION");
+    event.extensionId = extensionId;
+    csInterface.dispatchEvent(event);
+  }
+
+  /**
+   * Photoshopイベントコールバック
+   * 引数で渡されるイベントデータに含まれるイベントタイプIDで処理を仕分けている
+   *
+   * delete(1147958304) - レイヤー削除時　エラーメッセージがあれば消す
+   *
+   * 参考：
+   * http://www.davidebarranca.com/2015/09/html-panel-tips-18-photoshop-json-callback/
+   */
+  function PhotoshopCallbackUnique(csEvent) {
+      try {
+          if (typeof csEvent.data === "string") {
+              csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
+
+            switch(csEvent.data.eventID) {
+              case 1147958304: //delete
+                  handleDeleteEvent(csEvent.data.eventData.layerID);
+                break;
+            }
+
+          } else {
+              console.log("PhotoshopCallbackUnique expecting string for csEvent.data!");
+          }
+      } catch(e) {
+          console.log("PhotoshopCallbackUnique catch: " + e);
+      }
+  }
+
+  /**
+   * IDで指定したPhotoshop処理にイベントをディスパッチする
+   * イベントIDは Photoshop Javascript Scription Reference の 'Appendix A: Event ID Codes' で確認できる
+   * http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/photoshop/pdfs/photoshop-cc-javascript-ref-2015.pdf
+   *
+   * @param {string} eventStringID 'stringIDToTypeID' に対応したイベントID
+   * @return {void}
+   */
+  function eventRegistering (eventStringID) {
+
+    var event  = new CSEvent("com.adobe.PhotoshopRegisterEvent",
+                             "APPLICATION");
+    event.extensionId = extensionId;
+
+    csInterface.evalScript("app.stringIDToTypeID('" + eventStringID + "')", function (typeID) {
+        event.data = typeID;
+        csInterface.dispatchEvent(event);
+        console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
+    });
+  }
+
+
+  /**
+   * Photoshop レイヤー削除イベント時の処理
+   * エラーメッセージから該当するレイヤーIDのメッセージを消す
+   * レイヤーセットを削除したときはIDが渡されない(undefined)ため何も出来ない。。。
+   * @param {?Array.<number>} layerID 削除されたレイヤーID
+   * @return {void}
+   */
+  function handleDeleteEvent (layerID) {
+
+    if ( !layerID ) {
+      return;
+    }
+
+    _.each(layerID, function(id) {
+      $vContainer.find('.message[data-id="' + id + '"]').remove();
+    });
+
+    var errorNum = $vContainer.find('.icon.error').length,
+        warnNum  = $vContainer.find('.icon.warn').length;
+
+    $('#error-total').text(errorNum);
+    $('#warn-total').text(warnNum);
+
+  }
+
   //Init
   function init() {
+    console.log(extensionId)
 
     themeManager.init();
+
+    //setPersistent();
+
+    // Listener for PhotoshopJSONCallback
+    csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, PhotoshopCallbackUnique);
+
+    eventRegistering('delete'); //1147958304
 
     Q.fcall(loadConfig)
      .then(displayConfig)
@@ -630,6 +724,9 @@
    * csInterface イベントリスナーの設定
    */
   function setEventListeners() {
+
+    //ドキュメント閉じた時
+    csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
     //ドキュメント保存したときの自動チェック
     var autocheck = window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true';
@@ -1118,9 +1215,6 @@
       });
 
   });
-
-  //ドキュメント閉じた時
-  csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
