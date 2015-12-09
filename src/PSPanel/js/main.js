@@ -588,10 +588,15 @@
       try {
           if (typeof csEvent.data === "string") {
               csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
+console.log(csEvent.data.eventData.layerID);
 
             switch(csEvent.data.eventID) {
               case 1147958304: //delete
                   handleDeleteEvent(csEvent.data.eventData.layerID);
+                break;
+
+              case 1298866208: //make
+                  handleMakeEvent(csEvent.data.eventData.layerID);
                 break;
             }
 
@@ -650,6 +655,65 @@
 
   }
 
+  /**
+   * Photoshop レイヤー作成イベント時の処理
+   * バリデーションリストに命名してくださいメッセージを追加する
+   * レイヤーセットを作成したときはIDが渡されない(undefined)ため何も出来ない。。。
+   * @param {?Array.<number>} layerID 削除されたレイヤーID
+   * @return {void}
+   */
+  function handleMakeEvent(layerID) {
+
+    if ( !layerID || !$listOthers.find('.message').length) {
+      return;
+    }
+
+    var data = {
+      id: layerID
+    };
+
+    JSXRunner.runJSX("getLayerData", {data: data}, function (result) {
+      //result = { title: "レイヤー 49", index: "152", kind: "LayerKind.NORMAL"}
+      console.log('handleMakeEvent:' + result);
+
+      var obj = _stringToObject(result);
+      var complete;
+
+      if ( !obj.index ) {
+        return;
+      }
+
+      var messages = $listLayers.find('.message');
+
+      obj.hint = [_getValidationMessage('NONAME_LAYERS', 'hint')];
+      obj.type = 'warn';
+
+      if ( !messages.length ) {
+        $listLayers.append(messageTmp(obj));
+        return;
+      }
+
+      messages.each(function(i, el) {
+        var $el = $(el);
+        var eIdx = parseInt(el.getAttribute('data-index'));
+        var oIdx = parseInt(obj.index);
+
+        //NORMALが作られてから矩形に置き換わった場合は削除しておく
+        if ( (obj.kind !== 'LayerKind.NORMAL') && (eIdx === oIdx)) {
+          $el.remove();
+        }
+
+        if ( eIdx < oIdx && !complete) {
+          $el.before(messageTmp(obj));
+          complete = true;
+        }
+
+      });
+
+
+    });
+  }
+
   //Init
   function init() {
     console.log(extensionId)
@@ -662,6 +726,7 @@
     csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, PhotoshopCallbackUnique);
 
     eventRegistering('delete'); //1147958304
+    eventRegistering('make'); //1147958304
 
     Q.fcall(loadConfig)
      .then(displayConfig)

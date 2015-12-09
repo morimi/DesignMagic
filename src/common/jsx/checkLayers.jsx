@@ -11,10 +11,10 @@ try {
  * @param {string} kind LayerKind
  * @return {string} stringifyした文字列
  */
-function resultToString(id, title, hint, type, kind) {
+function resultToString(id, index, title, hint, type, kind) {
   //return JSON.stringify(this.data); JSON使えないよ
 
-  var text = '{id: ' + id + ', title:"' + title + '", hint:[';
+  var text = '{id: ' + id + ', index: ' + index + ', title:"' + title + '", hint:[';
 
   for ( var i = 0, l = hint.length; i < l; i++ ) {
     text += '"' + hint[i] + '"' + ',';
@@ -217,7 +217,7 @@ function check(targets) {
     h = (h + !target.visible)|0;
 
     if ( hint.length ) {
-      mes.push(resultToString(target.id, name, hint, type, (kind || target.typename)));
+      mes.push(resultToString(target.id, target.itemIndex, name, hint, type, (kind || target.typename)));
     }
 
     i = (i+1)|0;

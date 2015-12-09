@@ -352,7 +352,7 @@ try {
   //    desc297.putObject( sTID( "strokeStyle" ), sTID( "strokeStyle" ), desc301 );
 
       desc296.putObject( cTID( "Usng" ), sTID( "contentLayer" ), desc297 );
-      desc296.putInteger( cTID( "LyrI" ), 17301 );
+      //desc296.putInteger( cTID( "LyrI" ), 17301 );
       executeAction( cTID( "Mk  " ), desc296, DialogModes.NO );
 
       rasterizeLayer();
