@@ -5,6 +5,7 @@
   'use strict';
 
   var csInterface = new CSInterface();
+  var extensionId =  csInterface.getExtensionID();
       //,localeStrings = csInterface.initResourceBundle();
 
   //Modules
@@ -564,10 +565,168 @@
 
   }
 
+  /**
+   * PhotoshopのHTMLパネルのコンテンツが永続する設定
+   * initで実行するとパネルを切り替えても再読み込みしなくなるので、アプリの再起動が必要
+   */
+  function setPersistent() {
+    var event = new CSEvent("com.adobe.PhotoshopPersistent", "APPLICATION");
+    event.extensionId = extensionId;
+    csInterface.dispatchEvent(event);
+  }
+
+  /**
+   * Photoshopイベントコールバック
+   * 引数で渡されるイベントデータに含まれるイベントタイプIDで処理を仕分けている
+   *
+   * delete(1147958304) - レイヤー削除時　エラーメッセージがあれば消す
+   *
+   * 参考：
+   * http://www.davidebarranca.com/2015/09/html-panel-tips-18-photoshop-json-callback/
+   */
+  function PhotoshopCallbackUnique(csEvent) {
+      try {
+          if (typeof csEvent.data === "string") {
+              csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
+console.log(csEvent.data.eventData.layerID);
+
+            switch(csEvent.data.eventID) {
+              case 1147958304: //delete
+                  handleDeleteEvent(csEvent.data.eventData.layerID);
+                break;
+
+              case 1298866208: //make
+                  handleMakeEvent(csEvent.data.eventData.layerID);
+                break;
+            }
+
+          } else {
+              console.log("PhotoshopCallbackUnique expecting string for csEvent.data!");
+          }
+      } catch(e) {
+          console.log("PhotoshopCallbackUnique catch: " + e);
+      }
+  }
+
+  /**
+   * IDで指定したPhotoshop処理にイベントをディスパッチする
+   * イベントIDは Photoshop Javascript Scription Reference の 'Appendix A: Event ID Codes' で確認できる
+   * http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/photoshop/pdfs/photoshop-cc-javascript-ref-2015.pdf
+   *
+   * @param {string} eventStringID 'stringIDToTypeID' に対応したイベントID
+   * @return {void}
+   */
+  function eventRegistering (eventStringID) {
+
+    var event  = new CSEvent("com.adobe.PhotoshopRegisterEvent",
+                             "APPLICATION");
+    event.extensionId = extensionId;
+
+    csInterface.evalScript("app.stringIDToTypeID('" + eventStringID + "')", function (typeID) {
+        event.data = typeID;
+        csInterface.dispatchEvent(event);
+        console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
+    });
+  }
+
+
+  /**
+   * Photoshop レイヤー削除イベント時の処理
+   * エラーメッセージから該当するレイヤーIDのメッセージを消す
+   * レイヤーセットを削除したときはIDが渡されない(undefined)ため何も出来ない。。。
+   * @param {?Array.<number>} layerID 削除されたレイヤーID
+   * @return {void}
+   */
+  function handleDeleteEvent (layerID) {
+
+    if ( !layerID ) {
+      return;
+    }
+
+    _.each(layerID, function(id) {
+      $vContainer.find('.message[data-id="' + id + '"]').remove();
+    });
+
+    var errorNum = $vContainer.find('.icon.error').length,
+        warnNum  = $vContainer.find('.icon.warn').length;
+
+    $('#error-total').text(errorNum);
+    $('#warn-total').text(warnNum);
+
+  }
+
+  /**
+   * Photoshop レイヤー作成イベント時の処理
+   * バリデーションリストに命名してくださいメッセージを追加する
+   * レイヤーセットを作成したときはIDが渡されない(undefined)ため何も出来ない。。。
+   * @param {?Array.<number>} layerID 削除されたレイヤーID
+   * @return {void}
+   */
+  function handleMakeEvent(layerID) {
+
+    if ( !layerID || !$listOthers.find('.message').length) {
+      return;
+    }
+
+    var data = {
+      id: layerID
+    };
+
+    JSXRunner.runJSX("getLayerData", {data: data}, function (result) {
+      //result = { title: "レイヤー 49", index: "152", kind: "LayerKind.NORMAL"}
+      console.log('handleMakeEvent:' + result);
+
+      var obj = _stringToObject(result);
+      var complete;
+
+      if ( !obj.index ) {
+        return;
+      }
+
+      var messages = $listLayers.find('.message');
+
+      obj.hint = [_getValidationMessage('NONAME_LAYERS', 'hint')];
+      obj.type = 'warn';
+
+      if ( !messages.length ) {
+        $listLayers.append(messageTmp(obj));
+        return;
+      }
+
+      messages.each(function(i, el) {
+        var $el = $(el);
+        var eIdx = parseInt(el.getAttribute('data-index'));
+        var oIdx = parseInt(obj.index);
+
+        //NORMALが作られてから矩形に置き換わった場合は削除しておく
+        if ( (obj.kind !== 'LayerKind.NORMAL') && (eIdx === oIdx)) {
+          $el.remove();
+        }
+
+        if ( eIdx < oIdx && !complete) {
+          $el.before(messageTmp(obj));
+          complete = true;
+        }
+
+      });
+
+
+    });
+  }
+
   //Init
   function init() {
+    console.log(extensionId)
 
     themeManager.init();
+
+    //setPersistent();
+
+    // Listener for PhotoshopJSONCallback
+    csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, PhotoshopCallbackUnique);
+
+    eventRegistering('delete'); //1147958304
+    eventRegistering('make'); //1147958304
 
     Q.fcall(loadConfig)
      .then(displayConfig)
@@ -630,6 +789,9 @@
    * csInterface イベントリスナーの設定
    */
   function setEventListeners() {
+
+    //ドキュメント閉じた時
+    csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
     //ドキュメント保存したときの自動チェック
     var autocheck = window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true';
@@ -1118,9 +1280,6 @@
       });
 
   });
-
-  //ドキュメント閉じた時
-  csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
   //素のinit()ではaddClassが想定通り動かんので
   $(document).ready(init);
