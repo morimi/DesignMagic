@@ -706,6 +706,8 @@ console.log(csEvent.data.eventData.layerID);
 
         if ( eIdx < oIdx && !complete) {
           $el.before(messageTmp(obj));
+          var warnNum = $('#warn-total').text();
+          $('#warn-total').text( parseInt(warnNum) + 1);
           complete = true;
         }
 
@@ -1089,6 +1091,8 @@ console.log(csEvent.data.eventData.layerID);
         complete($parent, $title, $form, newName);
       }
 
+      var warnNum = $('#warn-total').text();
+      $('#warn-total').text( parseInt(warnNum) - parseInt(obj.total));
 
       $console.empty().append(consoleTmp({message: Strings.formatStr(Strings.Pr_COMPLETE_NAMECHANGE, obj.total) }));
     });
