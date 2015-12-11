@@ -480,6 +480,7 @@
         if ( _.isArray(r.list) && r.list.length ) {
           _.each(r.list, function(obj) {
             obj.theme = r.theme;
+            obj.hintCodes = obj.hint.join(',');
 
             _.each(obj.hint, function(h, i) {
               switch(h) {
@@ -911,7 +912,13 @@ console.log(csEvent.data.eventData.layerID);
    * パネルからのレイヤー名変更するクラス
    * @since version 0.4.0
    */
-  var ChangeLayerName = function(el) {};
+  var ChangeLayerName = {};
+
+  /**
+   * クリックされたli.messageのdata-idをキーに、同じ.titleテキストを持つli.message要素の配列を格納する
+   * @type {{string:Array.<Object>}} li.message[data-id]:[<li.message>]
+   */
+  ChangeLayerName.messages = {};
 
   /**
    * バリデーションメッセージがクリックされた時の処理
@@ -920,23 +927,50 @@ console.log(csEvent.data.eventData.layerID);
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.onClickMessage = function () {
-    var $this = $(this);
+  ChangeLayerName.onClickMessage = function () {
+    var $this = $(this);//.message
+    ChangeLayerName._isAll = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
 
     if ( $this.hasClass('select') ){
       return;
     }
 
-    var $title = $this.find('.title');
+    var $title = $this.find('.title'),
+        //@type {string}
+        oldName = $title.text();
+
+    $this.data('oldName', oldName);//古い名前保存
 
     var data = {
       id: $this.attr('data-id'),
       name: $title.text()
     };
 
+    /**
+     * @type {Array.<Object>} li.messageの配列
+     */
+    var messages = [];
+
+
+    if ( ChangeLayerName._isAll ) { //同じ物を目立たせる
+      $listLayers.find('.title').each(function(i, el) {
+        var $_this = $(el);
+
+        if ( $_this.text() === oldName) {
+          $_this.css('border', 'dashed 1px white');
+          messages.push($_this.parents('.message').get(0));
+        } else {
+          $_this.css('border', 'none');
+        }
+
+      });
+
+      ChangeLayerName.messages[data.id] = messages;
+    }
+
     console.log('( ˘ω˘ )　ChangeLayerName.onClickMessage: '+ data.id );
 
-    $vContainer.find('.select').removeClass('select');
+    $listLayers.find('.select').removeClass('select');
     $this.addClass('select');
 
     JSXRunner.runJSX("selectLayer", {data: data}, function (result) {
@@ -951,7 +985,7 @@ console.log(csEvent.data.eventData.layerID);
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.onDbClickMessage = function () {
+  ChangeLayerName.onDbClickMessage = function () {
     var $this = $(this); //.title
     var $parents = $this.parents('.message');
 
@@ -975,21 +1009,33 @@ console.log(csEvent.data.eventData.layerID);
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.change = function change() {
+  ChangeLayerName.change = function change() {
     var $this = $(this); //js-changeLayerName
     var $parent = $this.parents('.message');
     var $form = $this.parent('.js-changeLayerName');
     var $input = $form.find('.js-inputLayerName');
     var $title = $parent.find('.title');
     var newName = $input.val();
+    var ids = [ $parent.attr('data-id') ];
 
     if ( !$parent.hasClass('select') || ! newName || $parent.data('pending')) {
       return;
     }
 
+    $console.empty().append(consoleTmp({message: Strings.Pr_START_NAMECHANGE }));
+
+    //一括変更の場合
+    if ( ChangeLayerName._isAll ) {
+      //対象のIDを配列化
+      ids = ChangeLayerName.messages[$parent.attr('data-id')].map(function(el) {
+        return el.getAttribute('data-id');
+      });
+    }
+
     var data = {
       newName: newName,
-      isAll: window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll')
+      isAll:ChangeLayerName._isAll,
+      ids: ids
     };
 
     $parent.data('pending', true);
@@ -1008,7 +1054,7 @@ console.log(csEvent.data.eventData.layerID);
       parent.find('.icon.alert').replaceWith('<img src="images/icon/' + themeManager.getThemeColorType() + '/valid.png" width="14" height="14" class="icon valid alert">');
 
       //titleを入れ替える
-      title.text(newName).show();
+      title.text(newName).css('border', 'none').show();
 
       //hintを消す
       parent.find('.message-hint').remove();
@@ -1025,20 +1071,17 @@ console.log(csEvent.data.eventData.layerID);
 
 
     JSXRunner.runJSX("changeLayerName", {data: data, Strings: Strings}, function (result) {
-      var obj = _stringToObject(result);
+      var obj = _stringToObject(result),
+          oldName =  $this.data('oldName');
 
       //まとめて変更
-      if ( data.isAll ) {
+      if ( ChangeLayerName._isAll ) {
 
-        complete($parent, $title, $form, newName);
-
-        $listLayers.find('.message').each(function(i, el) {
+         _.each(ChangeLayerName.messages[$parent.attr('data-id')], function(el) {
           var $el = $(el);
           var $_title  = $el.find('.title');
 
-          if ( $_title.text() === obj.baseName ) {
-            complete($el, $_title, $el.find('.js-changeLayerName'), newName);
-          }
+          complete($el, $_title, $el.find('.js-changeLayerName'), newName);
 
         });
 
@@ -1046,6 +1089,8 @@ console.log(csEvent.data.eventData.layerID);
         complete($parent, $title, $form, newName);
       }
 
+
+      $console.empty().append(consoleTmp({message: Strings.formatStr(Strings.Pr_COMPLETE_NAMECHANGE, obj.total) }));
     });
 
 
@@ -1057,7 +1102,7 @@ console.log(csEvent.data.eventData.layerID);
    * @since version 0.4.0
    * @return {void}
    */
-  ChangeLayerName.prototype.cancel = function cancel() {
+  ChangeLayerName.cancel = function cancel() {
     var $this = $(this); //.js-cancelLayerName
     var $parent = $this.parents('.message');
 
@@ -1075,7 +1120,7 @@ console.log(csEvent.data.eventData.layerID);
   /**
    * 表示・非表示操作
    */
-  ChangeLayerName.prototype.onClickKind = function () {
+  ChangeLayerName.onClickKind = function () {
     var $this = $(this);
     var $parent = $this.parents('.message');
     var action = $this.data('visible') || 'hidden';
@@ -1094,14 +1139,13 @@ console.log(csEvent.data.eventData.layerID);
 
   };
 
-  var _changeLayerName = new ChangeLayerName();
 
   $vContainer
-    .on('click', '.message', _changeLayerName.onClickMessage)
-    .on('dblclick', '.title', _changeLayerName.onDbClickMessage)
-    .on('click', '.js-changeLayerName', _changeLayerName.change)
-    .on('click', '.js-cancelLayerName', _changeLayerName.cancel)
-    .on('click', '.icon.kind', _changeLayerName.onClickKind);
+    .on('click', '.message', ChangeLayerName.onClickMessage)
+    .on('dblclick', '.title', ChangeLayerName.onDbClickMessage)
+    .on('click', '.js-changeLayerName', ChangeLayerName.change)
+    .on('click', '.js-cancelLayerName', ChangeLayerName.cancel)
+    .on('click', '.icon.kind', ChangeLayerName.onClickKind);
 
 
   /********************************************************
