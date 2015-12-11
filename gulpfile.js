@@ -124,7 +124,7 @@ gulp.task( 'src_ndm_clean', src_ndm_clean );
  */
 function src_ndm_copy() {
   return gulp.src( '.' )
-    .pipe( exec('cp -r ./node_modules <%= options.path.src %>/node_modules', options) )
+    .pipe( exec('cp -r ./node_modules <%= options.path.src %>', options) )
     .pipe( exec.reporter(reportOptions) );
 }
 gulp.task( 'src_ndm_copy', src_ndm_copy );
