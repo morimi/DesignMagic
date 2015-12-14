@@ -71,40 +71,46 @@ var themeManager = (function () {
      */
     function updateThemeWithAppSkinInfo(appSkinInfo) {
 
-      var $body = $("body");
+      var body = document.body,
+          className = "",
+          baseClassName = body.className ? body.className + ' ': '';
 
         var rgbBgColor = appSkinInfo.panelBackgroundColor.color,
         cssBgColor = "#" + toHex(rgbBgColor);
 
-        $body.removeClass();
+        body.removeAttribute('class');
+
         if (process.platform.substr(0, 3) === "win") {
-            $body.addClass("windows");
+            baseClassName = baseClassName + "windows";
         }
 
        switch (rgbBgColor.red) {
         case 52:
-            $body.addClass("darker");
+            className = baseClassName + "darker";
             replaceImageSRC("light", "dark");
             break;
         case 83:
-            $body.addClass("dark");
+            className = baseClassName + "dark";
             replaceImageSRC("light", "dark");
             break;
         case 184:
-            $body.addClass("light");
+            className = baseClassName + "light";
             replaceImageSRC("dark", "light");
             break;
         case 214:
-            $body.addClass("lighter");
+            className = baseClassName + "lighter";
             replaceImageSRC("dark", "light");
             break;
           default:
             // unrecognized theme
-            document.body.className ='dark';
+            className = baseClassName + 'dark';
             break;
         }
 
-        $body.css({"background-color": cssBgColor});
+      body.className = className;
+
+        //$body.css({"background-color": cssBgColor});
+      body.setAttribute('style', 'background-color:' + cssBgColor);
     }
 
 
@@ -134,11 +140,11 @@ var themeManager = (function () {
 
 
     function replaceImageSRC(before, after) {
-      $.each($('img'), function(i, img) {
-        var $img = $(img);
-        var src = $img.attr('src').replace(before, after);
-        $img.attr('src', src);
-      });
+//      $.each($('img'), function(i, img) {
+//        var $img = $(img);
+//        var src = $img.attr('src').replace(before, after);
+//        $img.attr('src', src);
+//      });
     }
 
 
