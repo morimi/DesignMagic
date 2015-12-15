@@ -61,6 +61,13 @@
     var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
     var localData = window.localStorage.getItem('com.cyberagent.designmagic:conf.result');
 
+    /**
+     * conf.jsonのテキストをObjectに変換
+     * ついでにテンプレート用の'theme'と'Strings'も追加する
+     * @param {string} dataStr conf.jsonの中身
+     * @param {string} url data.urlに追加する文字列
+     * @param {Object} conf.jsonのオブジェクト
+     */
     var parseData = function(dataStr, url) {
       var data = JSON.parse(dataStr);
       data = _.defaultsDeep(data, DM.conf);
@@ -75,8 +82,6 @@
 
       return data;
     };
-
-    DM.vm.consoleText('conf.jsonを読み込みます');
 
     //urlもローカルファイルもない
     if (!url && localData && !DM.localConfFile ) {
@@ -119,6 +124,8 @@
 
   /**
    * リモートのconf.jsonをとりにいく
+   * 取れたら中身をオブジェクトに変換してvm.confCacheにセットする。
+   * 取れなかった場合はDM.confを代用してセットする。
    * @param {string} url Request url
    * @return {Promise} Q.defer promise object
    */
@@ -164,6 +171,8 @@
 
   /**
    * ローカルのconfファイルを読み込む
+   * 成功したらvm.confCacheにセットする
+   * 失敗した場合はDM.confを代用してセットする。
    * @return {Promise} Q.defer promise object
    */
   DM.loadLocalConfig = function () {
@@ -221,7 +230,6 @@
 
     Q.fcall(DM.loadConfig)
      .done(function() {
-      console.log('init', DM.vm.confCache())
       DM.vm.loading = false;
       m.redraw();
     });
@@ -254,9 +262,9 @@
         m('span#hidden-total.hd-number', '0'),
         m('div#status'),
         c.vm.loading ? m('img[src=images/icon/dark/loader.gif]#icon-loader') : '',
-        m('div.topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Check'),
-        m('div.topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Config'),
-        m('div.topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Tools')
+        m('div[data-mode="check"].topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Check'),
+        m('div[data-mode="config"].topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Config'),
+        m('div[data-mode="tools"].topcoat-button.hd-btn', {onclick: c.vm.switchContainer}, 'Tools')
       ]);
     };
 
@@ -309,15 +317,74 @@
         return;
       }
 
+      var keys = _.keys(conf.check);
+
+
       return m('div#config.container', [
         m('div#config-list.list', [
+          //base
           m('table.config-base', [
             m('caption', Strings.Pr_TITLE_BASEINFO),
             m('tr', [
               m('th[scope="row"]', Strings.Pr_CONFIG_NAME),
               m('td', conf.name)
-            ])
+            ]),
+            m('tr', [
+              m('th[scope="row"]', Strings.Pr_CONFIG_VERSION),
+              m('td', conf.version)
+            ]),
+            m('tr', [
+              m('th[scope="row"]', [
+                Strings.Pr_CONFIG_URL,
+                m('a[href="#"][data-mode="setting"]', {onclick: c.vm.switchContainer}, Strings.Pr_BUTON_CHANGE)
+              ]),
+              m('td', conf.url)
+            ]),
+          ]),
+          //config
+          keys.map(function(k) {
+            var _c = conf.check[k];
+            var _keys = _.keys(_c);
+            var K = k.toUpperCase();
+
+            return m('table.config-config', [
+              m('caption', _.capitalize(k)),
+              _keys.map(function(kk) {
+                return m('tr', [
+                  m('th[scope=row]', Strings['Pr_CONFIG_' + K + '_' + _.snakeCase(kk).toUpperCase()]),
+                  m('td', _c[kk])
+                ])
+              })
+            ]);
+
+          }),
+
+          m('dl', [
+            m('dt', Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL),
+            m('dd', Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_0),
+            m('dd', Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_1),
+            m('dd', Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_2)
           ])
+
+        ])
+      ]);
+    };
+
+
+    /**
+     * Setting view
+     * @type {function}
+     * @return {Object}
+     */
+    view.setting = function () {
+
+      if (c.vm.mode !== 'setting' || !conf) {
+        return;
+      }
+
+      return m('div#setting.container', [
+        m('div#setting-list.list', [
+          m('p', Strings.Pr_INPUT_TO_CONFIG_URL)
         ])
       ]);
     };
@@ -345,6 +412,7 @@
       view.header(),
       view.validation(),
       view.config(),
+      view.setting(),
       view.tools(),
       view.footer()
     ]);
@@ -384,10 +452,9 @@
      *
      */
     switchContainer : function() {
-      var mode = this.innerHTML.toLowerCase();
+      var mode = this.getAttribute('data-mode');
       console.log('[switchContainer]' + mode);
       DM.vm.mode = mode;
-      m.redraw();
     }
 
   };
