@@ -351,7 +351,7 @@
               m('caption', _.capitalize(k)),
               _keys.map(function(kk) {
                 return m('tr', [
-                  m('th[scope=row]', Strings['Pr_CONFIG_' + K + '_' + _.snakeCase(kk).toUpperCase()]),
+                  m('th[scope=row]', m.trust(Strings['Pr_CONFIG_' + K + '_' + _.snakeCase(kk).toUpperCase()])),
                   m('td', _c[kk])
                 ])
               })
