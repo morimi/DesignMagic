@@ -21,16 +21,16 @@ function CSXSWindowType()
 };
 
 /** Constant for the CSXS window type Panel. */
-window.CSXSWindowType._PANEL = "Panel";
+CSXSWindowType._PANEL = "Panel";
 
 /** Constant for the CSXS window type Modeless. */
-window.CSXSWindowType._MODELESS = "Modeless";
+CSXSWindowType._MODELESS = "Modeless";
 
 /** Constant for the CSXS window type ModalDialog. */
-window.CSXSWindowType._MODAL_DIALOG = "ModalDialog";
+CSXSWindowType._MODAL_DIALOG = "ModalDialog";
 
 /** EvalScript error message */
-window.EvalScript_ErrMessage = "EvalScript error.";
+EvalScript_ErrMessage = "EvalScript error.";
 
 /**
  * @class Version

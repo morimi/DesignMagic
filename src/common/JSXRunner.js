@@ -64,7 +64,7 @@ function _evalJSX(script, callback, optScriptName) {
     _.defer(function () {
         window.csInterface.evalScript(script, function () {
           // 返却値に {errorType:type, errorMessage:message} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
-          if (arguments[0] != window.EvalScript_ErrMessage) {
+          if (arguments[0] != "EvalScript error.") {
             var obj = (new Function("return " + arguments[0]))();
             try {
               if (obj.errorType == 'jsx') {
