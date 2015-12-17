@@ -13,48 +13,6 @@ var _           = require("lodash"),
     JSXRunner   = require("../common/JSXRunner"),
     Strings     = require("./js/LocStrings");
 
-
-
-/**
- * ViewModel
- */
-var ViewModel = function() {
-
-  //make observable
-  riot.observable(this);
-
-  /**
-   * 基本設定項目 conf.json
-   * @type {Object}
-   */
-  this.conf = require("../conf.json");
-
-  /**
-   * ローカルで読み込んだファイルの一時格納場所
-   * @type {?string}
-   */
-  this.localConfFile = null;
-
-   /**
-   * conf.jsonのキャッシュ
-   * @type {?Object}
-   */
-  this.confCache = null;
-
-  /**
-   * #consoleに出力する内容
-   */
-  this.consoleText  = null;
-
-
-  /**
-   * loader.gifの表示トリガー
-   * @type {boolean}
-   */
-  this.loading = true
-
-};
-
 /**
  * DesignMagic
  */
@@ -71,7 +29,7 @@ DM.init = function() {
 
   Q.fcall(DM.loadConfig)
    .done(function() {
-    DM.vm.loading = false;
+    DM.app.loading = false;
     riot.update();
     console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
   })
@@ -98,7 +56,7 @@ DM.loadConfig = function() {
    */
   var parseData = function(dataStr, url) {
     var data = JSON.parse(dataStr);
-    data = _.defaultsDeep(data, DM.vm.conf);
+    data = _.defaultsDeep(data, DM.app.conf);
     data.url = url;
 
     data = _.extend({
@@ -106,33 +64,33 @@ DM.loadConfig = function() {
         Strings: Strings
      }, data );
 
-    DM.vm.confCache(data);
+    DM.app.confCache = data;
 
     return data;
   };
 
   //urlもローカルファイルもない
-  if (!url && localData && !DM.vm.localConfFile ) {
+  if (!url && localData && !DM.app.localConfFile ) {
 
-    DM.vm.consoleText = Strings.Pr_MESSAGE_NOT_SETTING_FILE;
+    DM.app.consoleText = Strings.Pr_MESSAGE_NOT_SETTING_FILE;
     d.resolve(null);
 
   //キャッシュあった
-  } else if ( DM.vm.confCache && DM.vm.confCache.url === url ) {
+  } else if ( DM.app.confCache && DM.app.confCache.url === url ) {
 
     console.info('[loadConfig]Find local conf.json cache');
-    d.resolve(DM.vm.confCache);
+    d.resolve(DM.app.confCache);
 
   //ストレージに保存されてた
   } else if ( localData && (url === 'localhost') ) {
 
     var data = parseData(localData, 'localhost');
-    DM.vm.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
+    DM.app.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
 
     d.resolve(data);
 
   //ローカルファイルが指定された
-  } else if ( (DM.vm.localConfFile && DM.vm.localConfFile.type === 'application/json') ) {
+  } else if ( (DM.app.localConfFile && DM.app.localConfFile.type === 'application/json') ) {
 
     console.info('[loadConfig]Loading local conf.json file data');
 
@@ -166,8 +124,8 @@ DM.loadRemoteConfig = function(url) {
   var handleLoadConfigError = function(xhr) {
 
     if ( xhr.status >= 300) {
-      DM.vm.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
-      DM.vm.confCache = DM.vm.conf;
+      DM.app.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
+      DM.app.confCache = DM.app.conf;
     }
 
   };
@@ -178,31 +136,31 @@ DM.loadRemoteConfig = function(url) {
       res.setEncoding('utf8');
       res.on('data', function (data) {
         data = JSON.parse(data);
-        data = _.defaultsDeep(data, DM.vm.conf);
+        data = _.defaultsDeep(data, DM.app.conf);
         data = _.extend({
           url: url,
           theme: themeManager.getThemeColorType(),
           Strings: Strings
         }, data );
-        DM.vm.confCache = data;
+        DM.app.confCache = data;
 
-        DM.vm.trigger('confCache', data);
+        DM.app.trigger('confCache', data);
 
-        DM.vm.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
+        DM.app.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
         d.resolve(data);
       });
     }
 
     if (res.statusCode == '403') {
       handleLoadConfigError();
-      d.resolve(DM.vm.confCache);
+      d.resolve(DM.app.confCache);
     }
   });
 
 
   req.on('error', function() {
     handleLoadConfigError();
-    d.resolve(DM.vm.confCache);
+    d.resolve(DM.app.confCache);
   });
 
   return d.promise;
@@ -230,16 +188,16 @@ DM.loadLocalConfig = function () {
         window.localStorage.setItem('com.cyberagent.designmagic:conf.url', 'localhost');
         window.localStorage.setItem('com.cyberagent.designmagic:conf.result', result);
 
-        data = _.defaultsDeep(data, DM.vm.conf);
+        data = _.defaultsDeep(data, DM.app.conf);
         data = _.extend({
           url: 'localhost',
           theme: themeManager.getThemeColorType(),
           Strings: Strings
         }, data );
 
-        DM.vm.confCache = data;
-        DM.vm.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
-        DM.vm.localConfFile = null;
+        DM.app.confCache = data;
+        DM.app.consoleText = Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE;
+        DM.app.localConfFile = null;
 
         d.resolve(data);
       break;
@@ -248,9 +206,9 @@ DM.loadLocalConfig = function () {
   };
 
   reader.onerror = function() {
-    DM.vm.consoleText = Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG;
-    DM.vm.confCache = self.conf;
-    d.resolve(DM.vm.conf);
+    DM.app.consoleText = Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG;
+    DM.app.confCache = self.conf;
+    d.resolve(DM.app.conf);
   };
 
   reader.readAsText(this.localConfFile);

@@ -16,7 +16,7 @@
     var me = this;
 
 
-    this.parent.vm.on('confCache', function(data) {
+    this.parent.on('confCache', function(data) {
 
       me.validation_info.innerHTML = (data && data.name) ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL
 

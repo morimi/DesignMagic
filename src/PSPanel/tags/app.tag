@@ -1,5 +1,7 @@
 <app>
 
+  <!-- @fileoverview Design Magic (RiotJS ver) app.tag -->
+
   <div id="content">
 
     <header></header>
@@ -19,9 +21,35 @@
 
     var me = this;
 
+    /**
+     * 基本設定項目 conf.json
+     * @type {Object}
+     */
+    this.conf = require("../conf.json");
 
-    DM.vm = this.vm = new ViewModel();
+    /**
+     * ローカルで読み込んだファイルの一時格納場所
+     * @type {?string}
+     */
+    this.localConfFile = null;
 
+     /**
+     * conf.jsonのキャッシュ
+     * @type {?Object}
+     */
+    this.confCache = null;
+
+    /**
+     * #consoleに出力する内容
+     */
+    this.consoleText  = null;
+
+
+    /**
+     * loader.gifの表示トリガー
+     * @type {boolean}
+     */
+    this.loading = true;
 
     /**
      * 表示モード
@@ -43,11 +71,15 @@
     this.theme = 'dark';
 
 
+    DM.app = this;
 
+
+    /**
+     * start app
+     */
     this.on('mount', function() {
       DM.init();
     })
-
 
 
     /**
