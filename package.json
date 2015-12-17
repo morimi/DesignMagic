@@ -24,7 +24,8 @@
   "dependencies": {
     "handlebars": "^3.0.3",
     "lodash": "^3.10.0",
-    "q": "^1.4.1"
+    "q": "^1.4.1",
+    "riot": "^2.3.12"
   },
   "devDependencies": {
     "del": "^2.1.0",
