@@ -30,15 +30,18 @@
 			<Locale Code="All" />
 		</LocaleList>
 		<RequiredRuntimeList>
-			<RequiredRuntime Name="CSXS" Version="6.0" />
+			<RequiredRuntime Name="CSXS" Version="5.0" />
 		</RequiredRuntimeList>
 	</ExecutionEnvironment>
 	<DispatchInfoList>
 		<Extension Id="com.cyberagent.designmagic">
 			<DispatchInfo >
 				<Resources>
-				<MainPath>./PSPanel/index.html</MainPath>
-				<ScriptPath>./common/jsx/hostscript.jsx</ScriptPath>
+					<CEFCommandLine>
+						<Parameter>--enable-nodejs</Parameter>
+					</CEFCommandLine>
+					<MainPath>./PSPanel/index.html</MainPath>
+					<ScriptPath>./common/jsx/hostscript.jsx</ScriptPath>
 				</Resources>
 				<Lifecycle>
 					<AutoVisible>true</AutoVisible>

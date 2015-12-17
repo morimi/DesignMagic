@@ -35,5 +35,5 @@ function formatStr(str) {
     });
 }
 
-module.exports = localeStrings;
+module.exports = window.localeStrings;
 module.exports.formatStr = formatStr;
