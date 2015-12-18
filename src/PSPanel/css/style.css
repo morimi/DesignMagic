@@ -240,6 +240,20 @@ body.lighter .message {
   font-size: 10px;
 }
 
+body.darker .message-hint,
+body.dark .message-hint {
+    color: #888888;
+}
+
+body.lighter .message-hint {
+    color: #4f4f4f;
+}
+
+body.light .message-hint {
+    color: #404040;
+}
+
+
 /**
  * 初期メッセージ
  */

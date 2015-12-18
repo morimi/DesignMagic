@@ -67,9 +67,9 @@
     console.info('------mount configs------')
     
     
-    this.parent.on('confCache', function(data){
-      console.log('config.tag', data)
-      
-    })
+//    this.parent.on('confCache', function(data){
+//      console.log('config.tag', data)
+//      
+//    })
   </script>
 </configs>

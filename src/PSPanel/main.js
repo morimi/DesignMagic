@@ -19,8 +19,24 @@ var _           = require("lodash"),
 
 window.DM = {};
 
+
 /**
- * <validation>のmount時に実行
+ * 単位
+ * @const
+ */
+DM.UNITS_LABEL = {
+    CM: 'cm',
+    INCHES: 'inch',
+    MM: 'mm',
+    PERCENT: '%',
+    PICAS: 'pica',
+    POINTS: 'pt',
+    PIXELS: 'px'
+  };
+
+
+/**
+ * <app>のmount時に実行
  * conf.jsonの読み込み
  */
 DM.init = function() {
@@ -35,6 +51,7 @@ DM.init = function() {
   })
 
 };
+
 
 
 /**
@@ -230,3 +247,30 @@ DM.switchContainer = function(e) {
 };
 
 
+/**
+ * LocalStrings通したバリデーションメッセージ作成
+ * @param {string} rule 'RULERUNITS' 全部大文字のルール
+ * @param {string} type 'error','valid','warn'
+ */
+DM.getValidationMessage = function(rule, type) {
+  return Strings['Pr_' + type.toUpperCase() + '_' + rule];
+}
+
+
+/**
+* string を テンプレート用のobjectに変換
+* UIテーマ(dark, light)を追加する
+* http://hamalog.tumblr.com/post/4047826621/json-javascript
+* @param {string} str
+* @return {Object}
+*/
+DM.stringToObject = function(str) {
+    var obj = (new Function("return " + str))();
+
+    obj = _.extend({
+        theme: themeManager.getThemeColorType(),
+        Strings: Strings
+     }, obj || {});
+
+    return obj;
+};

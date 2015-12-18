@@ -68,9 +68,17 @@
      * 'darker' 'dark' 'light' 'lighter'
      * @type {string}
      */
-    this.theme = 'dark';
+    this.theme = themeManager.getThemeColorType() || 'dark';
 
+      
+    /**
+     *
+     */
+    this.validation = false;
 
+    /**
+     *
+     */
     DM.app = this;
 
 
@@ -100,9 +108,10 @@
 
       me.mode = str;
 
-      me.tags.validation.update()
-      me.tags.configs.update()
-      me.tags.tools.update();
+      me.update(str, me.validation);
+//      me.tags.validation.update()
+//      me.tags.configs.update()
+//      me.tags.tools.update();
     })
 
   </script>
