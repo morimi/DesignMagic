@@ -21,35 +21,6 @@
 
     var me = this;
 
-    /**
-     * 基本設定項目 conf.json
-     * @type {Object}
-     */
-    this.conf = require("../conf.json");
-
-    /**
-     * ローカルで読み込んだファイルの一時格納場所
-     * @type {?string}
-     */
-    this.localConfFile = null;
-
-     /**
-     * conf.jsonのキャッシュ
-     * @type {?Object}
-     */
-    this.confCache = null;
-
-    /**
-     * #consoleに出力する内容
-     */
-    this.consoleText  = null;
-
-
-    /**
-     * loader.gifの表示トリガー
-     * @type {boolean}
-     */
-    this.loading = true;
 
     /**
      * 表示モード
@@ -70,25 +41,23 @@
      */
     this.theme = themeManager.getThemeColorType() || 'dark';
 
-      
-    /**
-     *
-     */
-    this.validation = false;
-
-    /**
-     *
-     */
-    DM.app = this;
-
 
     /**
      * start app
      */
     this.on('mount', function() {
-      DM.init();
+          
+      Q.fcall(me.loadConfig)
+       .done(function(data) {
+        me.hideLoading();
+        me.trigger('confCache', data);
+        console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
+      })
+
     })
 
+
+    themeManager.init();
 
     /**
      * 表示モード(mode)を引数で渡された値に変更する
@@ -100,8 +69,6 @@
      */
     this.on('mode', function(str){
 
-      console.log('[vm.changeMode]' + me.mode);
-
       if ( typeof str !== 'string') {
         str = 'check';
       }
@@ -112,7 +79,10 @@
 //      me.tags.validation.update()
 //      me.tags.configs.update()
 //      me.tags.tools.update();
-    })
+    });
+    
+    this.mixin('Config');
+    this.mixin('Loading');
 
   </script>
 </app>

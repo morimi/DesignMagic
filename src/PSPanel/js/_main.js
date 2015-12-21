@@ -513,25 +513,6 @@
   }
 
 
-  /**
-   * エラーと注意の総数から罪の重さを量る
-   * @param {number} errorNum エラー総数
-   * @param {number} warnNum 注意総数
-   * @return {number} 0 - 7 （罪の重さを8段階で返す）
-   */
-  function _calcGuilty(errorNum, warnNum) {
-    var g = 0;
-
-    if (( errorNum > 20 ) || ( warnNum > 120 )) g = 7;
-    else if (( errorNum > 15 ) || ( warnNum > 90 )) g = 6;
-    else if  (( errorNum > 10 ) || ( warnNum > 60 )) g = 5;
-    else if  (( errorNum > 5 ) || ( warnNum > 30 )) g = 4;
-    else if  (( errorNum > 1 ) || ( warnNum > 20 )) g = 3;
-    else if  ( warnNum > 10 ) g = 2;
-    else if  ( warnNum > 0 )  g = 1;
-
-    return g;
-  }
 
 
   /**

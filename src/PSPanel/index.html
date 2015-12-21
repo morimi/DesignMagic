@@ -14,12 +14,26 @@
   <app></app>
 
   <script src="js/libs/CSInterface.js"></script>
-  <script>
-    //JSXRunnner.jsの為に
-    csInterface = new CSInterface();
-    localeStrings = csInterface.initResourceBundle();
-  </script>
   <script src="js/themeManager.js"></script>
+  <script>
+    
+  var csInterface = new CSInterface();
+  var localeStrings = csInterface.initResourceBundle();
+  var extensionId =  csInterface.getExtensionID();
+  //Modules
+  var _           = require("lodash"),
+      Q           = require("Q"),
+      http        = require('http'),
+      JSXRunner   = require("../common/JSXRunner"),
+      Strings     = require("./js/LocStrings");
+
+  </script>
+  
+  <script src="mixins/config.js" type="riot/tag"></script>
+  <script src="mixins/console.js" type="riot/tag"></script>
+  <script src="mixins/loading.js" type="riot/tag"></script>
+  <script src="mixins/validation.js" type="riot/tag"></script>
+  <script src="mixins/util.js" type="riot/tag"></script>
 
   <!-- riot tags -->
   <script src="tags/app.tag" type="riot/tag"></script>
@@ -28,9 +42,9 @@
   <script src="tags/validation.tag" type="riot/tag"></script>
   <script src="tags/config.tag" type="riot/tag"></script>
   <script src="tags/tools.tag" type="riot/tag"></script>
+  
 
   <script src="../node_modules/riot/riot+compiler.min.js"></script>
-  <script src="main.js"></script>
 
   <script>
     riot.mount('*');
