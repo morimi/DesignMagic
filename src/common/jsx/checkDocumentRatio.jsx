@@ -9,23 +9,26 @@
  * 4 -> 1280
  */
 
-try {
+(function() {
+  
+  try {
 
-var RATIO = parseFloat('<%= config.ratio %>'),
-    value = RATIO * 320;
+  var RATIO = parseFloat('<%= config.ratio %>'),
+      value = RATIO * 320;
 
-if ( documents.length > 0 ) {
-  if ( activeDocument.width !== value ) {
+  if ( documents.length > 0 ) {
+    if ( activeDocument.width !== value ) {
 
-    '{value: "' + activeDocument.width + '", type: "error"}';
+      return '{value: "' + activeDocument.width + '", type: "error"}';
 
-  } else {
+    } else {
 
-    '{value: "' + activeDocument.width + '", type: "valid"}';
+      return '{value: "' + activeDocument.width + '", type: "valid"}';
 
+    }
   }
-}
 
-} catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
-}
+  } catch(e) {
+    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+  }
+})();

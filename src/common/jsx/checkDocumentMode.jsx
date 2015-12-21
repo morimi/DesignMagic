@@ -1,26 +1,24 @@
 /**
  * @fileoverview documentModeチェック
  */
+(function() {
+  
+  try {
 
-try {
+    if (documents.length > 0 ) {
+      if (activeDocument.mode === DocumentMode["<%= config.documentModeType %>"]) {
+        return '{value: "' + activeDocument.mode + '", type: "valid"}';
 
-function checkMode() {
-  if (activeDocument.mode !== DocumentMode["<%= config.documentModeType %>"]) {
+      } else {
+        return '{value: "' + activeDocument.mode + '", type: "error"}';
 
-    return '{value: "' + activeDocument.mode + '", type: "error"}';
+      }
+    } else {
+      return '{value: "404", type: "error"}';
+    }
 
-  } else {
-
-    return '{value: "' + activeDocument.mode + '", type: "valid"}';
-
+  } catch(e) {
+    return '{errorType: "jsx", errorMessage: "' + e + '"}';
   }
 
-}
-
-if (documents.length > 0 ) {
-  checkMode();
-}
-
-} catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
-}
+})();
