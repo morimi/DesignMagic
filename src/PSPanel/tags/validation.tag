@@ -54,7 +54,9 @@
     });
     
     //ドキュメント閉じた時
-    csInterface.addEventListener( 'documentAfterDeactivate' , this.reset);
+    csInterface.addEventListener( 'documentAfterDeactivate' , function() {
+      me.reset();
+    });
 
     this.mixin('Validation');
   </script>

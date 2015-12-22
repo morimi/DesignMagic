@@ -57,6 +57,7 @@ riot.mixin('Validation', {
     
     this.parent.tags.header.update({ errorVal: this.errorVal, warnVal: this.warnVal, hiddenVal: this.hiddenVal});
     this.setConsole({});
+    this.update();
   },
   
   
