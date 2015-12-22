@@ -199,14 +199,23 @@ body.lighter .container{
   display: block;
   border-bottom: 1px solid #383838;
   background: #535353;
+  position: relative;
 }
 
-.message.select {
+.message-wrapper.selected {
   background: #636363;
 }
 
 .message.modified {
   background: #6a8d9f;
+}
+
+.message-data {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 

@@ -4,16 +4,9 @@
     show="{this.parent.mode == 'check'}">
     <ul id="message-layers" class="list" if="{ layersMes.length }">
 
-      <li class="message" each="{ layersMes }" data-type="{ type }" data-id="{ id }" data-index="{ index }" data-hints="{ hintCodes }">
-        <div class="message-wrapper">
-          <p class="message-title">
-            <img riot-src="images/icon/{ parent.parent.theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
-            <img if="{ kind }" riot-src="images/icon/{ parent.parent.theme }/{ kind }.png" width="14" height="14" class="icon kind">
-            <span class="title">{ title }</span>
-          </p>
-          <p class="message-hint" each="{ hi, i in hint }">{ hi }</p>
-        </div>
-      </li>
+    <li class="message" each="{ layersMes }">
+      <validation-message theme="{ parent.parent.theme }" id="{ this.id }"></validation-message>
+    </li>
 
     </ul>
     <ul id="message-others" class="list">
@@ -57,6 +50,14 @@
     csInterface.addEventListener( 'documentAfterDeactivate' , function() {
       me.reset();
     });
+    
+    this.selectedId = null;
+    
+    
+    
+    this.on('toggle', function(id) {
+      this.trigger('select', id)
+    })
 
     this.mixin('Validation');
   </script>
