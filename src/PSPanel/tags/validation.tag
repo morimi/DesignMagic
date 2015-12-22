@@ -51,7 +51,10 @@
 
       me.check()
 
-    })
+    });
+    
+    //ドキュメント閉じた時
+    csInterface.addEventListener( 'documentAfterDeactivate' , this.reset);
 
     this.mixin('Validation');
   </script>

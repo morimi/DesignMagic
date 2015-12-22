@@ -41,10 +41,22 @@ riot.mixin('Validation', {
      .then(this.checkDocumentRatio)
      .then(this.checkLayers)
      .done(function() {
-      console.log('check completed ٩(ˊᗜˋ*)و', me.layersMes)
+      console.log('check completed ٩(ˊᗜˋ*)و');
       me.displayResult(start);
       me.update();
     })
+  },
+  
+  
+  reset: function() {
+    this.layersMes = [];
+    this.othersMes = [];
+    this.errorVal = 0;
+    this.warnVal = 0;
+    this.hiddenVal = 0;
+    
+    this.parent.tags.header.update({ errorVal: this.errorVal, warnVal: this.warnVal, hiddenVal: this.hiddenVal});
+    this.setConsole({});
   },
   
   
@@ -66,7 +78,6 @@ riot.mixin('Validation', {
    */
   calcGuilty: function() {
     var g = 0;
-    console.log(this.errorVal, this.warnVal)
 
     if (( this.errorVal > 20 ) || ( this.warnVal > 120 )) g = 7;
     else if (( this.errorVal > 15 ) || ( this.warnVal > 90 )) g = 6;
@@ -125,10 +136,6 @@ riot.mixin('Validation', {
   */
   stringToObject: function(str) {
       var obj = (new Function("return " + str))();
-
-//        obj = _.extend({
-//            theme: themeManager.getThemeColorType()
-//         }, obj || {});
 
       return obj;
   },
@@ -346,6 +353,7 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
 
         var obj = me.stringToObject(result);
+        
         if (_.isObject(obj) && obj.type ) {
           var unit =  me.UNITS_LABEL[c.check.config.rulerUnitsType];
           obj.title = me.getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
@@ -382,9 +390,16 @@ riot.mixin('Validation', {
 
         var r = me.stringToObject(result);
 
+        if ( !_.isObject(r) ) {
+          return d.resolve(c);
+        }
+        
         if ( _.isArray(r.list) && r.list.length ) {
-          _.each(r.list, function(obj) {
-            obj.theme = r.theme;
+          var i = r.list.length-1;
+          
+          while( i > -1 ) {
+            var obj = r.list[i];
+            
             obj.hintCodes = obj.hint.join(',');
 
             _.each(obj.hint, function(h, i) {
@@ -400,7 +415,9 @@ riot.mixin('Validation', {
 
             me.countError(obj);
             me.layersMes.push(obj);
-          });
+            
+            i = (i-1)|0;
+          }
         }
 
         me.hiddenVal = r.hidden;

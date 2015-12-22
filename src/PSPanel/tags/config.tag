@@ -25,8 +25,8 @@
       
       <table each="{ category, sets in this.parent.confCache.check }">
         <caption>{ _.capitalize(category) }</caption>
-        <tr each="{ prop, value in sets}">
-          <th scope="row"> { Strings['Pr_CONFIG_' + category.toUpperCase() + '_' + _.snakeCase(prop).toUpperCase()] } </th>
+        <tr each="{ prop, value in sets }">
+          <th scope="row"> <b category="{parent.category}" prop="{prop}"></b> </th>
           <td>{ value } </td>
         </tr>
       </table>
@@ -66,6 +66,9 @@
 
     console.info('------mount configs------')
     
+    riot.tag('b', '', function(opts) {
+        this.root.innerHTML = Strings['Pr_CONFIG_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
+    });
     
 //    this.parent.on('confCache', function(data){
 //      console.log('config.tag', data)
