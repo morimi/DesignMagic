@@ -2,13 +2,9 @@
 
   <div id="validation" class="container"
     show="{this.parent.mode == 'check'}">
-    <ul id="message-layers" class="list" if="{ layersMes.length }">
-
-    <li class="message" each="{ layersMes }">
-      <validation-message theme="{ parent.parent.theme }" id="{ this.id }" name="{this.title}"></validation-message>
-    </li>
-
-    </ul>
+      <validation-message if="{ layersMes.length }" data="{ layersMes }">
+        
+      </validation-message>
     <ul id="message-others" class="list">
        <li class="validation-info" id="validation_info" if="{ !othersMes.length }"></li>
 
@@ -31,19 +27,10 @@
     //this.parent = <app>
     var me = this;
     
-    /**
-     * クリックで選択されたメッセージのID
-     */
-    this.selectedId = 0;
-    this.selectedIds = [];
-    
-    /**
-     * check後のメッセージ総数
-     */
-    this.layersMesNum = 0;
-    
 
-    
+    /**
+     * 起動直後のメッセージ表示
+     */
     this.parent.on('confCache', function(data) {
 
       me.validation_info.innerHTML = (data && data.name) ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL
@@ -74,42 +61,7 @@
       me.reset();
     });
     
-    
-    /**
-     * メッセージ選択イベント走ったとき
-     * 選択されたIDを上書き格納、ID群は初期化
-     */
-    this.on('select', function(id) {
-      me.selectedId = id;
-      me.selectedIds = [];
-      
-      me.Storage.setStorage('selectedId', id);
-      me.Storage.setStorage('selectedIds', []);
-      
-      //レイヤーパネルも選択状態にする
-      me.RunJSX.selectLayer(id);
-    });
-    
-    /**
-     * 同じレイヤー名を持つメッセージのIDが発見されたら
-     * trigger.pushIds 
-     */
-    this.on('pushIds', function(id) {
-      
-      //IDを格納
-      me.selectedIds.push(id);
-      me.Storage.setStorage('selectedIds', me.selectedIds);
-      
-      //レイヤーパネルの選択を増やす
-      me.RunJSX.selectLayerAll(id);
-      
-    });
-    
-    
-    this.on('afterNameChange', function(result) {
-      
-    });
-    
+
   
     this.mixin('Storage');
     this.mixin('Validation');

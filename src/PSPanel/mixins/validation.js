@@ -16,14 +16,30 @@ riot.mixin('Validation', {
   
   init: function() {
     
+    /**
+     * check後のメッセージ総数
+     */
     this.layersMesNum = 0;
     
+    /**
+     * checkLayersのメッセージ
+     * @type {Array.<Object>}
+     */
     this.layersMes = [];
+    
+    
+    /**
+     * checkLayers以外のメッセージ
+     * @type {Array.<Object>}
+     */
     this.othersMes = [];
 
     this.mixin('Console');
   },
 
+  /**
+   * バリデーション実行
+   */
   check: function() {
     var me = this;
     var start = Date.now();
@@ -49,7 +65,9 @@ riot.mixin('Validation', {
     })
   },
   
-  
+  /**
+   * 結果のリセット
+   */
   reset: function() {
     this.layersMes = [];
     this.othersMes = [];
@@ -98,7 +116,7 @@ riot.mixin('Validation', {
    */
   displayResult: function(start){
     var console = {
-      time: Math.abs((start - Date.now()) / 1000) + 's',
+      time: this.getExecTime(start),
       lv: this.calcGuilty(),
       message: null
     };
@@ -138,7 +156,9 @@ riot.mixin('Validation', {
   * @return {Object}
   */
   stringToObject: function(str) {
-      var obj = (new Function("return " + str))();
+      var obj = (new Function("return " + str))() || {};
+    
+      obj.theme = themeManager.getThemeColorType();
 
       return obj;
   },
@@ -408,6 +428,7 @@ riot.mixin('Validation', {
             var obj = r.list[i];
             
             obj.hintCodes = obj.hint.join(',');
+            obj.theme = r.theme;
 
             _.each(obj.hint, function(h, i) {
               switch(h) {

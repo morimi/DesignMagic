@@ -19,9 +19,12 @@ riot.mixin('RunJSX', { RunJSX: {
    *
    * @param {Array} ids
    */
-  selectLayerAll: function(id) {
-    JSXRunner.runJSX("selectLayerAll", {data: {id: id }}, function (result) {
-      return result;
+  selectLayerAll: function(ids, callback) {
+    var self = this;
+    JSXRunner.runJSX("selectLayerAll", {data: {ids: ids }}, function (result) {
+      if ( callback ) {
+        callback(self.stringToObject(result));
+      }
     });
   },
   

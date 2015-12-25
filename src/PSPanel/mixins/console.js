@@ -15,10 +15,34 @@ riot.mixin('Console', {
   * @param {Object} data
   */
   setConsole: function(data) {
-    if ( this.parent ) {
-     this.parent.tags.footer.update(data);  
-    } else {
-      this.tags.footer.update(data);  
+    var footer = this.getFooter();
+    
+    footer.update(data);
+  },
+  
+  getExecTime: function(start) {
+    return Math.abs((start - Date.now()) / 1000) + 's'
+  },
+     
+  getFooter: function() {
+
+      var footer;
+
+      function _traverse(parent) {
+        
+        if (parent.root.tagName !== 'APP') {
+          _traverse(parent.parent);
+        }
+        
+        if (parent.root.tagName === 'APP') {
+          footer = parent.tags.footer;
+        }
+        
+      }
+
+      _traverse(this.parent);
+
+      return footer;
+    
     }
-  }
 });

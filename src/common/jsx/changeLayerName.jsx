@@ -84,7 +84,7 @@ try {
 
     activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_CHANGELAYERNAME %>", "_changeAllLayerName(_ids)");
 
-    return '{value:"complete", total:' + _ids.length + ', name:"' + _newName + '", type: "console"}';
+    return '{value:"complete", total:' + _ids.length + ', name:"' + _newName + '", ids:[' +  _ids.join(',') +'], type: "console"}';
   }
 
 } catch(e) {

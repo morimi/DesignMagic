@@ -1,10 +1,13 @@
 <!-- @fileoverview バリデーション結果メッセージ部分 -->
 <validation-message>
  
+<ul id="message-layers" class="list">
+
+ <li class="message" each="{ opts.data.filter(listFilter) }" onclick="{ toggle }">
   <div class="message-wrapper {selected:selected}">
     <p class="message-title">
-      <img riot-src="images/icon/{ opts.theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
-      <img if="{ kind }" riot-src="images/icon/{ opts.theme }/{ kind }.png" width="14" height="14" class="icon kind">
+      <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
+      <img if="{ kind }" riot-src="images/icon/{ theme }/{ kind }.png" width="14" height="14" class="icon kind">
       <span class="title {change:changeName}" if="{ !showForm }">{ title }</span>
       <nameForm value="{title}" if="{ showForm }" showForm="{ showForm }"></nameForm>
     </p>
@@ -12,47 +15,28 @@
       { text }
     </p>
   </div>
-  
-  <div class="message-data" data-type="{ type }" data-id="{ id }" data-index="{ index }" data-hints="{ hintCodes }" onclick="{ toggle }" hide="{ showForm }"></div>
+ </li>
 
-
+</ul>
 <script>
   
   var me = this;
   
   /**
-   * 初回クリックタイムスタンプ
-   * @type {number}
+   * 処理中の場合 true 
    */
-  var start;
+  this.processing = false;
   
   /**
-   * クリックカウンター
-   * @type {number}
+   * ダブルクリックで選択されたメッセージ
    */
-  var i = 0;
+  this.selectedItem = null;
   
   /**
-   * メッセージの選択状態
-   * １回目クリックでtrue
-   * @type {boolean}
+   * selectedItemと同じレイヤー名のメッセージID配列
+   * @type {Array.<number>}
    */
-  this.selected = opts.selected || false;
-  
-  /**
-   * 名前変更状態
-   * 400ms以内に２回目クリックでtrue
-   * @type {boolean}
-   */
-  this.changeName = opts.changeName || false;
-  
-  /**
-   * レイヤー名編集用テキストエリア表示状態
-   * trueで表示
-   * @type {boolean}
-   */
-  this.showForm = false;
-  
+  this.selectedIds = [];
   
   /**
    * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
@@ -61,116 +45,176 @@
    */
   this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
   
-    
+    console.log(this.isAllChangeLayerName)
   /**
    * バリデーションメッセージがクリックされた時の処理
-   * @param {MouseEvent} e 
+   * @param {MouseEvent} e イベントオブジェクト
    * @return {void}
    */
   toggle(e) {
-    
-    //@type {HTML Element} div.message-data
-    //var el = e.target;
-    //li.message el.parentElement
-    //span.title el.parentElement.childNodes[1].childNodes[1].childNodes[5]
-    
-    if ( i == 0 )  {
       
-      this.selected = true;
-      
-      start = Date.now();
+    /**
+     * クリックされたメッセージデータ
+     * @type {Object}
+     */
+    var item = e.item;
     
-      //<validation>を経由してほかのメッセージにIDを通知
-      this.parent.trigger('select', this.id);
+    if ( this.processing ) {
+      return;
+    }
+
+    if ( item.clickCount != 1 )  {
+      this.selectedIds = [];
+      /**
+       * メッセージの選択状態
+       * １回目クリックでtrue
+       * @type {boolean}
+       */   
+      item.selected = true;
     
-      i = 1;
+      /**
+       * 初回クリックタイムスタンプ
+       * @type {number}
+       */
+      item.startTime = Date.now();
       
+      /**
+       * クリックカウンター
+       * @type {number}
+       */
+      item.clickCount = 1;
+  
+      /**
+       * 名前変更状態
+       * 400ms以内に２回目クリックでtrue
+       * @type {boolean}
+       */
+      //item.changeName = false;
+      
+      /**
+       * レイヤー名編集用テキストエリア表示状態
+       * trueで表示
+       * @type {boolean}
+       */
+      //item.showForm = false;
+      
+      //item保存
+      this.selectedItem = item;
+      
+      
+      //レイヤーパネルも選択状態にする
+      me.RunJSX.selectLayer(item.id);
+      
+
       //時間切れ
       setTimeout(function(){
-        i = 0;
+        item.clickCount = 0;
       }, 400);
       
-    } else {
+    } else if (item.clickCount == 1) {
       
-      i = 0;
+      item.clickCount = 0;
       
       //ダブルクリック判定
-      if ( (Date.now() - start) < 400 ) {
-        //<validation>を経由してほかのメッセージにレイヤー名を通知
-        this.parent.trigger('changeName', this.title);
+      if ( (Date.now() - item.startTime) < 400 ) {
+        this.handleDoubleClick(item);
       }
       
-      start = Date.now();
+      item.startTime = Date.now();
     } 
   }
   
-  //<validation>経由で選択されたIDが渡されたら
-  this.parent.on('select', function(id) {
+  /**
+   * 選択状態のフィルタリング
+   * @param {Object} item メッセージデータ
+   */
+  listFilter(item) {
+    
+    if (! this.selectedItem ) {
+       return item;
+    }
     
     //自身のIDと比較して選択状態を変更
-    me.selected = (id === me.id);
-    me.showForm = false;
-    me.changeName = false;
-    i = 0;
+    if ( this.selectedItem.id != item.id ) {
+      item.selected = false;
+      item.changeName = false;
+      item.showForm = false;
+    }
+    
+    //同じレイヤー名を持つメッセージのIDが発見されたら
+    if (this.selectedItem.title == item.title ) {
+      item.changeName = true;
       
-  });
-  
-  //ダブルクリックして<validation>経由でレイヤー名が渡されたら
-  this.parent.on('changeName', function(name) {
-    
-    //自身のnameと比較して状態を変更
-    me.changeName = (name === me.title);
-    
-    //レイヤー名が同じである場合はIDを<validation>に通知
-    if (name === me.title) {
-      me.parent.trigger('pushIds', me.id);
+      if ( this.selectedIds.indexOf(item.id) === -1) {
+        //IDを保存しておく
+        this.selectedIds.push(item.id);
+      }
     }
     
-    //レイヤー名が同じで選択状態の場合はテキストエリアを表示
-    if ( ( name === me.title ) && me.selected ){ 
-      me.showForm = true;
     
-    }
-    
-  });
-  
-  
+    return item;
+  }
+
   /**
-   * 削除された
+   * メッセージがダブルクリックされたときのイベントハンドラ
+   * @param {Object} item ダブルクリックされたメッセージデータ
    */
-  this.on('unmount', function() {
+   this.handleDoubleClick =  function(item) {
+     item.changeName = true;
+     
+    var i, l = me.selectedIds.length;
+     
+      //レイヤーパネルの選択を増やす
+      me.RunJSX.selectLayerAll(me.selectedIds);
+     
+     item.showForm = true;
+  };
+
+    
+  /**
+   * 名前が変更された後の処理
+   * result.ids == selectedIds
+   * result.name 変更後の名前
+   * 
+   * 結果を元にeachで表示するdataを修正する
+   * 
+   * filterで処理して生成したdataをupdateに渡して更新したい気持ちになったが
+   * 実際やってみると何の反応もなかった。どうやら親の方で渡してやらないとだめらしい
+   * @param {Object} result nameFormからtrigger経由で渡されたjsxの返り値
+   */
+  this.on('afterNameChange', function(result) {
+    
+    var i = 0, l = me.opts.data.length;
+      
+    while ( i < l ) {
+      var item = me.opts.data[i];
+      item.changeName = false;
+      item.showForm = false;
+      
+      if ( result.ids.indexOf(item.id) !== -1) {
+        
+        item.title = result.name;
+      
+        for(var m = item.hint.length; m--; ) {
+          if ( item.hint[m].code == 'NONAME' ) {
+            item.hint.splice(m, 1);
+          } 
+        }
+
+        if ( !item.hint.length ) {
+          me.opts.data.splice(i, 1);
+          l = l-1;
+          i = i-1;
+        }
+        
+      }
+        i = i+1|0;
+    }
+    
+    me.selectedIds = [];
+    me.selectedItem = null;
+    
     me.update();
-  });
-    
-
-  /**
-   * 名前が変更された
-   */
-  this.parent.on('afterNameChange', function(result) {
-
-    if ( result.ids.indexOf(me.opts.id) === -1 ) {
-      return;
-    }
-    
-    console.log('message.change.complete', result)
-
-    for(var i = me.hint.length; i--; ) {
-      var hint = me.hint[i];
-
-      if ( hint.code == 'NONAME' ) {
-        me.hint.splice(i, i+1);
-      } 
-
-    }
-
-    if ( !me.hint.length ) {
-      me.unmount();
-    } else {
-      
-      me.showForm = false;
-      me.changeName = false;
-      me.update({title:result.name});
-    }
 
   });
   
@@ -186,9 +230,10 @@
   
   <script>
     var my = this;
+    var startTime = 0;
   
     this.on('updated', function() {
-      if ( my.parent.showForm ) {
+      if ( my.showForm ) {
         my.nameForm.focus();
       }
     });
@@ -196,7 +241,7 @@
     
   /**
    * 変更処理
-   * changeLayerName.jsxに新しいレイヤー名を渡して実行する
+   * 押されたキーがEnterだった場合のみchangeLayerName.jsxに新しいレイヤー名を渡して実行する
    * @since version 0.4.0
    * @return {void}
    */
@@ -207,9 +252,13 @@
         return;
       }
       
+      startTime = Date.now();
+      
+      my.parent.processing = true;
+      
       var data = {
-        id: my.Storage.getStorage('selectedId'),
-        ids: my.Storage.getStorage('selectedIds'),
+        id: my.parent.selectedItem.id,
+        ids: my.parent.selectedIds,
         newName: value
       };
       
@@ -217,38 +266,35 @@
     }
     
     /** 
-     *
+     * テキストフォームの選択が外れた時のイベントハンドラ
+     * フォーム要素を非表示にする（フラグの操作）
      */
     blur() {
       my.nameForm.value = '';
-       my.parent.showForm = false;
+      my.parent.showForm = false;
     }
     
     
-    
+    /**
+     * 変更完了後に実行される
+     * 処理中フラグをoffにしてafterNameChangeイベントを発火
+     * @param {OBject} result Object化した結果
+     */
     this.afterChange = function(result) {
+      my.parent.processing = false;
       
-      console.log('change.complete', my.parent.id)
+      console.log('change.complete', result)
       
-      result.ids = my.Storage.getStorage('selectedIds');
+      my.parent.trigger('afterNameChange', result);
+    
+      my.setConsole({
+        time: my.getExecTime(startTime),
+        message: Strings.formatStr(Strings.Pr_COMPLETE_NAMECHANGE, result.total)
+      });
       
-      my.parent.parent.trigger('afterNameChange', result);
-      
-//      var hints = my.parent.hint;
-//      
-//      for(var i = hints.length; i--; ) {
-//        var hint = hints[i];
-//        
-//        if ( hint.code == 'NONAME' ) {
-//          hints.slice(i, 1);
-//        } 
-//      }
-//      
-      
-      
-    }
+    };
     
     this.mixin('RunJSX');
-    this.mixin('Storage');
+    this.mixin('Console');
   </script>
 </nameForm>
