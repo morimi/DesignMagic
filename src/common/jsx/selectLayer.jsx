@@ -1,7 +1,7 @@
 /**
  * @fileoverview レイヤー/グループを選択する
  * idとレイヤー名を使用する
- * data = { name: string, id: number }
+ * data = { id: number }
  * @since version 0.4.0
  */
 
@@ -9,21 +9,21 @@
 try {
 
   function selectLayer() {
-    function cTID(s) { return app.charIDToTypeID(s); };
-    function sTID(s) { return app.stringIDToTypeID(s); };
 
     var desc = new ActionDescriptor();
     var ref = new ActionReference();
     var list = new ActionList();
+    
+    var id = parseInt("<%= data.id %>");
 
-    //ref.putName( cTID( "Lyr " ), "<%= data.name %>");
-    ref.putIdentifier(cTID("Lyr "), parseInt("<%= data.id %>"));
-    desc.putReference( cTID( "null" ), ref );
-    desc.putBoolean( cTID( "MkVs" ), false );
+    ref.putIdentifier( charIDToTypeID("Lyr "), id );
+    desc.putReference( charIDToTypeID( "null" ), ref );
+    desc.putBoolean( charIDToTypeID( "MkVs" ), false );
 
-    list.putInteger( parseInt("<%= data.id %>") );
-    desc.putList( cTID( "LyrI" ), list );
-    executeAction(  cTID( "slct" ), desc, DialogModes.NO );
+    list.putInteger( id );
+    desc.putList( charIDToTypeID( "LyrI" ), list );
+    executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
+    
   }
 
   if (documents.length !== 0 ) {

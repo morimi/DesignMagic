@@ -16,6 +16,8 @@ riot.mixin('Validation', {
   
   init: function() {
     
+    this.layersMesNum = 0;
+    
     this.layersMes = [];
     this.othersMes = [];
 
@@ -395,8 +397,12 @@ riot.mixin('Validation', {
           return d.resolve(c);
         }
         
+        me.layersMesNum = r.list.length;
+        
         if ( _.isArray(r.list) && r.list.length ) {
           var i = r.list.length-1;
+          var minSize = c.check.fonts.minSize;
+          var unitsLabel = me.UNITS_LABEL[c.check.config.rulserUnitsType];
           
           while( i > -1 ) {
             var obj = r.list[i];
@@ -406,10 +412,12 @@ riot.mixin('Validation', {
             _.each(obj.hint, function(h, i) {
               switch(h) {
                 case 'FONT_MINSIZE':
-                  obj.hint[i] = Strings.formatStr(me.getValidationMessage(h + '_LAYERS', 'hint'), c.check.fonts.minSize + me.UNITS_LABEL[c.check.config.rulserUnitsType]);
+                  obj.hint[i] = {code: h,
+                                 text: Strings.formatStr(me.getValidationMessage(h + '_LAYERS', 'hint'), minSize + unitsLabel)};
                   break;
                 default:
-                  obj.hint[i] = me.getValidationMessage(h + '_LAYERS', 'hint');
+                  obj.hint[i] = {code: h,
+                                 text: me.getValidationMessage(h + '_LAYERS', 'hint')};
               }
 
             });

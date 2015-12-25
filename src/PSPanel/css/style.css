@@ -197,9 +197,11 @@ body.lighter .container{
  */
 .message {
   display: block;
+  position: relative;
+}
+.message-wrapper {
   border-bottom: 1px solid #383838;
   background: #535353;
-  position: relative;
 }
 
 .message-wrapper.selected {
@@ -242,6 +244,14 @@ body.lighter .message {
   overflow: hidden;
   text-overflow: ellipsis;
   margin: 0;
+}
+
+.title {
+  display: inline-block;
+}
+
+.title.change {
+  border: dashed 1px rgba(255,255,255,.5)
 }
 
 .message-hint {

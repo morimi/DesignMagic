@@ -27,6 +27,8 @@ try {
   var _ids = "<%= data.ids %>".split(',');
 
 
+  var _id = parseInt("<%= data.id %>");
+  
   /**
    * レイヤー名を変更する
    * @param {number} id レイヤーのID
@@ -73,18 +75,16 @@ try {
 
       i = (i+1)|0;
     }
+    
+    selectLayer(_id);
   }
 
 
   if (documents.length !== 0 ) {
 
-   var aLayer = activeDocument.activeLayer;
-
     activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_CHANGELAYERNAME %>", "_changeAllLayerName(_ids)");
 
-    activeDocument.activeLayer = aLayer;
-
-    return '{value:"complete", total:' + _ids.length + ', type: "console"}';
+    return '{value:"complete", total:' + _ids.length + ', name:"' + _newName + '", type: "console"}';
   }
 
 } catch(e) {
