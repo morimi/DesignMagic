@@ -31,6 +31,8 @@
       return '{value: "0", type: "warn"}';
 
     }
+  } else {
+      return '{value: "404", type: "error"}';
   }
 
   } catch(e) {

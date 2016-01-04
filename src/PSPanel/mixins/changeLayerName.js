@@ -25,8 +25,6 @@ riot.mixin('ChangeLayerName', {
     //li.message el.parentElement
     //span.title el.parentElement.childNodes[1].childNodes[1].childNodes[5]
     
-    console.log(el.parentElement.childNodes[1].childNodes[1].childNodes[5])
-    
     
   }
 });

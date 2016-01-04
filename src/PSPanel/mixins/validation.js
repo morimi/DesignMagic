@@ -224,7 +224,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.type && obj.value != "404") {
+        if (obj.type && obj.value != 404) {
 
           if ( obj.type === 'error' ) {
             obj.hint = [Strings.formatStr(me.getValidationMessage('DOCUMENTMODE', 'hint'), label)];
@@ -266,7 +266,8 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
 
         var obj = me.stringToObject(result);
-        if (_.isObject(obj) && obj.type ) {
+        
+        if (obj.value != 404 && obj.type ) {
 
           obj.title = me.getValidationMessage('DOCUMENTNAME', obj.type);
 
@@ -302,7 +303,8 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
 
         var obj = me.stringToObject(result);
-        if (_.isObject(obj) && obj.type) {
+        
+        if (obj.value != 404 && obj.type) {
 
           obj.title = Strings.formatStr(me.getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
 
@@ -339,7 +341,8 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
 
         var obj = me.stringToObject(result);
-        if (_.isObject(obj)) {
+        
+        if (obj.type && obj.value != 404) {
           var value = parseInt(obj.value);
 
           obj.title = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
@@ -377,7 +380,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (_.isObject(obj) && obj.type ) {
+        if (obj.value != 404 && obj.type ) {
           var unit =  me.UNITS_LABEL[c.check.config.rulerUnitsType];
           obj.title = me.getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
 
@@ -413,7 +416,7 @@ riot.mixin('Validation', {
 
         var r = me.stringToObject(result);
 
-        if ( !_.isObject(r) ) {
+        if ( ! r.list || r.value == 404 ) {
           return d.resolve(c);
         }
         

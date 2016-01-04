@@ -45,7 +45,6 @@
    */
   this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
   
-    console.log(this.isAllChangeLayerName)
   /**
    * バリデーションメッセージがクリックされた時の処理
    * @param {MouseEvent} e イベントオブジェクト
@@ -282,8 +281,6 @@
      */
     this.afterChange = function(result) {
       my.parent.processing = false;
-      
-      console.log('change.complete', result)
       
       my.parent.trigger('afterNameChange', result);
     

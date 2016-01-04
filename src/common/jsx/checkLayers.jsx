@@ -271,9 +271,11 @@ function getLayerKind(desc) {
       return '{hidden: "' + h + '", list:[]}';
     }
 
+  } else {
+    return '{value: "404", type: "error"}';
   }//if
     
 } catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
+  return '{errorType: "jsx", errorMessage: "' + e + '"}';
 }
 })();

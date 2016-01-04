@@ -69,10 +69,6 @@
     riot.tag('b', '', function(opts) {
         this.root.innerHTML = Strings['Pr_CONFIG_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
     });
-    
-//    this.parent.on('confCache', function(data){
-//      console.log('config.tag', data)
-//      
-//    })
+
   </script>
 </configs>

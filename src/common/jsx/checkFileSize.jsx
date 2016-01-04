@@ -16,6 +16,8 @@
       } else if ( limit && size < limit ){
         return '{limit: "' + limit + '", value:"' + size + '", type: "valid"}';
       }
+    } else {
+      return '{value: "404", type: "error"}';
     }
 
   } catch(e) {

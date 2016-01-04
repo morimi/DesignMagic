@@ -26,6 +26,8 @@
       return '{value: "' + activeDocument.width + '", type: "valid"}';
 
     }
+  } else {
+    return '{value: "404", type: "error"}';
   }
 
   } catch(e) {
