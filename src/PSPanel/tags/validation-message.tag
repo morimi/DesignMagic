@@ -3,7 +3,7 @@
  
 <ul id="message-layers" class="list">
 
- <li class="message" each="{ opts.data.filter(listFilter) }" onclick="{ toggle }">
+ <li class="message" each="{ opts.data.filter(listFilter) }" onclick="{ toggle }" ondblclick="{ handleDoubleClick }">
   <div class="message-wrapper {selected:selected}">
     <p class="message-title">
       <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
@@ -62,65 +62,35 @@
       return;
     }
 
-    if ( item.clickCount != 1 )  {
-      this.selectedIds = [];
-      /**
-       * メッセージの選択状態
-       * １回目クリックでtrue
-       * @type {boolean}
-       */   
-      item.selected = true;
-    
-      /**
-       * 初回クリックタイムスタンプ
-       * @type {number}
-       */
-      item.startTime = Date.now();
-      
-      /**
-       * クリックカウンター
-       * @type {number}
-       */
-      item.clickCount = 1;
-  
-      /**
-       * 名前変更状態
-       * 400ms以内に２回目クリックでtrue
-       * @type {boolean}
-       */
-      //item.changeName = false;
-      
-      /**
-       * レイヤー名編集用テキストエリア表示状態
-       * trueで表示
-       * @type {boolean}
-       */
-      //item.showForm = false;
-      
-      //item保存
-      this.selectedItem = item;
-      
-      
-      //レイヤーパネルも選択状態にする
-      me.RunJSX.selectLayer(item.id);
-      
+    this.selectedIds = [];
+    /**
+     * メッセージの選択状態
+     * １回目クリックでtrue
+     * @type {boolean}
+     */   
+    item.selected = true;
 
-      //時間切れ
-      setTimeout(function(){
-        item.clickCount = 0;
-      }, 400);
-      
-    } else if (item.clickCount == 1) {
-      
-      item.clickCount = 0;
-      
-      //ダブルクリック判定
-      if ( (Date.now() - item.startTime) < 400 ) {
-        this.handleDoubleClick(item);
-      }
-      
-      item.startTime = Date.now();
-    } 
+    /**
+     * 名前変更状態
+     * 400ms以内に２回目クリックでtrue
+     * @type {boolean}
+     */
+    //item.changeName = false;
+
+    /**
+     * レイヤー名編集用テキストエリア表示状態
+     * trueで表示
+     * @type {boolean}
+     */
+    //item.showForm = false;
+
+    //item保存
+    this.selectedItem = item;
+
+
+    //レイヤーパネルも選択状態にする
+    me.RunJSX.selectLayer(item.id);
+
   }
   
   /**
@@ -156,17 +126,17 @@
 
   /**
    * メッセージがダブルクリックされたときのイベントハンドラ
-   * @param {Object} item ダブルクリックされたメッセージデータ
+   * @param {MouseEvent} e イベントオブジェクト
    */
-   this.handleDoubleClick =  function(item) {
-     item.changeName = true;
+   handleDoubleClick(e) {
+     e.item.changeName = true;
      
     var i, l = me.selectedIds.length;
      
       //レイヤーパネルの選択を増やす
       me.RunJSX.selectLayerAll(me.selectedIds);
      
-     item.showForm = true;
+     e.item.showForm = true;
   };
 
     
