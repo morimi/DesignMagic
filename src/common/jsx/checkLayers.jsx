@@ -265,17 +265,17 @@ function getLayerKind(desc) {
     } //while
     
     if ( mes.length ) {
-      return '{hidden: "' + h + '", list:[' + mes.join(',') + ']}';
+      return '{hidden: "' + h + '", list:[' + mes.join(',') + '], status: 200}';
 
     } else {
-      return '{hidden: "' + h + '", list:[]}';
+      return '{hidden: "' + h + '", list:[], status: 200}';
     }
 
   } else {
-    return '{value: "404", type: "error"}';
+    return '{status: 404}';
   }//if
     
 } catch(e) {
-  return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
 }
 })();

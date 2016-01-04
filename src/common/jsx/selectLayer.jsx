@@ -29,8 +29,10 @@ try {
   if (documents.length !== 0 ) {
 
     selectLayer();
+  } else {
+    '{status: 404}';
   }
 
 } catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
+  '{type: "jsx", message: "' + e + '", status: 500}';
 }

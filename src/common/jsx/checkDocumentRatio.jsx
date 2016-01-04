@@ -19,18 +19,18 @@
   if ( documents.length > 0 ) {
     if ( activeDocument.width !== value ) {
 
-      return '{value: "' + activeDocument.width + '", type: "error"}';
+      return '{value: "' + activeDocument.width + '", type: "error", status: 200}';
 
     } else {
 
-      return '{value: "' + activeDocument.width + '", type: "valid"}';
+      return '{value: "' + activeDocument.width + '", type: "valid", status: 200}';
 
     }
   } else {
-    return '{value: "404", type: "error"}';
+    return '{status: 404}';
   }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 })();

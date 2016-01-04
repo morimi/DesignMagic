@@ -95,16 +95,18 @@
       if ( layers.length ) {
         activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETECOPYTEXT %>", "deleteCopyText(layers)");
 
-        return '{value:"complete", total:' + layers.length + ', type: "console"}';
+        return '{ total:' + layers.length + ', status: 200}';
 
       } else {
-        return '{value:"notfound", total:0, type: "console"}';
+        return '{ total:0, status: 200 }';
       }
+    } else {
+      return '{status: 404}';
     }
 
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+  return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

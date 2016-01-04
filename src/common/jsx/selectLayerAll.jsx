@@ -10,7 +10,7 @@
   try {
 
     if (documents.length === 0 ) {
-      return '{value:"nodocument", type: "error"}';
+      return '{status: 404}';
     }
     
     var desc = new ActionDescriptor();
@@ -46,7 +46,7 @@
     
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

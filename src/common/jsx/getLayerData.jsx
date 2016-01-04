@@ -74,11 +74,13 @@
 
     var d = getLayerData();
 
-    return '{id: "' + d.id + '", title: "' + d.name + '", index: "' + d.index + '", kind: "' + d.kind + '"}';
+    return '{id: "' + d.id + '", title: "' + d.name + '", index: "' + d.index + '", kind: "' + d.kind + '", status: 200}';
 
+  } else {
+    return '{status: 404}';
   }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 })();

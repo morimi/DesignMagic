@@ -177,7 +177,7 @@ riot.mixin('Validation', {
 
           var obj = me.stringToObject(result);
 
-          if (_.isObject(obj) && obj.list.length) {
+          if (obj.status === 200 && obj.list.length) {
 
             _.each(obj.list, function(r, i) {
               var name = _.camelCase(r.name);
@@ -224,7 +224,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.type && obj.value != 404) {
+        if (obj.status === 200) {
 
           if ( obj.type === 'error' ) {
             obj.hint = [Strings.formatStr(me.getValidationMessage('DOCUMENTMODE', 'hint'), label)];
@@ -267,7 +267,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.value != 404 && obj.type ) {
+        if (obj.status === 200) {
 
           obj.title = me.getValidationMessage('DOCUMENTNAME', obj.type);
 
@@ -304,7 +304,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.value != 404 && obj.type) {
+        if (obj.status === 200) {
 
           obj.title = Strings.formatStr(me.getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
 
@@ -342,7 +342,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.type && obj.value != 404) {
+        if (obj.status === 200) {
           var value = parseInt(obj.value);
 
           obj.title = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
@@ -380,7 +380,7 @@ riot.mixin('Validation', {
 
         var obj = me.stringToObject(result);
         
-        if (obj.value != 404 && obj.type ) {
+        if (obj.status === 200) {
           var unit =  me.UNITS_LABEL[c.check.config.rulerUnitsType];
           obj.title = me.getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
 
@@ -416,7 +416,7 @@ riot.mixin('Validation', {
 
         var r = me.stringToObject(result);
 
-        if ( ! r.list || r.value == 404 ) {
+        if ( ! r.list || r.value === 404 ) {
           return d.resolve(c);
         }
         

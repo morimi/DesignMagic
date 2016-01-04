@@ -484,16 +484,16 @@ try {
 
     createDialog();
 
-  return '{value:"' + _resultValue + '", type: "console"}';
+  return '{value:"' + _resultValue + '", status: 200}';
 
   } else {
 
-   return '{value:"nodocument", type: "console"}';
+   return '{status: 404}';
 
   }
 
 } catch(e) {
-  return '{errorType: "jsx", errorMessage: "' + e + '"}';
+  return '{type: "jsx", message: "' + e + '", status: 500}';
 }
 
 })();

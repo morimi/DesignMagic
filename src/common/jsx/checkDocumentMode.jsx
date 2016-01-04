@@ -7,18 +7,18 @@
 
     if (documents.length > 0 ) {
       if (activeDocument.mode === DocumentMode["<%= config.documentModeType %>"]) {
-        return '{value: "' + activeDocument.mode + '", type: "valid"}';
+        return '{value: "' + activeDocument.mode + '", type: "valid", status: 200}';
 
       } else {
-        return '{value: "' + activeDocument.mode + '", type: "error"}';
+        return '{value: "' + activeDocument.mode + '", type: "error", status: 200}';
 
       }
     } else {
-      return '{value: "404", type: "error"}';
+      return '{status: 404}';
     }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

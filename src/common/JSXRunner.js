@@ -63,12 +63,12 @@ function _evalJSX(script, callback, optScriptName) {
     var self = this;
     _.defer(function () {
         csInterface.evalScript(script, function () {
-          // 返却値に {errorType:type, errorMessage:message} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
+          // 返却値に {type:type, message:message, status:500} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
           if (arguments[0] != EvalScript_ErrMessage) {
             var obj = (new Function("return " + arguments[0]))();
             try {
-              if (obj.errorType == 'jsx') {
-                console.log('[jsx error - ' + optScriptName + '] ' + obj.errorMessage);
+              if (obj.type == 'jsx') {
+                console.log('[jsx error - ' + optScriptName + '] ' + obj.message);
                 arguments[0] = null; //エラー用データを破棄
               }
             } catch(e) {

@@ -29,11 +29,13 @@
 
     if (documents.length !== 0 ) {
       visible();
+    } else {
+      return '{status: 404}';
     }
 
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

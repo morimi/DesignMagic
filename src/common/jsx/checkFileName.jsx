@@ -16,19 +16,19 @@
 
     if ( !name.match(reg3) ) {
 
-      return '{type: "error"}';
+      return '{status: 200, type: "error"}';
 
     } else {
 
-      return '{type: "valid"}';
+      return '{status: 200, type: "valid"}';
 
     }
   } else {
-      return '{value: "404", type: "error"}';
+      return '{status: 404}';
   }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

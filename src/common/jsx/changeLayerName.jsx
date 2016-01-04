@@ -84,11 +84,13 @@ try {
 
     activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_CHANGELAYERNAME %>", "_changeAllLayerName(_ids)");
 
-    return '{value:"complete", total:' + _ids.length + ', name:"' + _newName + '", ids:[' +  _ids.join(',') +'], type: "console"}';
+    return '{total:' + _ids.length + ', name:"' + _newName + '", ids:[' +  _ids.join(',') +'], status: 200}';
+  } else {
+    return '{status: 404}';
   }
 
 } catch(e) {
-  return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
 }
 
 })();

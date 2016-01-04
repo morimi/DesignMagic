@@ -29,13 +29,13 @@ try {
 
 
   if ( mes.length ) {
-    '{list:[' + mes.join(',') + ']}';
+    '{list:[' + mes.join(',') + '], status: 200}';
 
   } else {
-    '{list:[]}';
+    '{list:[], status: 200}';
   }
 
 
 } catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
+  '{type: "jsx", message: "' + e + '", status: 500}';
 }

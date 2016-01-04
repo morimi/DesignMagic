@@ -48,7 +48,7 @@
      * update
      * バリデーション実行
      */
-    this.on('update', function(mode, validation) {
+    this.on('update', function(mode) {
       if ( mode != 'check' ) return;
 
       me.check()

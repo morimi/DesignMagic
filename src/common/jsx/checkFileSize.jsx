@@ -11,17 +11,17 @@
       var limit = Math.abs('<%= config.size %>');
 
       if ( limit && size > limit ) {
-        return '{limit: "' + limit + '", value:"' + size + '", type: "warn"}';
+        return '{limit: "' + limit + '", value:"' + size + '", type: "warn", status: 200}';
 
       } else if ( limit && size < limit ){
-        return '{limit: "' + limit + '", value:"' + size + '", type: "valid"}';
+        return '{limit: "' + limit + '", value:"' + size + '", type: "valid", status: 200}';
       }
     } else {
-      return '{value: "404", type: "error"}';
+      return '{status: 404}';
     }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

@@ -78,16 +78,18 @@
 
         app.displayDialogs = DialogModes.ERROR;//戻しておく
 
-        return '{value:"complete", total:' + layers.length + ', type: "console"}';
+        return '{total:' + layers.length + ', status: 200}';
 
       } else {
-        return '{value:"nolayers", total:0, type: "console"}';
+        return '{total:0, status: 200}';
       }
+    } else {
+      return '{status: 404}';
     }
 
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();

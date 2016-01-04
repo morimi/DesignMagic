@@ -18,25 +18,25 @@
 
       if ( n !== undefined ) { //valid
 
-        return '{value: "' + n + '", type: "valid"}';
+        return '{value: "' + n + '", type: "valid", status: 200}';
 
       } else { //選択されてない
 
-        return '{value: "0", type: "valid"}';
+        return '{value: "0", type: "valid", status: 200}';
 
       }
 
     } else {
 
-      return '{value: "0", type: "warn"}';
+      return '{value: "0", type: "warn", status: 200}';
 
     }
   } else {
-      return '{value: "404", type: "error"}';
+      return '{ status: 404 }';
   }
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{type: "jsx", message: "' + e + '", status: 500}';
   }
 
 })();
