@@ -1,8 +1,6 @@
 <!-- @fileoverview バリデーション結果メッセージ部分 -->
 <validation-message>
  
-<ul id="message-layers" class="list">
-
  <li class="message" each="{ opts.data.filter(listFilter) }" onclick="{ toggle }" ondblclick="{ handleDoubleClick }">
   <div class="message-wrapper {selected:selected}">
     <p class="message-title">
@@ -16,8 +14,7 @@
     </p>
   </div>
  </li>
-
-</ul>
+  
 <script>
   
   var me = this;

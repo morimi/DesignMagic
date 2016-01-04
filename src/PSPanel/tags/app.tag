@@ -74,7 +74,7 @@
 
       me.mode = str;
 
-      me.update(str, me.validation);
+      me.update(str);
 //      me.tags.validation.update()
 //      me.tags.configs.update()
 //      me.tags.tools.update();

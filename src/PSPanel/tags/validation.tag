@@ -2,9 +2,9 @@
 
   <div id="validation" class="container"
     show="{this.parent.mode == 'check'}">
-      <validation-message if="{ layersMes.length }" data="{ layersMes }">
+     <ul riot-tag="validation-message" class="list" if="{ layersMes.length }" data="{ layersMes }">
         
-      </validation-message>
+      </ul>
     <ul id="message-others" class="list">
        <li class="validation-info" id="validation_info" if="{ !othersMes.length }"></li>
 
