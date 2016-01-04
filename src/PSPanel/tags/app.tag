@@ -42,8 +42,6 @@
     this.theme = themeManager.getThemeColorType() || 'dark';
 
 
-    themeManager.init();
-
     /**
      * start app
      */
@@ -56,7 +54,8 @@
         console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
       })
 
-    })
+    });
+    
 
     /**
      * 表示モード(mode)を引数で渡された値に変更する
