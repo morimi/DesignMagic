@@ -17,26 +17,35 @@
   <app></app>
 
   <script src="js/libs/CSInterface.js"></script>
-  <script>
-    //JSXRunnner.jsの為に
-    csInterface = new CSInterface();
-    localeStrings = csInterface.initResourceBundle();
-  </script>
   <script src="js/themeManager.js"></script>
+  <script>
+    var csInterface = new CSInterface();
+    var localeStrings = csInterface.initResourceBundle();
+    var extensionId =  csInterface.getExtensionID();
+    //Modules
+    var _           = require("lodash"),
+        Q           = require("Q"),
+        http        = require('http'),
+        JSXRunner   = require("../common/JSXRunner"),
+        Strings     = require("./js/LocStrings");
+        themeManager.init();
+  </script>
 
   <!-- riot tags -->
+  <script src="mixins/config.js" type="riot/tag"></script>
+  <script src="mixins/validation.js" type="riot/tag"></script>
+  
   <script src="tags/app.tag" type="riot/tag"></script>
-  <script src="tags/header.tag" type="riot/tag"></script>
-  <script src="tags/footer.tag" type="riot/tag"></script>
   <script src="tags/validation.tag" type="riot/tag"></script>
   <script src="tags/config.tag" type="riot/tag"></script>
   <script src="tags/tools.tag" type="riot/tag"></script>
+  <script src="tags/header.tag" type="riot/tag"></script>
+  <script src="tags/footer.tag" type="riot/tag"></script>
 
-  <script src="../node_modules/riot/riot+compiler.min.js"></script>
-  <script src="main.js"></script>
+  <script src="../node_modules/riot/riot+compiler.js"></script>
 
   <script>
-    riot.mount('*');
+    riot.mount('app');
   </script>
   </body>
 </html>

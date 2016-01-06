@@ -4,23 +4,20 @@
 
 try {
 
-function checkMode() {
-  if (activeDocument.mode !== DocumentMode["<%= config.documentModeType %>"]) {
+  if (documents.length > 0 ) {
+    if (activeDocument.mode !== DocumentMode["<%= config.documentModeType %>"]) {
 
-    return '{value: "' + activeDocument.mode + '", type: "error"}';
+      '{ "value": "' + activeDocument.mode + '", "type": "error", "status": 200}';
 
+    } else {
+
+      '{ "value": "' + activeDocument.mode + '", "type": "valid", "status": 200}';
+
+    }
   } else {
-
-    return '{value: "' + activeDocument.mode + '", type: "valid"}';
-
+    '{ "status": 404}';
   }
 
-}
-
-if (documents.length > 0 ) {
-  checkMode();
-}
-
 } catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
+  '{ "type": "jsx", "message": "' + e + '", "status": 500}';
 }

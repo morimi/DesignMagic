@@ -197,16 +197,27 @@ body.lighter .container{
  */
 .message {
   display: block;
+  position: relative;
+}
+.message-wrapper {
   border-bottom: 1px solid #383838;
   background: #535353;
 }
 
-.message.select {
+.message-wrapper.selected {
   background: #636363;
 }
 
 .message.modified {
   background: #6a8d9f;
+}
+
+.message-data {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 
@@ -235,10 +246,32 @@ body.lighter .message {
   margin: 0;
 }
 
+.title {
+  display: inline-block;
+}
+
+.title.change {
+  border: dashed 1px rgba(255,255,255,.5)
+}
+
 .message-hint {
   margin: 0;
   font-size: 10px;
 }
+
+body.darker .message-hint,
+body.dark .message-hint {
+    color: #888888;
+}
+
+body.lighter .message-hint {
+    color: #4f4f4f;
+}
+
+body.light .message-hint {
+    color: #404040;
+}
+
 
 /**
  * 初期メッセージ
@@ -293,6 +326,39 @@ body.light .panel-footer {
   font-size: 9px;
 }
 
+
+/* 計測時間 */
+.time {
+  margin-right: 5px;
+  background: #333;
+  color: #fff;
+  padding: .3rem .5rem;
+  border-radius: .3rem;
+}
+
+/* レベルカラーリング */
+.lv1 {
+  color: aliceblue;
+}
+.lv2 {
+  color: #acffec;
+}
+.lv3 {
+  color: #d5ff8b;
+}
+.lv4 {
+  color: #f8ff8b;
+}
+.lv5 {
+  color: #ffd16e;
+}
+.lv6 {
+  color: #ff7145;
+}
+.lv7 {
+  background: red;
+  color: #fff;
+}
 /************************************************
  * Utilities
  */
