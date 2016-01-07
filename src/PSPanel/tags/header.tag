@@ -53,7 +53,7 @@
      */
     switchContainer(e) {
       this.parent.mode = e.currentTarget.getAttribute('data-mode');
-      this.parent.update()
+      this.parent.update({mode: this.parent.mode})
     }
     
   </script>

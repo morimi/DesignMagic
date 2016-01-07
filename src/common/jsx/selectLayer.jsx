@@ -1,36 +1,37 @@
 /**
  * @fileoverview レイヤー/グループを選択する
- * idとレイヤー名を使用する
- * data = { name: string, id: number }
+ * idを使用する
+ * data = { id: number }
  * @since version 0.4.0
  */
 
+(function() {
+  
+  try {
 
-try {
+    if (documents.length !== 0 ) {
+      
+      var desc = new ActionDescriptor();
+      var ref = new ActionReference();
+      var list = new ActionList();
+      var id = parseInt("<%= id %>");
 
-  function selectLayer() {
-    function cTID(s) { return app.charIDToTypeID(s); };
-    function sTID(s) { return app.stringIDToTypeID(s); };
+      ref.putIdentifier( charIDToTypeID("Lyr "), id );
+      desc.putReference( charIDToTypeID( "null" ), ref );
+      desc.putBoolean( charIDToTypeID( "MkVs" ), false );
 
-    var desc = new ActionDescriptor();
-    var ref = new ActionReference();
-    var list = new ActionList();
+      list.putInteger( id );
+      desc.putList( charIDToTypeID( "LyrI" ), list );
+      executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
+      
+      return '{"status": 200}';
+      
+    } else {
+      return '{"status": 404}';
+    }
 
-    //ref.putName( cTID( "Lyr " ), "<%= data.name %>");
-    ref.putIdentifier(cTID("Lyr "), parseInt("<%= data.id %>"));
-    desc.putReference( cTID( "null" ), ref );
-    desc.putBoolean( cTID( "MkVs" ), false );
-
-    list.putInteger( parseInt("<%= data.id %>") );
-    desc.putList( cTID( "LyrI" ), list );
-    executeAction(  cTID( "slct" ), desc, DialogModes.NO );
+  } catch(e) {
+    return '{"type": "jsx", "message": "' + e + '", "status": 500}';
   }
 
-  if (documents.length !== 0 ) {
-
-    selectLayer();
-  }
-
-} catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
-}
+}());

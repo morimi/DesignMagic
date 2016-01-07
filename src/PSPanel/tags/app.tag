@@ -72,16 +72,27 @@
      */
     this.on('message', function(mes) {
       opt.message = mes;
-      me.tags.footer.update(opt)
+      me.tags.footer.update(opt);
     });
     
+    
+    /**
+     * check始まったときの処理
+     */
+    this.tags.validation.on('validationStart', function(result) {
+      opt.loading = true;
+      opt.message = Strings.Pr_MESSAGE_CHECK_START;
+      me.tags.header.update(opt);
+      me.tags.footer.update(opt);
+    });
     
     /**
      * check終わったときの処理
      * headerとfooterに結果渡して更新
      */
     this.tags.validation.on('validationEnd', function(result) {
-      console.log('validationEnd');
+      console.log('<app> on validationEnd');
+      result.loading = false;
       me.tags.header.update(result);
       me.tags.footer.update(result);
     });

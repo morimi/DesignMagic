@@ -2,6 +2,7 @@
  * @fileoverview バリデーション機能を集約したミックスイン
  * 
  * カスタムイベント
+ * validationStart - チェック開始時に発火する。
  * validationEnd - チェック完了時に発火する。引数で結果オブジェクトを渡す
  *
  */
@@ -78,7 +79,7 @@ riot.mixin('Validation', {
   /**
    * 結果のリセット
    */
-  reset: function() {
+  resetResult: function() {
     
     this.result.errorVal = 0;
     this.result.warnVal = 0;
@@ -96,7 +97,7 @@ riot.mixin('Validation', {
   /**
    * バリデーション実行
    */
-  check: function(config) {
+  checkExecute: function(config) {
     var me = this;
 
     //updateに紐づけてると無慈悲に実行されて無限ループするのでここで阻止する
@@ -107,7 +108,9 @@ riot.mixin('Validation', {
 
     console.info('check start ٩(ˊᗜˋ*)و');
     
-    this.reset();
+    me.trigger('validationStart');
+    
+    this.resetResult();
 
     this.prosessing = true;
 
@@ -127,7 +130,7 @@ riot.mixin('Validation', {
       me.result.message = me.getResultMessage(me.result);
       
       me.trigger('validationEnd', me.result);
-      //me.displayResult(start);
+      
       me.update();
       
       me.prosessing = false;

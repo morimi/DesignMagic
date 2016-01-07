@@ -87,4 +87,37 @@ DM.getNumberOfLayers = function() {
 };
 
 
+/**
+ * IDを元にレイヤーを選択する
+ * @param {number} id レイヤーのID
+ */
+DM.selectLayerById = function(id) {
+  var desc = new ActionDescriptor();
+  var ref = new ActionReference();
+
+  ref.putIdentifier(charIDToTypeID("Lyr "), id);
+  desc.putReference( charIDToTypeID( "null" ), ref );
+  desc.putBoolean( charIDToTypeID( "MkVs" ), false );
+  executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
+};
+
+
+/**
+ * IDで指定したレイヤー名を変更する
+ * @param {number} id レイヤーのID
+ * @param {striing} name レイヤー名
+ */
+DM.changeLayerNameById = function (id, name) {
+  var ref = new ActionReference();
+  var desc = new ActionDescriptor();
+  ref.putIdentifier(charIDToTypeID("Lyr "), id);
+  desc.putReference( charIDToTypeID( "null" ), ref );
+
+  var desc2 = new ActionDescriptor();
+  desc2.putString( charIDToTypeID( "Nm  " ), name );
+  desc.putObject( charIDToTypeID( "T   " ), charIDToTypeID( "Lyr " ), desc2 );
+  executeAction( charIDToTypeID( "setd" ), desc, DialogModes.NO );
+};
+
+
 '{"status": 200}';
