@@ -78,6 +78,10 @@ dd {
   padding: .2rem .5rem;
 }
 
+.topcoat-button {
+  font-size: 10px;
+}
+
 /*************************************************/
 
 
@@ -136,7 +140,6 @@ body.light .panel-header {
  * check, config, tool button
  */
 .hd-btn {
-  font-size: 10px;
   margin: 0 0 0 .3rem;
 }
 

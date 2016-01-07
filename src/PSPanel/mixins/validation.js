@@ -23,6 +23,7 @@ riot.mixin('Validation', {
   
   
   init: function() {
+      console.log('init validation.js')
     
     /**
      * 結果
@@ -70,7 +71,7 @@ riot.mixin('Validation', {
      * 結果文字列をObject変換したものをプールする
      */ 
     this.pool = {};
-        
+    
   },
   
   
@@ -114,6 +115,10 @@ riot.mixin('Validation', {
 
     Q.fcall(this.checkUnits, config)
      .then(this.checkDocumentMode)
+     .then(this.checkFileName)
+     .then(this.checkFileSize)
+     //.then(this.checkLayerComps)
+     .then(this.checkLayers)
      .done(function() {
       console.info('check completed ٩(ˊᗜˋ*)و');
       
@@ -129,8 +134,19 @@ riot.mixin('Validation', {
     })
   },
   
+  
+  /**
+   * 実行時間を計算して整形したものを返す
+   * @return {string}
+   */
+  getExecTime: function(start) {
+    return Math.abs((start - Date.now()) / 1000) + 's'
+  },
+  
+  
   /**
    * 結果用メッセージを得る
+   * @param {Object} r Result variable object
    * @return {string}
    */
   getResultMessage: function(r) {
@@ -148,18 +164,9 @@ riot.mixin('Validation', {
     }
     
   },
-  
-  
-  /**
-   * 実行時間を計算して整形したものを返す
-   * @return {string}
-   */
-  getExecTime: function(start) {
-    return Math.abs((start - Date.now()) / 1000) + 's'
-  },
-  
   /**
    * エラーと注意の総数から罪の重さを量る
+   * @param {Object} r Result variable object
    * @return {number} 0 - 7 （罪の重さを8段階で返す）
    */
   calcGuilty: function(r) {
@@ -175,6 +182,19 @@ riot.mixin('Validation', {
 
     return g;
   },
+
+
+  /**
+   * エラー・注意のカウント
+   * @param {{type: 'string'}} obj typeプロパティが含まれているオブジェクト
+   */
+  countError: function(obj) {
+    if ( !obj.type ) return;
+    if ( obj.type == 'error' ) this.result.errorVal = this.result.errorVal + 1|0;
+    if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal + 1|0;
+    //h = h+1|0;
+  },
+  
   
   /**
   * string を テンプレート用のobjectに変換する
@@ -185,22 +205,10 @@ riot.mixin('Validation', {
   */
   stringToObject: function(str) {
       var obj = JSON.parse(str) || {};
-
+    
       obj.theme = themeManager.getThemeColorType();
 
       return obj;
-  },
-
-
-  /**
-   * エラー・注意のカウント
-   * @param {{type: 'string'}}
-   */
-  countError: function(obj) {
-
-    if ( obj.type == 'error' ) this.result.errorVal = this.result.errorVal + 1|0;
-    if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal + 1|0;
-    //h = h+1|0;
   },
   
   /**
@@ -210,8 +218,13 @@ riot.mixin('Validation', {
   getResultObject: function(name, result) {
     var obj;
     
+    //レイヤーは物量多いのでスルー
+    if ( name == 'checkLayers' ) {
+      
+      obj = this.stringToObject(result);
+    
     //前回チェックと同じ結果である場合
-    if ( this.cache[name] && this.cache[name] === result ) {
+    } else if ( this.cache[name] && this.cache[name] === result ) {
       obj = this.pool[name]; //プールから再利用
       
     } else { //結果が無いか違う場合は新規作成して保管
@@ -237,6 +250,7 @@ riot.mixin('Validation', {
     return Strings['Pr_' + type.toUpperCase() + '_' + rule];
   },
 
+  
   /**
    * 単位チェック
    * @param {Object} c config data object
@@ -248,7 +262,7 @@ riot.mixin('Validation', {
     if (c.check.config.rulerUnits || c.check.config.typeUnits) {
 
       JSXRunner.runJSX("checkUnits", {config: c.check.config}, function (result) {
-
+      
         var obj = me.getResultObject('checkUnits', result);
         
         if (obj.status === 200 && obj.list) {
@@ -265,7 +279,6 @@ riot.mixin('Validation', {
 
             me.countError(r);
             me.othersMes.push(r);
-
           });
         }
 
@@ -281,14 +294,14 @@ riot.mixin('Validation', {
 
     return d.promise;
 
-  },
+  }
   
   
   /**
    * ドキュメントモードのチェック
    * @param {Object} c config data object
    */
-  checkDocumentMode: function(c) {
+  ,checkDocumentMode: function(c) {
     var me = this;
     var d = Q.defer();
     
@@ -325,5 +338,217 @@ riot.mixin('Validation', {
     }
 
     return d.promise;
+  }
+  
+  /**
+   * ファイル名チェック
+   * @param {Object} c config data object
+   */
+  ,checkFileName: function(c) {
+    var me = this;
+    var d = Q.defer();
+
+    if (_.isArray(c.check.files.name)) {
+      JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
+
+        var obj = me.getResultObject('checkFileName', result);
+        
+        if (obj.status === 200) {
+
+          obj.title = me.getValidationMessage('DOCUMENTNAME', obj.type);
+
+          if ( obj.type === 'error' ) {
+            obj.hint = [me.getValidationMessage('DOCUMENTNAME', 'hint')];
+          }
+
+          me.countError(obj);
+          me.othersMes.push(obj);
+        }
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+
+  }
+  
+  
+  /**
+   * ファイルサイズのチェック
+   */
+  ,checkFileSize: function(c) {
+    var me = this;
+    var d = Q.defer();
+
+    if ( _.isNumber(c.check.files.size) ) {
+
+      JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
+
+        var obj = me.getResultObject('checkFileSize', result);
+        
+        if (obj.status === 200) {
+
+          obj.title = Strings.formatStr(me.getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
+
+          if ( obj.type !== 'valid' ) {
+            obj.hint = [Strings.formatStr(me.getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
+          }
+
+          me.countError(obj);
+          me.othersMes.push(obj);
+
+        }
+
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+  }
+  
+  /**
+   * レイヤーカンプのチェック
+   */
+  ,checkLayerComps: function checkLayerComps(c) {
+    var me = this;
+    var d = Q.defer();
+
+    if ( c.check.files.useLayerComps ) {
+
+      JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
+
+        var obj = me.getResultObject('checkLayerComps', result);
+        
+        if (obj.status === 200) {
+
+          obj.title = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
+
+
+          if (obj.type === 'valid' && ! obj.value) {
+            obj.hint = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
+          }
+
+          me.countError(obj);
+          me.othersMes.push(obj);
+        }
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+  }
+  
+  /**
+   * Ratioのチェック
+   */
+  ,checkDocumentRatio: function(c) {
+    var me = this;
+    var d = Q.defer();
+
+    if ( c.check.files.ratio ) {
+
+      JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
+
+        var obj = me.getResultObject('checkDocumentRatio', result);
+        
+        if (obj.status === 200) {
+          var unit =  me.UNITS_LABEL[c.check.config.rulerUnitsType];
+          obj.title = me.getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
+
+          if ( obj.type === 'error') {
+            obj.hint = [Strings.formatStr(me.getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
+          }
+
+          me.countError(obj);
+          me.othersMes.push(obj);
+        }
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+  }
+  
+  /**
+   * レイヤーのチェック
+   */
+  ,checkLayers: function(c) {
+    var me = this;
+    var d = Q.defer();
+
+    if ( _.isObject(c.check.layers) && _.isObject(c.check.fonts) ) {
+
+      JSXRunner.runJSX("checkLayers", {config: c.check, Strings: Strings}, function (result) {
+
+        var r = me.getResultObject('checkLayers', result);
+        
+        if ( ! r.list || r.value === 404 ) {
+          return d.resolve(c);
+        }
+        
+        if ( _.isArray(r.list) && r.list.length ) {
+          var i = r.list.length-1;
+          var minSize = c.check.fonts.minSize;
+          var unitsLabel = me.UNITS_LABEL[c.check.config.rulserUnitsType];
+          
+          while( i > -1 ) {
+            var obj = r.list[i];
+            
+            obj.hintCodes = obj.hint.join(',');
+            obj.theme = r.theme;
+
+            _.each(obj.hint, function(h, i) {
+              switch(h) {
+                case 'FONT_MINSIZE':
+                  obj.hint[i] = {code: h,
+                                 text: Strings.formatStr(me.getValidationMessage(h + '_LAYERS', 'hint'), minSize + unitsLabel)};
+                  break;
+                default:
+                  obj.hint[i] = {code: h,
+                                 text: me.getValidationMessage(h + '_LAYERS', 'hint')};
+              }
+
+            });
+
+            me.countError(obj);
+            me.layersMes.push(obj);
+            
+            i = (i-1)|0;
+          }
+        }
+        
+        me.result.hiddenVal = r.hidden;
+        
+        d.resolve(c);
+      });
+
+    } else {
+
+      d.resolve(c);
+
+    }
+
+    return d.promise;
+
   }
 });

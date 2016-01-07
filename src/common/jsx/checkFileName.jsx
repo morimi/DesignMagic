@@ -2,32 +2,30 @@
  * @fileoverview activeDocument のファイル名チェック
  */
 
-try {
+(function() {
+  
+  try {
+  
+    if (documents.length > 0 ) {
+      var reg = new RegExp('<%= config.name[0] %>', '<%= config.name[1] %>'),
+          name = activeDocument.name.split('.')[0];
 
-function check() {
-  var reg = '<%= config.name[0] %>',
-      reg2 = '<%= config.name[1] %>';
+      if (! name.match(reg)) {
 
-  var reg3 = new RegExp(reg, reg2),
-      name = activeDocument.name.split('.')[0];
+       return '{"type": "error", "status": 200}';
 
+      } else {
 
-  if (! name.match(reg3)) {
+       return '{"type": "valid", "status": 200}';
 
-    return '{type: "error"}';
+      }
+    } else {
+      return '{"status": 404}';
+    }
 
-  } else {
-
-    return '{type: "valid"}';
-
+  } catch(e) {
+    return '{ "type": "jsx", "message": "' + e + '", "status": 500}';
   }
 
-}
-
-if (documents.length > 0 ) {
-  check();
-}
-
-} catch(e) {
-  '{errorType: "jsx", errorMessage: "' + e + '"}';
-}
+  
+}());

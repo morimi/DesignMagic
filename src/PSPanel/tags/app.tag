@@ -52,7 +52,7 @@
       console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
       opt.loading = false;
       me.tags.header.update(opt);
-      me.trigger('loadconf');
+      me.trigger('loadconf', data);
     };
     
     /**

@@ -78,7 +78,8 @@ function _evalJSX(script, callback, optScriptName) {
               // obj.type が undefined というエラーが表示されるので握りつぶす.
             }
           }
-          callback.apply(self, arguments);
+          
+          if (callback) callback.apply(self, arguments);
         });
     });
 }
@@ -94,7 +95,7 @@ function _evalJSX(script, callback, optScriptName) {
 function runJSX(scriptName, data, callback) {
     var template = _getJSXTemplate(scriptName),
         rendered = template(data);
-
+  
     _evalJSX(rendered, callback, scriptName);
 }
 
