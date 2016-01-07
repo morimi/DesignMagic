@@ -63,9 +63,17 @@
      */
     this.selectedIds = [];
     
+      
+    /**
+     * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
+     * true: 変更する
+     * @type {boolean}
+     */
+    this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
     
     /**
      * バリデーションメッセージがクリックされた時の処理
+     * レイヤーパネルも選択状態にする
      * @param {MouseEvent} e イベントオブジェクト
      * @return {void}
      */
@@ -80,7 +88,6 @@
       
       if ( this.processing || this.selectedItem && this.selectedItem.id === item.id ) return;
             
-      
       /**
        * メッセージの選択状態
        * １回目クリックでtrue
@@ -104,7 +111,7 @@
     };
     
     /**
-     * メッセージのフィルタリング
+     * eachされるメッセージのフィルタリング
      * @param {Object} item メッセージデータ
      */
     messageFilter(item) {
@@ -124,6 +131,7 @@
       if (this.selectedItem.title == item.title ) {
         item.changeName = true;
 
+        //保管済みIDでないかチェックして
         if ( this.selectedIds.indexOf(item.id) === -1) {
           //IDを保存しておく
           this.selectedIds.push(item.id);
@@ -136,6 +144,8 @@
     
    /**
      * メッセージがダブルクリックされたときのイベントハンドラ
+     * レイヤー名変更用のテキストエリアを表示する
+     * isAllChangeLayerName == trueの場合は同じレイヤー名をもつレイヤーを選択状態にする
      * @param {MouseEvent} e イベントオブジェクト
      */
      onDblClickMessage(e) {
@@ -172,7 +182,8 @@
 
    /**
      * update
-     * バリデーション実行
+     * マウント時、イベントハンドラ実行時などでupdateされたときはチェックを実行しない
+     * チェックの実行は手動のupdateで引数に{mode:check}を含む場合に限る
      */
     this.on('update', function(opt) {
       //console.log('<validation> on update', opt);
@@ -185,11 +196,11 @@
     });
     
     /**
-     * 名前が変更された後の処理
+     * <nameForm>で名前が変更された後の処理 
      * result.ids == selectedIds
      * result.name 変更後の名前
      * 
-     * 結果を元にeachで表示するdataを修正する
+     * 結果を元にeachで表示するdataを直接修正する
      */
     this.on('afterNameChange', function(result) {
       var i = 0, l = me.layersMes.length;
@@ -215,18 +226,27 @@
             me.layersMes.splice(i, 1);
             l = l-1;
             i = i-1;
+            //チェック結果のerrorVal, warnValも減らす
+            me.countDownError(item);
           }
 
         }
 
         i = i+1|0;
       }
-
+      
       me.selectedIds = [];
       me.selectedItem = null;
       me.processing = false;
 
       me.update();
+      
+      //validation.jsが持ってるチェック結果上書き
+      me.result.time = me.getExecTime(result.startTime);
+      me.result.message = Strings.formatStr(Strings.Pr_COMPLETE_NAMECHANGE, result.total);
+      
+      //<app>におしらせ
+      me.parent.trigger('toolEnd', this.result);
 
     });
     
@@ -259,9 +279,10 @@
   <script>
     
     var my = this;
+    var app = my.parent.parent;
     
   /**
-   * 変更処理
+   * レイヤー名変更処理
    * 押されたキーがEnterだった場合のみchangeLayerName.jsxに新しいレイヤー名を渡して実行する
    * @since version 0.4.0
    * @return {void}
@@ -274,9 +295,16 @@
         return;
       }
       
+      //開始時間
       var startTime = Date.now();
       
-      this.parent.processing = true;
+      //<validation>のステータス変更
+      my.parent.processing = true;
+      
+      //<app>におしらせ
+      app.trigger('toolStart', {
+        message: Strings.Pr_START_NAMECHANGE
+      });
       
       var data = {
         id: my.parent.selectedItem.id,
@@ -284,8 +312,16 @@
         newName: value
       };
     
+      //jsx実行
       JSXRunner.runJSX("changeLayerName", {data: data, Strings: Strings}, function (result) {
-        my.parent.trigger('afterNameChange', JSON.parse(result));
+        
+        result = JSON.parse(result);
+        result.startTime = startTime;
+        
+        //<validation>におしらせ
+        my.parent.trigger('afterNameChange', result);
+        
+        my = null;
       });
     };
     

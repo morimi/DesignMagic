@@ -126,7 +126,6 @@ riot.mixin('Validation', {
       console.info('check completed ٩(ˊᗜˋ*)و');
       
       me.result.time = me.getExecTime(startTime);
-      me.result.lv = me.calcGuilty(me.result);
       me.result.message = me.getResultMessage(me.result);
       
       me.trigger('validationEnd', me.result);
@@ -167,34 +166,29 @@ riot.mixin('Validation', {
     }
     
   },
-  /**
-   * エラーと注意の総数から罪の重さを量る
-   * @param {Object} r Result variable object
-   * @return {number} 0 - 7 （罪の重さを8段階で返す）
-   */
-  calcGuilty: function(r) {
-    var g = 0;
 
-    if (( r.errorVal > 20 ) || ( r.warnVal > 120 )) g = 7;
-    else if (( r.errorVal > 15 ) || ( r.warnVal > 90 )) g = 6;
-    else if  (( r.errorVal > 10 ) || ( r.warnVal > 60 )) g = 5;
-    else if  (( r.errorVal > 5 ) || ( r.warnVal > 30 )) g = 4;
-    else if  (( r.errorVal > 1 ) || ( r.warnVal > 20 )) g = 3;
-    else if  ( r.warnVal > 10 ) g = 2;
-    else if  ( r.warnVal > 0 )  g = 1;
-
-    return g;
-  },
 
 
   /**
-   * エラー・注意のカウント
+   * エラー・注意のカウントアップ
    * @param {{type: 'string'}} obj typeプロパティが含まれているオブジェクト
    */
-  countError: function(obj) {
+  countUpError: function(obj) {
     if ( !obj.type ) return;
     if ( obj.type == 'error' ) this.result.errorVal = this.result.errorVal + 1|0;
     if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal + 1|0;
+    //h = h+1|0;
+  },
+  
+
+  /**
+   * エラー・注意のカウントダウン
+   * @param {{type: 'string'}} obj typeプロパティが含まれているオブジェクト
+   */
+  countDownError: function(obj) {
+    if ( !obj.type ) return;
+    if ( obj.type == 'error' ) this.result.errorVal = this.result.errorVal - 1|0;
+    if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal - 1|0;
     //h = h+1|0;
   },
   
@@ -280,7 +274,7 @@ riot.mixin('Validation', {
 
             r.title = Strings.formatStr(me.getValidationMessage(r.name, r.type), unit);
 
-            me.countError(r);
+            me.countUpError(r);
             me.othersMes.push(r);
           });
         }
@@ -323,7 +317,7 @@ riot.mixin('Validation', {
           
           obj.title = Strings.formatStr(me.getValidationMessage('DOCUMENTMODE', obj.type), obj.value);
 
-          me.countError(obj);
+          me.countUpError(obj);
           me.othersMes.push(obj);
 
           d.resolve(c);
@@ -364,7 +358,7 @@ riot.mixin('Validation', {
             obj.hint = [me.getValidationMessage('DOCUMENTNAME', 'hint')];
           }
 
-          me.countError(obj);
+          me.countUpError(obj);
           me.othersMes.push(obj);
         }
         d.resolve(c);
@@ -402,7 +396,7 @@ riot.mixin('Validation', {
             obj.hint = [Strings.formatStr(me.getValidationMessage('FILESIZE', 'hint'), obj.value, obj.limit)];
           }
 
-          me.countError(obj);
+          me.countUpError(obj);
           me.othersMes.push(obj);
 
         }
@@ -441,7 +435,7 @@ riot.mixin('Validation', {
             obj.hint = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', 'select'), obj.value)];
           }
 
-          me.countError(obj);
+          me.countUpError(obj);
           me.othersMes.push(obj);
         }
         d.resolve(c);
@@ -477,7 +471,7 @@ riot.mixin('Validation', {
             obj.hint = [Strings.formatStr(me.getValidationMessage('DOCUMENTRATIO', 'hint'), (c.check.files.ratio * 320) + unit)];
           }
 
-          me.countError(obj);
+          me.countUpError(obj);
           me.othersMes.push(obj);
         }
         d.resolve(c);
@@ -533,7 +527,7 @@ riot.mixin('Validation', {
 
             });
 
-            me.countError(obj);
+            me.countUpError(obj);
             me.layersMes.push(obj);
             
             i = (i-1)|0;

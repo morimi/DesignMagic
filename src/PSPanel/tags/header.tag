@@ -55,6 +55,7 @@
       this.parent.mode = e.currentTarget.getAttribute('data-mode');
       this.parent.update({mode: this.parent.mode})
     }
+
     
   </script>
 </header>

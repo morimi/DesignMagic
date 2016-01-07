@@ -80,6 +80,7 @@
      * check始まったときの処理
      */
     this.tags.validation.on('validationStart', function(result) {
+      console.log('<app> on validationStart');
       opt.loading = true;
       opt.message = Strings.Pr_MESSAGE_CHECK_START;
       me.tags.header.update(opt);
@@ -95,6 +96,22 @@
       result.loading = false;
       me.tags.header.update(result);
       me.tags.footer.update(result);
+    });
+    
+    
+    this.on('toolStart', function(data) {
+      console.log('<app> on toolStart');
+      data.loading = true;
+      me.tags.header.update(data);
+      me.tags.footer.update(data);
+    });
+    
+    
+    this.on('toolEnd', function(data) {
+      console.log('<app> on toolEnd');
+      data.loading = false;
+      me.tags.header.update(data);
+      me.tags.footer.update(data);
     });
       
     this.mixin('Config');
