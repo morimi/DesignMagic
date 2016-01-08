@@ -47,7 +47,19 @@
   <script>
     location.hash = '';
     riot.mount('app')
-    riot.route.start(true)
+    riot.route.start(true);
+    
+    
+    /**
+     * raw html insert
+     * @param {{category:string, prop:string}} opts
+     *
+     * Strings.Pr_TOOLS_ATTENTION -> <b category="TOOLS" prop="ATTENTION"></b>
+     */
+    riot.tag('string', '', function(opts) {
+        this.root.innerHTML = Strings['Pr_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
+    });
+      
   </script>
   </body>
 </html>

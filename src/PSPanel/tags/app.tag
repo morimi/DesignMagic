@@ -137,7 +137,8 @@
       me.tags.header.update(data);
       me.tags.footer.update(data);
     });
-      
+    
+    
     this.mixin('Config');
   </script>
 </app>

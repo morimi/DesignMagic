@@ -27,7 +27,7 @@
         <caption>{ _.capitalize(category) }</caption>
         <tr each="{ prop, value in sets }">
           <th scope="row">
-            <b category="{parent.category}" prop="{prop}"></b>
+            <string category="CONFIG_{parent.category}" prop="{prop}"></string>
           </th>
           <td>{ value } </td>
         </tr>
@@ -128,11 +128,6 @@
      * エラーメッセージ
      */
     this.errorMessage = null;
-    
-  
-    riot.tag('b', '', function(opts) {
-        this.root.innerHTML = Strings['Pr_CONFIG_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
-    });
     
     
     onChangeInputUrl(e) {
