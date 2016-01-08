@@ -57,6 +57,19 @@
     
     
     /**
+     * 保存したとき自動チェック
+     * csInterfaceに渡すイベント
+     */
+    this.handleAutoCheck = function () {
+      riot.route('check');
+      me.tags.validation.update({mode: 'check'});
+    }
+    
+    if ( window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true') {
+      csInterface.addEventListener( 'documentAfterSave' , this.handleAutoCheck);
+    }
+    
+    /**
      * start app
      */
     this.on('mount', function () {

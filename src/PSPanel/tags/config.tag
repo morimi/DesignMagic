@@ -34,13 +34,44 @@
       </table>
       
       <dl>
-       <dt>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL}</dt>
-       <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_0}</dd>
-       <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_1}</dd>
-       <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_2}</dd>
+        <dt>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL}</dt>
+        <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_0}</dd>
+        <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_1}</dd>
+        <dd>{Strings.Pr_CONFIG_LAYERS_NAMING_LEVEL_2}</dd>
       </dl>
 
+      <hr>
+
+     <!--オプション-->
+      <dl>
+        <dt>{Strings.Pr_CONFIG_OPTION}</dt>
+        <dd>
+          <label class="topcoat-checkbox">
+            <input type="checkbox" class="js-is-autocheck" onchange="{ onChangeAutoSave }" checked="{ isAutoCheck }">
+            <div class="topcoat-checkbox__checkmark"></div>
+            {Strings.Pr_CONFIG_OPTION_AUTOSAVE}
+          </label>
+        </dd>
+        <dd>
+          <label class="topcoat-checkbox">
+            <input type="checkbox" class="js-nameChangeAll" onchange="{ onChangeNameAll }" checked="{ isNameChangeAll }">
+            <div class="topcoat-checkbox__checkmark"></div>
+            同じ名前のレイヤー/グループを全て変更対象にする
+          </label>
+        </dd>
+
+      </dl>
+      
+      <hr>
+      <!--説明-->
+        <dl>
+          <dt>{Strings.Pr_NOTE_ICONS}</dt>
+          <dd><img src="images/icon/{this.parent.theme}/error.png" width="14" height="14" class="icon" alt=""> {Strings.Pr_NOTE_ICONS_ERROR}</dd>
+          <dd><img src="images/icon/{this.parent.theme}/warn.png" width="14" height="14" class="icon" alt=""> {Strings.Pr_NOTE_ICONS_WARN}</dd>
+          <dd><img src="images/icon/{this.parent.theme}/eye.png" width="14" height="14" class="icon" alt=""> {Strings.Pr_NOTE_ICONS_EYE}</dd>
+        </dl>
      </div>
+     
 
     </div>
     
@@ -77,7 +108,21 @@
     
     var me = this;
     
+    /**
+     * 新しいURL
+     * @type {string}
+     */
     this.newUrl = null;
+    
+    /**
+     * 自動でチェックするかどうかフラグ
+     */
+    this.isAutoCheck = window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true';
+    
+    /**
+     * 同じ名前のレイヤーを全て対象にする
+     */
+    this.isNameChangeAll = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
     
     /**
      * エラーメッセージ
@@ -143,6 +188,30 @@
       
     };
     
+    
+    
+    /**
+     * 保存したとき自動チェックオプションがクリックされた
+     */
+    onChangeAutoSave(e) {
+      var checked = e.target.checked;
+      
+      window.localStorage.setItem('com.cyberagent.designmagic:autocheck', checked);
+      
+      if ( checked ) {
+        csInterface.addEventListener( 'documentAfterSave' , this.parent.handleAutoCheck);
+      } else {
+        csInterface.removeEventListener( 'documentAfterSave' , this.parent.handleAutoCheck);
+      }
+    };
+    
+    /**
+     * 同じ名前のレイヤーを全て変更対象にする
+     */
+    onChangeNameAll(e) {
+      var checked = e.target.checked;
+      window.localStorage.setItem('com.cyberagent.designmagic:nameChangeAll', checked);
+    };
     
   
 

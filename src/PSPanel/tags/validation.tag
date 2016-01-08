@@ -108,6 +108,7 @@
         console.log('End selectLayer', result)
       });
       
+      console.log(this.isAllChangeLayerName)
     };
     
     /**
@@ -143,8 +144,8 @@
         item.showForm = false;
       }
 
-      //同じレイヤー名を持つメッセージのIDが発見されたら
-      if (this.selectedItem.title == item.title ) {
+      //同じレイヤー名を持つメッセージのIDが発見されたら（オプションでONになってる場合）
+      if (this.selectedItem.title == item.title && this.isAllChangeLayerName) {
         item.changeName = true;
 
         //保管済みIDでないかチェックして
@@ -171,6 +172,12 @@
        
        e.item.changeName = true;
        e.item.showForm = true;
+       
+       //同じ名前のIDを全て対象にするオプションがOFFだと、
+       //messageFilterでselectedIdsにidが追加されないのでここで追加しておく
+       if ( !this.isAllChangeLayerName ) {
+         me.selectedIds.push(e.item.id);
+       }
 
       //レイヤーパネルの選択を増やす
       JSXRunner.runJSX("selectLayerAll", {ids: me.selectedIds }, function (result) {
