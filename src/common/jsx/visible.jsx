@@ -9,14 +9,14 @@
 
   try {
 
-    function visible() {
+
+    if (documents.length !== 0 ) {
       var desc = new ActionDescriptor();
       var list = new ActionList();
       var ref = new ActionReference();
-      var charId = ( "<%= data.action %>" === 'hidden') ? "Hd  " : "Shw ";
+      var charId = ( "<%= action %>" === 'hidden') ? "Hd  " : "Shw ";
 
-
-      ref.putIdentifier(charIDToTypeID("Lyr "), parseInt("<%= data.id %>"));
+      ref.putIdentifier(charIDToTypeID("Lyr "), parseInt("<%= id %>"));
       list.putReference( ref );
       desc.putList( charIDToTypeID( "null" ), list );
       executeAction( charIDToTypeID( charId ), desc, DialogModes.NO );
@@ -24,16 +24,16 @@
       desc = null;
       list = null;
       ref = null;
-    }
-
-
-    if (documents.length !== 0 ) {
-      visible();
+      
+      return '{"status": 200}';
+      
+    } else {
+      return '{"status": 404}';
     }
 
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{"type": "jsx", "message": "' + e + '", "status": 500}';
   }
 
 })();

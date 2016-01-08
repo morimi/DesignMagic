@@ -79,13 +79,14 @@
 
     /**
      * @requires checkLayers
-     * @param {string} title
-     * @param {Array} hint
-     * @param {string} type
+     * @param {string} title レイヤー名
+     * @param {Array} hint ヒント
+     * @param {string} type メッセージタイプ
      * @param {string} kind LayerKind
+     * @param {boolean} isVisible 表示状態
      * @return {string} stringifyした文字列
      */
-    function resultToString(id, index, title, hint, type, kind) {
+    function resultToString(id, index, title, hint, type, kind, isVisible) {
       //return JSON.stringify(this.data); JSON使えないよ
 
       var text = '{"id": ' + id + ', "index": ' + index + ', "title":"' + title + '", "hint":[';
@@ -95,7 +96,8 @@
       }
       text = text.slice(0, -1); //末尾の , を切る
       text += '], "type":"' + type + '",'
-      text += '"kind": "' + kind + '"'
+      text += '"kind": "' + kind + '",'
+      text += '"visible": "' + (isVisible ? 'show' : 'hidden') + '"'
       text += '}';
 
       return  text;
@@ -178,7 +180,7 @@
           h = (h + !isVisible)|0;
 
           if ( hint.length ) {
-            mes.push(resultToString(id, i, name, hint, type, kindObj));
+            mes.push(resultToString(id, i, name, hint, type, kindObj, isVisible));
           }
 
         }//if

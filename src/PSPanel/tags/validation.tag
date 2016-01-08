@@ -9,7 +9,7 @@
          <div class="message-wrapper {selected:selected}">
           <p class="message-title">
             <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
-            <img if="{ kind }" riot-src="images/icon/{ theme }/{ kind }.png" width="14" height="14" class="icon kind">
+            <img if="{ kind }" riot-src="images/icon/{ theme }/{ kind }.png" width="14" height="14" class="icon kind { visible }" onclick="{ onClickKind }">
             <span class="title {change:changeName}" if="{ !showForm }">{ title }</span>
             <nameForm value="{title}" if="{ showForm }" showForm="{ showForm }"></nameForm>
           </p>
@@ -109,6 +109,22 @@
       });
       
     };
+    
+    /**
+     * Kindアイコンがクリックされた時の処理
+     */
+    onClickKind(e) {
+      var item = e.item;
+      
+      var action = item.visible || 'hidden';
+      
+      JSXRunner.runJSX("visible", { id: e.item.id, action: action }, function (result) {
+        item.visible = (action === 'hidden') ? 'show':'hidden';
+        item = null;
+        console.log('End visible', result)
+      });
+      
+    }
     
     /**
      * eachされるメッセージのフィルタリング

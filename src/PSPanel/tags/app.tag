@@ -98,7 +98,9 @@
       me.tags.footer.update(result);
     });
     
-    
+    /**
+     * ツール処理始まる時の処理
+     */
     this.on('toolStart', function(data) {
       console.log('<app> on toolStart');
       data.loading = true;
@@ -107,6 +109,9 @@
     });
     
     
+    /**
+     * ツール処理終わった時の処理
+     */
     this.on('toolEnd', function(data) {
       console.log('<app> on toolEnd');
       data.loading = false;

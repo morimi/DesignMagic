@@ -276,6 +276,11 @@ body.light .message-hint {
 }
 
 
+.icon.hidden {
+  opacity: .5;
+}
+
+
 /**
  * 初期メッセージ
  */
