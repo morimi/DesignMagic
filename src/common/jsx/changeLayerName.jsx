@@ -38,7 +38,6 @@
       while ( i < l ) {
         var id = parseInt(ids[i]);
 
-        DM.selectLayerById(id);
         DM.changeLayerNameById(id, _newName);
 
         i = (i+1)|0;

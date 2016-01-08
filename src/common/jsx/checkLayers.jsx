@@ -184,6 +184,9 @@
           }
 
         }//if
+        
+        desc = null;
+        ref2 = null;
 
         i = (i+1)|0;
 

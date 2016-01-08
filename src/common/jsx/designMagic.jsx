@@ -31,7 +31,7 @@ DM.getTextSize = function(desc) {
                      .getDouble (stringIDToTypeID('size'));
 
   var scale = DM.getTextScale('yy', desc);
-
+  
   return Math.round((pixels * scale) * 100) / 100;
 };
   
@@ -107,11 +107,14 @@ DM.selectLayerById = function(id) {
  * @param {number} id レイヤーのID
  * @param {striing} name レイヤー名
  */
-DM.changeLayerNameById = function (id, name) {
+DM.changeLayerNameById = function(id, name) {
   var ref = new ActionReference();
   var desc = new ActionDescriptor();
   ref.putIdentifier(charIDToTypeID("Lyr "), id);
   desc.putReference( charIDToTypeID( "null" ), ref );
+
+  desc.putBoolean( charIDToTypeID( "MkVs" ), false );
+  executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
 
   var desc2 = new ActionDescriptor();
   desc2.putString( charIDToTypeID( "Nm  " ), name );

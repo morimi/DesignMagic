@@ -21,7 +21,7 @@
     // this.parent = undefined
 
     var me = this;
-    var opt = {};
+    var _opt = {};
     
     /**
      * 表示モード
@@ -53,7 +53,8 @@
       console.log('riot.route === ' + mode)
       me.mode = mode;
       me.update();
-    })
+    });
+    
     
     /**
      * start app
@@ -61,24 +62,23 @@
     this.on('mount', function () {
       console.info('<app> Start loading of conf.json...');
       
-      
       Q.fcall(me.loadConfig)
        .done(function(data) {
-          console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
-          opt.loading = false;
-          me.tags.header.update(opt);
+          console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ', me.confCache);
+          _opt.loading = false;
+          me.tags.header.update(_opt);
           me.tags.configs.update();
           me.trigger('loadconf', data);
-        });
-      
+       });
     });
+    
     
     /**
      * console message
      */
     this.on('message', function(mes) {
-      opt.message = mes;
-      me.tags.footer.update(opt);
+      _opt.message = mes;
+      me.tags.footer.update(_opt);
     });
     
     
@@ -87,10 +87,10 @@
      */
     this.tags.validation.on('validationStart', function(result) {
       console.log('<app> on validationStart');
-      opt.loading = true;
-      opt.message = Strings.Pr_MESSAGE_CHECK_START;
-      me.tags.header.update(opt);
-      me.tags.footer.update(opt);
+      _opt.loading = true;
+      _opt.message = Strings.Pr_MESSAGE_CHECK_START;
+      me.tags.header.update(_opt);
+      me.tags.footer.update(_opt);
     });
     
     /**

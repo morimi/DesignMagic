@@ -32,7 +32,7 @@ riot.mixin('Config', {
    * @param {Object} conf.jsonのオブジェクト
    */
   
-  paseData: function(dataStr, url) {
+  parseData: function(dataStr, url) {
     var data = JSON.parse(dataStr);
     data = _.defaultsDeep(data, this.conf);
     data.url = url;
@@ -47,26 +47,32 @@ riot.mixin('Config', {
   */
   loadConfig : function() {
 
+    console.info('[localConfig] start method...');
+    
     var me = this;
     var d = Q.defer();
     var url = window.localStorage.getItem('com.cyberagent.designmagic:conf.url');
     var localData = window.localStorage.getItem('com.cyberagent.designmagic:conf.result');
-
+    
     //urlもローカルファイルもない
-    if (!url && localData && ! this.localConfFile ) {
-
-      me.trigger('message', Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
+    if ( (!url && localData && !this.localConfFile)
+          || ( !url && !localData )
+       ) {
+      
+      console.info('[loadConfig] URL and local file was not found.');
+      me.trigger('message', Strings.Pr_MESSAGE_NOT_SETTING_FILE);
       d.resolve(null);
 
     //キャッシュあった
     } else if ( this.confCache && this.confCache.url === url ) {
 
-      console.info('[loadConfig]Find local conf.json cache');
+      console.info('[loadConfig] config.json of the cache was found.');
       d.resolve(this.confCache);
 
-    //ストレージに保存されてた
+    //ローカルストレージに保存されてた
     } else if ( localData && (url === 'localhost') ) {
       
+      console.info('[loadConfig] conf.json data was found in the localStorage.');
       me.trigger('message', Strings.Pr_MESSAGE_SUCCES_LOAD_CONFIG_FILE);
       
       this.confCache = this.parseData(localData, 'localhost');
@@ -74,16 +80,16 @@ riot.mixin('Config', {
       d.resolve(this.confCache);
 
     //ローカルファイルが指定された
-    } else if ( (this.localConfFile && this.localConfFile.type === 'application/json') ) {
+    } else if ( this.localConfFile && this.localConfFile.type === 'application/json' ) {
 
-      console.info('[loadConfig]Loading local conf.json file data');
+      console.info('[loadConfig] Loading local conf.json file data');
 
       return this.loadLocalConfig();
 
     //リモートのファイルが指定された
     } else {
 
-      console.info('[loadConfig]Loading remote conf.json ....');
+      console.info('[loadConfig] Loading remote conf.json ....' + url, localData);
 
       return this.loadRemoteConfig(url);
     }
@@ -108,7 +114,7 @@ riot.mixin('Config', {
      */
     var handleLoadConfigError = function(xhr) {
 
-      if ( xhr.status >= 300) {
+      if ( xhr && xhr.status >= 300) {
         me.trigger('message', Strings.Pr_MESSAGE_USE_DEFAULT_CONFIG);
         me.confCache = me.conf;
       }
@@ -132,6 +138,7 @@ riot.mixin('Config', {
         });
       }
 
+      console.log(res)
       if (res.statusCode == '403') {
         handleLoadConfigError();
         d.resolve(me.confCache);

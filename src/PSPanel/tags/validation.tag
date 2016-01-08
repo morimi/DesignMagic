@@ -301,7 +301,7 @@
 <!--レイヤー名変更テキストエリア-->
 <nameForm>
  
-  <input type="text" id="nameForm" placeholder="{ title }" value="" onkeydown="{ onKeyDownForm }" onblur="{ onBlurForm }">
+  <input type="text" id="nameForm" class="topcoat-text-input--large" placeholder="{ title }" value="" onkeydown="{ onKeyDownForm }" onblur="{ onBlurForm }">
   
   <script>
     

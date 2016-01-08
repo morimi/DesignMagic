@@ -223,7 +223,7 @@ body.lighter .container{
   left: 0;
 }
 
-
+/*カラバリ*/
 body.darker .message {
   background: #343434;
   border-bottom-color: #111;
@@ -249,6 +249,7 @@ body.lighter .message {
   margin: 0;
 }
 
+/* titleにはレイヤー名、バリデーション結果など入る */
 .title {
   display: inline-block;
 }
@@ -257,11 +258,13 @@ body.lighter .message {
   border: dashed 1px rgba(255,255,255,.5)
 }
 
+/*バリデーション結果のヒント*/
 .message-hint {
   margin: 0;
   font-size: 10px;
 }
 
+/*ヒントのカラバリ*/
 body.darker .message-hint,
 body.dark .message-hint {
     color: #888888;
@@ -276,6 +279,7 @@ body.light .message-hint {
 }
 
 
+/* .kindアイコンのvisiblity */
 .icon.hidden {
   opacity: .5;
 }
@@ -296,9 +300,15 @@ body.light .validation-info {
 }
 
 
+/*************************************************/
 
-.config-base th{
+/* 設定 */
+.config-base th {
   width: 40%;
+}
+
+.error-message {
+  color: tomato;
 }
 
 /*************************************************/
@@ -367,6 +377,7 @@ body.light .panel-footer {
   background: red;
   color: #fff;
 }
+
 /************************************************
  * Utilities
  */
