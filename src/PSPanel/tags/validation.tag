@@ -156,7 +156,7 @@
        e.item.changeName = true;
        e.item.showForm = true;
 
-       //レイヤーパネルの選択を増やす
+      //レイヤーパネルの選択を増やす
       JSXRunner.runJSX("selectLayerAll", {ids: me.selectedIds }, function (result) {
         me.processing = false;
         return result;
@@ -186,10 +186,21 @@
      * チェックの実行は手動のupdateで引数に{mode:check}を含む場合に限る
      */
     this.on('update', function(opt) {
-      //console.log('<validation> on update', opt);
       
       //実行を手動updateに限定する
       if ( getConfig() && (opt && opt.mode === 'check') ) {
+       console.log('<validation> on update...checkExecute');
+        
+        //レイヤーパネルの選択状態を解除
+        if ( this.selectedItem ) {
+          JSXRunner.runJSX("deselectLayer", null, function (result) {
+            console.log('End deselectLayer', result)
+          });
+        }
+        
+       this.selectedItem = null;
+       this.selectedIds.length = 0;
+        
        this.checkExecute(getConfig());
       }
     
