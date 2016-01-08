@@ -45,7 +45,9 @@
   <script src="../node_modules/riot/riot+compiler.js"></script>
 
   <script>
-    riot.mount('app');
+    location.hash = '';
+    riot.mount('app')
+    riot.route.start(true)
   </script>
   </body>
 </html>

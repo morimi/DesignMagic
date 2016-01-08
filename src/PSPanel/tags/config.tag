@@ -17,7 +17,7 @@
         <tr>
           <th scope="row">
           {Strings.Pr_CONFIG_URL}
-          <a href="#" data-mode="setting" onclick="{DM.switchContainer}">{Strings.Pr_BUTON_CHANGE}</a>
+          <a href="#setting" data-mode="setting">{Strings.Pr_BUTON_CHANGE}</a>
           </th>
           <td>{this.parent.confCache.url}</td>
         </tr>
@@ -26,7 +26,9 @@
       <table each="{ category, sets in this.parent.confCache.check }">
         <caption>{ _.capitalize(category) }</caption>
         <tr each="{ prop, value in sets }">
-          <th scope="row"> <b category="{parent.category}" prop="{prop}"></b> </th>
+          <th scope="row">
+            <b category="{parent.category}" prop="{prop}"></b>
+          </th>
           <td>{ value } </td>
         </tr>
       </table>
@@ -48,12 +50,12 @@
       <div id="setting-list" class="list">
         <div id="setting-form">
          <p>{Strings.Pr_INPUT_TO_CONFIG_URL}</p>
-          <p>URL:<input type="text" class="topcoat-text-input--large" id="input-config-url" style="width:100%"></p>
+          <p>URL:<input type="text" class="topcoat-text-input--large" id="input-config-url" style="width:100%" onkeyup="{ onChangeUrlInput }"></p>
           <p>{Strings.Pr_SELECT_LOCAL_CONFIG_FILE}</p>
           <p><input type="file" accept="application/json" class="topcoat-text-input--large" id="select-config-file" style="width:100%"></p>
           <p>
-          <button class="js-btn-cancel topcoat-button--large" type="button">{Strings.Pr_BUTTON_CANCEL}</button>
-          <button class="topcoat-button--large js-btn-setting" type="button">{Strings.Pr_BUTTON_SETTING}</button>
+          <a href="#config" class="js-btn-cancel topcoat-button--large">{Strings.Pr_BUTTON_CANCEL}</a>
+          <button class="topcoat-button--large js-btn-setting" type="button" onclick="{ onClickUrlSetting }">{Strings.Pr_BUTTON_SETTING}</button>
           </p>
           <p style="margin-top: 20px"><button id="resetButton" class="js-btn-reset topcoat-button--large" type="button">{Strings.Pr_BUTTON_RESET}</button></p>
         </div>
@@ -64,11 +66,30 @@
   <script>
 
 
-    console.info('------mount configs------')
+    console.info('------mount configs------');
     
+    
+    this.newUrl = null;
+  
     riot.tag('b', '', function(opts) {
         this.root.innerHTML = Strings['Pr_CONFIG_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
     });
+    
+    
+    onChangeUrlInput(e) {
+      this.newUrl = e.currentTarget.value;
+    }
+    
+    /**
+     * 設定するボタン押したとき
+     */
+    onClickUrlSetting(e) {
+      console.log(this.newUrl);
+      
+    }
+    
+    
+  
 
   </script>
 </configs>

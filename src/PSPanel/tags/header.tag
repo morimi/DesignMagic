@@ -7,9 +7,9 @@
   <span id="hidden-total" class="hd-number">{ hiddenVal }</span>
   <div id="status"></div>
   <img src="images/icon/{ parent.theme }/loader.gif" alt="" id="icon-loader" show="{ loading }">
-  <div data-mode="check" class="topcoat-button hd-btn" onclick="{ switchContainer }">Check</div>
-  <div data-mode="config" class="topcoat-button hd-btn" onclick="{ switchContainer }">Config</div>
-  <div data-mode="tools" class="topcoat-button hd-btn" onclick="{ switchContainer }">Tools</div>
+  <a href="#check" class="topcoat-button hd-btn" onClick="{ check }">Check</a>
+  <a href="#config" class="topcoat-button hd-btn">Config</a>
+  <a href="#tools" class="topcoat-button hd-btn">Tools</a>
   
     <script>
 
@@ -45,15 +45,11 @@
     
 
     /**
-     * 表示モード(mode)を要素のdata-modeで指定された値に変更する
-     * 'check' - バリデーション表示(初期値)
-     * 'config' - conf.json内容表示
-     * 'setting' - URL設定変更表示
-     * 'tools' - ツール表示
      */
-    switchContainer(e) {
-      this.parent.mode = e.currentTarget.getAttribute('data-mode');
-      this.parent.update({mode: this.parent.mode})
+    check(e) {
+      this.parent.mode = 'check';
+      this.parent.update({mode: 'check'})
+      location.hash = '#check';
     }
 
     

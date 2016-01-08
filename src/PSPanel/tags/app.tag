@@ -23,17 +23,15 @@
     var me = this;
     var opt = {};
     
-    
     /**
      * 表示モード
      * 'check' - バリデーション表示(初期値)
-     * 'config' - conf.json内容表示
+     * 'configs' - conf.json内容表示
      * 'setting' - URL設定変更表示
      * 'tools' - ツール表示
      * @type {string}
      */
     this.mode = 'check';
-
 
     /**
      * UIのテーマ
@@ -43,17 +41,19 @@
      */
     this.theme = themeManager.getThemeColorType() || 'dark';
 
-    
-    
+
     /**
-     * @private
+     * 表示モード(mode)を要素のdata-modeで指定された値に変更する
+     * 'check' - バリデーション表示(初期値)
+     * 'config' - conf.json内容表示
+     * 'setting' - URL設定変更表示
+     * 'tools' - ツール表示
      */
-    function onConfigLoaded(data) {
-      console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
-      opt.loading = false;
-      me.tags.header.update(opt);
-      me.trigger('loadconf', data);
-    };
+    riot.route(function(mode){
+      console.log('riot.route === ' + mode)
+      me.mode = mode;
+      me.update();
+    })
     
     /**
      * start app
@@ -63,7 +63,13 @@
       
       
       Q.fcall(me.loadConfig)
-       .done(onConfigLoaded);
+       .done(function(data) {
+          console.log('╭( ･ㅂ･)و ̑̑ ｸﾞｯ');
+          opt.loading = false;
+          me.tags.header.update(opt);
+          me.tags.configs.update();
+          me.trigger('loadconf', data);
+        });
       
     });
     
