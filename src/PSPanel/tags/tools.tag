@@ -6,7 +6,7 @@
         <p><string category="TOOLS" prop="ATTENTION"></string></p>
          <dl>
            <dt class="clearfix">{Strings.Pr_HISTORY_DELETECOPYTEXT}
-             <button class="topcoat-button--large pull-r js-tools-deleteCopyText" type="button">{Strings.Pr_BUTTON_EXECUTE}</button>
+             <button class="topcoat-button--large pull-r js-tools-deleteCopyText" type="button" onclick="{ onDeleteCopyText }">{Strings.Pr_BUTTON_EXECUTE}</button>
            </dt>
            <dd>
             <!--{Strings.Pr_DESCRIPTION_DELETECOPYTEXT}-->
@@ -166,6 +166,46 @@
         } 
       });
     }
+    
+    /**
+     * 〜のコピー削除
+     */
+    onDeleteCopyText() {
+            var start = Date.now();
+      console.log('（＾ω＾）DeleteCopyText start');
+      
+      me.parent.trigger('toolStart', {message: Strings.Pr_START_DELETECOPYTEXT});
+     
+      JSXRunner.runJSX("deleteCopyText", {Strings: Strings}, function (result) {
+        var obj = JSON.parse(result);
+        var time = start - Date.now();
+        
+      console.log('（＾ω＾）DeleteCopyText end', obj);
+        
+        switch ( obj.status ) {
+          case 200:
+            var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETECOPYTEXT, obj.total);
+            
+            if ( !obj.total ) {
+              message = Strings.Pr_NOTFOUND_DELETECOPYTEXT;
+            }
+            
+            me.parent.trigger('toolEnd', {message: message, time: time});
+            
+            break;
+            
+          case 404:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_NODOCUMENT_CREATEDUMMYLAYER,
+                                         time: time});
+            break;
+            
+          default:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_ERROR_TOOLS,
+                                         time: time});
+        } 
+      });
+    }
+    
   </script>
 </tools>
 
