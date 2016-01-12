@@ -276,7 +276,7 @@
       me.update();
       
       //validation.jsが持ってるチェック結果上書き
-      me.result.time = me.getExecTime(result.startTime);
+      me.result.time = result.startTime - Date.now();
       me.result.message = Strings.formatStr(Strings.Pr_COMPLETE_NAMECHANGE, result.total);
       
       //<app>におしらせ

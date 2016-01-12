@@ -1,15 +1,19 @@
 <footer class="panel-hd panel-footer">
   <div id="console">
-    <span class="time lv{ calcGuilty() }" if="{ time }">{ time }</span>
+    <span class="time lv{ calcGuilty() }" if="{ time }">{ calcTime() }</span>
     <span class="console-message" if="{ message }">{ message }</span>
   </div>
 
   <script>
     var me = this;
     
-    this.time = null
     
-    this.message = null
+    /**
+     * timestamp整形
+     */
+    calcTime() {
+      return Math.abs(this.time / 1000) + 's';
+    }
           
     /**
      * エラーと注意の総数から罪の重さを量る

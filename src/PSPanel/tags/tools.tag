@@ -62,11 +62,30 @@
     onCreateDummyLayer() {
       var start = Date.now();
       console.log('（＾ω＾）createDummyLayer start');
+      
       me.parent.trigger('toolStart', {message: Strings.Pr_START_CREATEDUMMYLAYER});
      
       JSXRunner.runJSX("createDummyLayer", {Strings: Strings}, function (result) {
         var obj = JSON.parse(result);
-        console.log(obj)
+        var time = start - Date.now();
+        
+      console.log('（＾ω＾）createDummyLayer end', obj);
+        
+        switch ( obj.status ) {
+          case 200:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_COMPLETE_CREATEDUMMYLAYER,
+                                          time: time});
+            break;
+            
+          case 404:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_NODOCUMENT_CREATEDUMMYLAYER,
+                                         time: time});
+            break;
+            
+          default:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_ERROR_TOOLS,
+                                         time: time});
+        } 
       });
     }
     

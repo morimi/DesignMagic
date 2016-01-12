@@ -125,7 +125,7 @@ riot.mixin('Validation', {
      .done(function() {
       console.info('check completed ٩(ˊᗜˋ*)و');
       
-      me.result.time = me.getExecTime(startTime);
+      me.result.time = startTime - Date.now();
       me.result.message = me.getResultMessage(me.result);
       
       me.trigger('validationEnd', me.result);
@@ -134,15 +134,6 @@ riot.mixin('Validation', {
       
       me.prosessing = false;
     })
-  },
-  
-  
-  /**
-   * 実行時間を計算して整形したものを返す
-   * @return {string}
-   */
-  getExecTime: function(start) {
-    return Math.abs((start - Date.now()) / 1000) + 's'
   },
   
   
