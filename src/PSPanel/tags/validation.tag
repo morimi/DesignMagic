@@ -63,13 +63,6 @@
      */
     this.selectedIds = [];
     
-      
-    /**
-     * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
-     * true: 変更する
-     * @type {boolean}
-     */
-    this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
     
     /**
      * バリデーションメッセージがクリックされた時の処理
@@ -87,6 +80,14 @@
       
       
       if ( this.processing || this.selectedItem && this.selectedItem.id === item.id ) return;
+      
+      
+      /**
+       * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
+       * true: 変更する
+       * @type {boolean}
+       */
+      this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
             
       /**
        * メッセージの選択状態
@@ -108,7 +109,6 @@
         console.log('End selectLayer', result)
       });
       
-      console.log(this.isAllChangeLayerName)
     };
     
     /**
