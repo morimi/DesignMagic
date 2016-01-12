@@ -10,6 +10,8 @@
 
     if (documents.length !== 0 ) {
       
+      DM.activeLayer = activeDocument.activeLayer;
+      
       var desc = new ActionDescriptor();
       var ref = new ActionReference();
 

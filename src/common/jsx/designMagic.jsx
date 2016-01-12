@@ -122,5 +122,15 @@ DM.changeLayerNameById = function(id, name) {
   executeAction( charIDToTypeID( "setd" ), desc, DialogModes.NO );
 };
 
+/**
+ * アクティブレイヤーのIDを得る
+ * @return {number}
+ */
+DM.getActiveLayerId = function() {
+  var ref = new ActionReference();
+  ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
+  return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
+}
+
 
 '{"status": 200}';
