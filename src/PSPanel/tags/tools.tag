@@ -54,6 +54,7 @@
     console.info('------mount tools------')
     
     var me = this;
+    var app = this.parent;
 
     /**
      * ダミーレイヤーの作成
@@ -107,12 +108,13 @@
         switch ( obj.status ) {
           case 200:
             var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETEHIDDENLAYER, obj.layers, obj.total);
+            var hidden = app.tags.header.hiddenVal - obj.total;
             
             if ( !obj.total ) {
               message = Strings.Pr_NOTFOUND_DELETEHIDDENLAYER;
             }
             
-            me.parent.trigger('toolEnd', {message: message, time: time});
+            me.parent.trigger('toolEnd', {message: message, time: time, hiddenVal: hidden});
             
             break;
             

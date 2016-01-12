@@ -118,7 +118,6 @@
             ref2.putIndex( charIDToTypeID( "Lyr " ), i);
         var desc = executeActionGet(ref2);
         var layerSet = typeIDToStringID(desc.getEnumerationValue(stringIDToTypeID("layerSection")));
-        var isBackground = desc.getBoolean(stringIDToTypeID("background"));
 
         // if not layer group collect values;
         if ( layerSet != "layerSectionEnd" ) {
