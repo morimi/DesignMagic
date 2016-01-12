@@ -5,60 +5,49 @@
 (function() {
 
   try {
-
+    
     /**
-     * レイヤー配列をextendするための入れ物
-     * @type {Array.<Layers>}
+     * 処理した数
+     * @type {number}
      */
-    var layers = [];
-
+    var _total = 0;
+    
     /**
-     * 現在のレイヤー構造体から平坦化した配列を返却
-     * @return {Array.<Layer>}
+     * レイヤー数
+     * @type {number}
      */
-    function getLayersList() {
-
-      var list = [];
-
-      function _traverse(layers) {
-        var i = 0, l = layers.length;
-        while ( i < l ) {
-          var layer = layers[i];
-
-          if ( !layer.allLocked && !layer.isBackgroundLayer && !layer.visible ) {
-            list.push(layer);
-          }
-
-          if ( layer.typename === 'LayerSet' ) {
-            _traverse(layer.layers);
-          }
-
-          i = (i+1)|0;
-        }
-      }
-
-      _traverse(activeDocument.layers);
-
-      return list;
-    }
-
+    var _layers = 0;
+    
     /**
-     * 「のコピー」を削除する
-     * @param {Array.<Layer>} target activeDocument.layers
+     * 非表示レイヤーを削除する
      * @return {void}
      */
-    function deleteCopyText(targets) {
-      var i = 0, l = targets.length;
+    function deleteHiddenLayer() {
+      
+      var i = 1;
+          _layers = DM.getNumberOfLayers();
 
-      while ( i < l ) {
-        var target = targets[i];
+      while ( i < _layers ) {
+        var ref = new ActionReference();
+            ref.putIndex( charIDToTypeID( "Lyr " ), i);
+        var desc = executeActionGet(ref);
 
-        try {
-
-          target.remove();
-
-        } catch(e) {
-
+        var layerSet = typeIDToStringID(desc.getEnumerationValue(stringIDToTypeID("layerSection")));
+        var isBackground = desc.getBoolean(stringIDToTypeID("background"));
+        var isVisible = desc.getBoolean(stringIDToTypeID('visible'));
+        var layerName = desc.getString(charIDToTypeID( 'Nm  ' ));
+          
+        if ( layerSet != "layerSectionEnd" && !isBackground ) {
+        
+          if ( !isVisible ) {
+            desc.putReference( charIDToTypeID( "null" ), ref );
+            executeAction( charIDToTypeID( "Dlt " ), desc, DialogModes.NO );
+            
+            _total = (_total+1)|0;
+            _layers = (_layers-1)|0;
+            i = (i-1)|0;
+          }
+        
         }
 
         i = (i+1)|0;
@@ -71,23 +60,19 @@
 
       app.displayDialogs = DialogModes.NO; //「現在使用できません」ダイアログ表示しない
 
-      layers = getLayersList();
+      activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEHIDDENLAYER %>", "deleteHiddenLayer()");
 
-      if ( layers.length ) {
-        activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEHIDDENLAYER %>", "deleteCopyText(layers)");
+      app.displayDialogs = DialogModes.ERROR;//戻しておく
 
-        app.displayDialogs = DialogModes.ERROR;//戻しておく
+      return '{ "total":' + _total + ', "layers": ' + _layers + ', "status": 200 }';
 
-        return '{value:"complete", total:' + layers.length + ', type: "console"}';
-
-      } else {
-        return '{value:"nolayers", total:0, type: "console"}';
-      }
+    } else {
+      return '{"status": 404}';
     }
 
 
   } catch(e) {
-    return '{errorType: "jsx", errorMessage: "' + e + '"}';
+    return '{"type": "jsx", "message": "' + e + '", "status": 500}';
   }
 
 })();
