@@ -1,5 +1,6 @@
 /**
  * @fileoverview 非表示レイヤーを削除する
+ * レイヤー数が多いとCPU使用率ぶっちぎるので注意が必要
  * @since version 0.4.0
  */
 (function() {
@@ -13,10 +14,18 @@
     var _total = 0;
     
     /**
-     * レイヤー数
+     * 初期レイヤー数
      * @type {number}
      */
     var _layers = 0;
+      
+    
+    /**
+     * </Layer group>のレイヤー数
+     * @type {number}
+     */
+    var _lgTotal = 0;
+    
     
     /**
      * 非表示レイヤーを削除する
@@ -24,79 +33,57 @@
      */
     function deleteHiddenLayer() {
       
-      _layers = DM.getNumberOfLayers();
+      _layers = DM.getNumberOfLayers(); //first count
       
-      var i = 1;
+      var i = _layers; //index
           l = _layers;
-      
-      var isGroup = false, //グループに収まってるレイヤーであるか
-          isGroupContentLocked = false; //グループ内にロックされたレイヤーがあるかどうか
-      var gTotal = 0; //グループ内のレイヤー数
 
-      while ( i <= l ) {
+      while ( i != 0 ) {
         var ref = new ActionReference();
             ref.putIndex( charIDToTypeID( "Lyr " ), i);
         var desc = executeActionGet(ref);
 
         var layerSet = typeIDToStringID(desc.getEnumerationValue(stringIDToTypeID("layerSection")));
         var isVisible = desc.getBoolean(stringIDToTypeID('visible'));
-        var layerName = desc.getString(charIDToTypeID( 'Nm  ' ));
+        //var layerName = desc.getString(charIDToTypeID( 'Nm  ' ));
+        var isBackground = desc.getBoolean(stringIDToTypeID("background"));
+        var isDeleted = false;
         
-        //グループ開始した（endが先に来る）
-        isGroup = (layerSet == "layerSectionEnd") ? true : isGroup;
-        
-        //グループレイヤー総数カウント && (layerSet !== 'layerSectionEnd') 
-        if ( isGroup && (layerSet !== 'layerSectionEnd') ) {
-          gTotal = (gTotal+1)|0;
+        //alert(i + ':' + layerName + '/' + layerSet )
+      
+        if ( layerSet === 'layerSectionEnd') {
+          //不過視な</Layer group>レイヤーカウント
+          _lgTotal = (_lgTotal+1)|0;
         }
-        
-        //何かロックされているか調べる
-        var locking = desc.getObjectValue(stringIDToTypeID("layerLocking"));
-        var isLock = false;
-        
-        //透明、画像、位置、全部
-//        if (locking.getBoolean(1528) || locking.getBoolean(1529) ||
-//            locking.getBoolean(1530) || locking.getBoolean(1531))
-//        {
-        
-        //全ロックのみ
-        if (locking.getBoolean(1531)){
-          isLock = true;
-          
-          //グループ内にロックされたレイヤーがある
-          if ( isGroup ) {
-            isGroupContentLocked = true;
-          }
-          
-       　}
-        
-        //非表示であり、ロックもされてない
-        if ( !isVisible && !isLock ) {
-          
-          //layerSectionStartである場合は、コンテンツ内にロックレイヤーが無い場合のみ消す
-          //グループに所属してないレイヤー
-          if ( (layerSet == "layerSectionStart" && !isGroupContentLocked ) ||
-               (layerSet != "layerSectionEnd" && !isGroup )) {
-            
+
+        //非表示であり、背景でもない
+        if ( !isVisible && !isBackground ) {
+
+          try {
             desc.putReference( charIDToTypeID( "null" ), ref );
             executeAction( charIDToTypeID( "Dlt " ), desc, DialogModes.NO );
 
-            _total = (_total + gTotal + 1)|0;
-            l = (l - gTotal -1)|0;
+            var l2 = DM.getNumberOfLayers(); //second count
+            var deleted = Math.abs(l - l2); //差分
+            isDeleted = true;
             
-            i = (i - gTotal -1)|0;
-          }
-        
-        }
+            _total = _total + 1; //削除数
+            
+            //alert('i:'+ i + ' l:'+ l + ' l2:' + l2 + ' deleted:' + deleted + ' total:' + _total)
+      
+            l = l2;
+            i =  (i - deleted); //消した数だけindex減らす
 
-        //グループ終わった
-        if ( layerSet == "layerSectionStart" ) {
-          isGroup = false;
-          isGroupContentLocked = false;
-          gTotal = 0;
+          } catch(e) {
+            //エラーもみけす
+          }
+          
         }
         
-        i = (i+1)|0;
+        if ( !isDeleted ) {
+          i = (i-1)|0;
+        }
+        
       }
 
     }
@@ -110,7 +97,7 @@
 
       app.displayDialogs = DialogModes.ERROR;//戻しておく
 
-      return '{ "total":' + _total + ', "layers": ' + _layers + ', "status": 200 }';
+      return '{ "total":' + _total + ', "layers": ' + (_layers - _lgTotal) + ', "status": 200 }';
 
     } else {
       return '{"status": 404}';

@@ -108,7 +108,7 @@
         switch ( obj.status ) {
           case 200:
             var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETEHIDDENLAYER, obj.layers, obj.total);
-            var hidden = app.tags.header.hiddenVal - obj.total;
+            var hidden = Math.max(0, app.tags.header.hiddenVal - obj.total);
             
             if ( !obj.total ) {
               message = Strings.Pr_NOTFOUND_DELETEHIDDENLAYER;
