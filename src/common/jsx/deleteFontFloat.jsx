@@ -18,6 +18,9 @@
      * @type {number}
      */
     var _total = 0;
+    
+    
+    var idProtectAll = stringIDToTypeID( "protectAll" );
 
     /**
      * テキストパネルにフォントサイズをセットする
@@ -75,19 +78,21 @@
               textDesc = desc.getObjectValue(stringIDToTypeID('textKey')),
               textContent = textDesc.getString(stringIDToTypeID("textKey"));
             
+          var locking = desc.getObjectValue(stringIDToTypeID("layerLocking"));//ActionDescriptor
+          
           _layers = (_layers+1)|0;
           
-          if ( textContent.length ) { //内容がある
+          
+          if ( textContent.length && !locking.getBoolean(idProtectAll)) { //内容がある＆全ロックされてない
             
             var size = DM.getTextSize(textDesc);
             
             if ( /\./.test(size) ) { //小数点がある
 
-              DM.selectLayerById(id);
-              
-              setTextSize(id, Math.round(size));
+                DM.selectLayerById(id);
+                setTextSize(id, Math.round(size));
+                _total = (_total+1)|0;
 
-              _total = (_total+1)|0;
 
             }
             
