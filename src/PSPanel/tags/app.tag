@@ -66,7 +66,7 @@
     }
     
     if ( window.localStorage.getItem('com.cyberagent.designmagic:autocheck') === 'true') {
-      csInterface.addEventListener( 'documentAfterSave' , this.handleAutoCheck);
+      window.csInterface.addEventListener( 'documentAfterSave' , this.handleAutoCheck);
     }
     
     /**

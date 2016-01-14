@@ -286,7 +286,7 @@
     
     //ドキュメント閉じた時
     //内容のリセットする
-    csInterface.addEventListener( 'documentAfterDeactivate' , function() {
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , function() {
       me.resetResult();
       me.update({reset: true});
     });
