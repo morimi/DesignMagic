@@ -19,16 +19,19 @@
   <script src="js/libs/CSInterface.js"></script>
   <script src="js/themeManager.js"></script>
   <script>
-    var csInterface = new CSInterface();
-    var localeStrings = csInterface.initResourceBundle();
-    var extensionId =  csInterface.getExtensionID();
+    
+    window.csInterface = new CSInterface();
+    window.localeStrings = csInterface.initResourceBundle();
+    window.extensionId =  csInterface.getExtensionID();
+    
     //Modules
-    var _           = require("lodash"),
-        Q           = require("Q"),
-        http        = require('http'),
-        JSXRunner   = require("../common/JSXRunner"),
-        Strings     = require("./js/LocStrings");
-        themeManager.init();
+    window._           = require("lodash"),
+    window.Q           = require("Q"),
+    window.http        = require('http'),
+    window.JSXRunner   = require("../common/JSXRunner"),
+    window.Strings     = require("./js/LocStrings");
+    
+    themeManager.init();
   </script>
 
   <!-- riot tags -->
@@ -45,10 +48,10 @@
   <script src="../node_modules/riot/riot+compiler.js"></script>
 
   <script>
+    
     location.hash = '';
     riot.mount('app')
     riot.route.start(true);
-    
     
     /**
      * raw html insert

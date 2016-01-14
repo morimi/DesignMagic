@@ -62,9 +62,10 @@ function _getJSXTemplate(scriptName) {
 function _evalJSX(script, callback, optScriptName) {
     var self = this;
     _.defer(function () {
-        csInterface.evalScript(script, function () {
+
+        window.csInterface.evalScript(script, function () {
           // 返却値に {type:"jsx", message:message, status: 500} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
-          if (arguments[0] != EvalScript_ErrMessage) {
+          if (arguments[0] != "EvalScript error.") {
             try {
               if (arguments[0].indexOf('{ "type": "jsx"') !== -1) {
                 
