@@ -68,7 +68,14 @@ try {
   function UI_font(uiObj, uiFont, uiFontStyle, uiFontSize) {
       var fontStyle = eval("ScriptUI.FontStyle." + uiFontStyle);
       var gFont = ScriptUI.newFont(uiFont, fontStyle, uiFontSize);
-      uiObj.graphics.font = gFont;
+      /*
+      15.1でこういうエラーが出るそうなのでコメントアウトしておく
+       Window layout failed
+- Panel layout failed
+- Group layout failed
+- cannot get value of preferredSize property for statictext: キャッチされていない例外 preferredSize
+*/
+      //uiObj.graphics.font = gFont;
   }
 
   //http://www.javascripter.net/faq/hextorgb.htm
