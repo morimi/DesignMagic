@@ -4,6 +4,18 @@
       <div id="tools-list" class="list">
        <!--{Strings.Pr_TOOLS_ATTENTION}-->
         <p><string category="TOOLS" prop="ATTENTION"></string></p>
+        
+
+         <dl>
+           <dt class="clearfix">{Strings.Pr_HISTORY_CREATEDUMMYLAYER}
+             <button class="topcoat-button--large pull-r js-tools-createDummyLayer" type="button" onclick="{ onCreateDummyLayer }">{Strings.Pr_BUTTON_EXECUTE}</button>
+           </dt>
+           <dd>
+              <!--{Strings.Pr_DESCRIPTION_CREATEDUMMYLAYER}-->
+             <string category="DESCRIPTION" prop="CREATEDUMMYLAYER"></string>
+           </dd>
+         </dl>
+         
          <dl>
            <dt class="clearfix">{Strings.Pr_HISTORY_DELETECOPYTEXT}
              <button class="topcoat-button--large pull-r js-tools-deleteCopyText" type="button" onclick="{ onDeleteCopyText }">{Strings.Pr_BUTTON_EXECUTE}</button>
@@ -35,15 +47,15 @@
          </dl>
 
          <dl>
-           <dt class="clearfix">{Strings.Pr_HISTORY_CREATEDUMMYLAYER}
-             <button class="topcoat-button--large pull-r js-tools-createDummyLayer" type="button" onclick="{ onCreateDummyLayer }">{Strings.Pr_BUTTON_EXECUTE}</button>
+           <dt class="clearfix">{Strings.Pr_HISTORY_DELETEEMPTYGROUP}
+             <button class="topcoat-button--large pull-r" type="button" onclick="{ onDeleteEmptyGroup }">{Strings.Pr_BUTTON_EXECUTE}</button>
            </dt>
            <dd>
-              <!--{Strings.Pr_DESCRIPTION_CREATEDUMMYLAYER}-->
-             <string category="DESCRIPTION" prop="CREATEDUMMYLAYER"></string>
+             <!--{Strings.Pr_DESCRIPTION_DELETEEMPTYGROUP}-->
+             <string category="DESCRIPTION" prop="DELETEEMPTYGROUP"></string>
            </dd>
          </dl>
-
+         
       </div>
 
     </div>
@@ -193,6 +205,46 @@
             }
             
             me.parent.trigger('toolEnd', {message: message, time: time});
+            
+            break;
+            
+          case 404:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_NODOCUMENT_CREATEDUMMYLAYER,
+                                         time: time});
+            break;
+            
+          default:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_ERROR_TOOLS,
+                                         time: time});
+        } 
+      });
+    }
+    
+    /**
+     * 空のグループ削除
+     */
+    onDeleteEmptyGroup() {
+      var start = Date.now();
+      console.log('（＾ω＾）DeleteEmptyGroup start');
+      
+      me.parent.trigger('toolStart', {message: Strings.Pr_START_DELETEEMPTYGROUP});
+     
+      JSXRunner.runJSX("deleteEmptyGroup", {Strings: Strings}, function (result) {
+        var obj = JSON.parse(result);
+        var time = start - Date.now();
+        
+      console.log('（＾ω＾）DeleteEmptyGroup end', obj);
+        
+        switch ( obj.status ) {
+          case 200:
+            var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETEEMPTYGROUP, obj.groups, obj.total);
+            var hidden = Math.max(0, app.tags.header.hiddenVal - obj.total);
+            
+            if ( !obj.total ) {
+              message = Strings.Pr_NOTFOUND_DELETEEMPTYGROUP;
+            }
+            
+            me.parent.trigger('toolEnd', {message: message, time: time, hiddenVal: hidden});
             
             break;
             
