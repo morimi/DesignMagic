@@ -291,6 +291,11 @@ body.light .message-hint {
 }
 
 
+#nameForm {
+  width: 80%;
+}
+
+
 /**
  * 初期メッセージ
  */
