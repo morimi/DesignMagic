@@ -1,8 +1,8 @@
 /**
- * @fileoverview 非表示レイヤーを削除する
- * レイヤー数が多いとCPU使用率ぶっちぎるので注意が必要
- * @since version 0.4.0
+ * @fileoverview 空のグループを削除する
+ * @since version 0.5.0
  */
+
 (function() {
 
   try {
@@ -18,6 +18,12 @@
      * @type {number}
      */
     var _layers = 0;
+    
+    /**
+     * グループ数
+     * @type {number}
+     */
+    var _groups = 0;
       
     
     /**
@@ -25,6 +31,7 @@
      * @type {number}
      */
     var _lgTotal = 0;
+    
     
     /**
      * 渡されたindexのレイヤーがlayerSectionEndであるかチェックする
@@ -35,8 +42,6 @@
         var ref = new ActionReference();
             ref.putIndex( charIDToTypeID( "Lyr " ), idx);
         var desc = executeActionGet(ref);
-      
-      
         var layerSet = typeIDToStringID(desc.getEnumerationValue(stringIDToTypeID("layerSection")));
         
       return layerSet === 'layerSectionEnd';
@@ -44,46 +49,38 @@
     
     
     /**
-     * 非表示レイヤーを削除する
+     * 空のグループを削除する
      * @return {void}
      */
-    function deleteHiddenLayer() {
+    function deleteEmptyGroup() {
       
       _layers = DM.getNumberOfLayers(); //first count
       
-      var i = 1, //index
+      var i = _layers, //index
           l = _layers,
           isEmptyGroup = false;
 
-      while ( i <= l) {
+      while ( i != 0 ) {
         var ref = new ActionReference();
             ref.putIndex( charIDToTypeID( "Lyr " ), i);
         var desc = executeActionGet(ref);
 
         var layerSet = typeIDToStringID(desc.getEnumerationValue(stringIDToTypeID("layerSection")));
-        var isVisible = desc.getBoolean(stringIDToTypeID('visible'));
         var layerName = desc.getString(charIDToTypeID( 'Nm  ' ));
-        var isBackground = desc.getBoolean(stringIDToTypeID("background"));
         var isDeleted = false;
         
         //グループ
-        if ( layerSet === 'layerSectionStart') {
+        if ( layerSet === 'layerSectionStart' ) {
+          _groups = (_groups+1)|0;
           
+          //次のレイヤーがすぐEndかチェック（trueなら空グループとする）
           if ( isNextIndexSectionEnd(i-1) ) {
-            //前のレイヤーがすぐStartかチェック（trueなら空グループとする）
             isEmptyGroup = true;
           }
-        }
-      
-        if ( layerSet === 'layerSectionEnd') {
-          //不過視な</Layer group>レイヤーカウント
-          _lgTotal = (_lgTotal+1)|0;
+           
         }
         
-        //alert(i + ':' + layerName + '/' + isEmptyGroup )
-
-        //非表示であり、背景でもない、または空グループである
-        if ( (!isVisible && !isBackground) || isEmptyGroup ) {
+        if ( isEmptyGroup ) {
 
           try {
             desc.putReference( charIDToTypeID( "null" ), ref );
@@ -99,13 +96,9 @@
             //alert('i:'+ i + ' l:'+ l + ' l2:' + l2 + ' deleted:' + deleted + ' total:' + _total)
       
             l = l2;
-            
-            if ( layerSet === 'layerSectionStart' ) {
-              i =  (i - 1); //消した数だけindex減らす
-            }
+            i =  (i - deleted)|0; //消した数だけindex減らす
 
           } catch(e) {
-            //エラーもみけす
             //ロックされている場合はエラーになって処理されないためフラグだけ戻す
             isEmptyGroup = false;
           }
@@ -113,7 +106,7 @@
         }
         
         if ( !isDeleted ) {
-          i = (i+1)|0;
+          i = (i-1)|0;
         }
         
       }
@@ -125,11 +118,11 @@
 
       app.displayDialogs = DialogModes.NO; //「現在使用できません」ダイアログ表示しない
 
-      activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEHIDDENLAYER %>", "deleteHiddenLayer()");
+      activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_DELETEEMPTYGROUP %>", "deleteEmptyGroup()");
 
       app.displayDialogs = DialogModes.ERROR;//戻しておく
 
-      return '{ "total":' + _total + ', "layers": ' + (_layers - _lgTotal) + ', "status": 200 }';
+      return '{ "total":' + _total + ', "groups": ' + _groups + ', "status": 200 }';
 
     } else {
       return '{"status": 404}';

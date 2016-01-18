@@ -107,7 +107,7 @@ riot.mixin('Config', {
    */
   loadRemoteConfig: function(url) {
     var d = Q.defer();
-    var me = this;
+    var me = this, req;
 
     /**
      * @param {XMLHttpRequest} xhr
@@ -120,8 +120,8 @@ riot.mixin('Config', {
       }
 
     };
-
-    var req = http.get(url, function (res) {
+    
+    var handleLoadConfigSuccess = function (res) {
 
       if (res.statusCode == '200') {
         res.setEncoding('utf8');
@@ -138,13 +138,21 @@ riot.mixin('Config', {
         });
       }
 
-      console.log(res)
       if (res.statusCode == '403') {
         handleLoadConfigError();
         d.resolve(me.confCache);
       }
-    });
+    };
+    
+    if ( url.indexOf('https') === -1 ) {
+      
+      req = http.get(url, handleLoadConfigSuccess);
+      
+    } else {
+      
+      req = https.get(url, handleLoadConfigSuccess);
 
+    }
 
     req.on('error', function() {
       handleLoadConfigError();

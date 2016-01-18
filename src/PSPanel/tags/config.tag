@@ -130,7 +130,13 @@
     this.errorMessage = null;
     
     
+    this.on('mount', function() {
+      this.$inputConfUrl = document.getElementById('input-config-url');
+    })
+    
+    
     onChangeInputUrl(e) {
+      this.errorMessage = null;
       this.newUrl = e.currentTarget.value;
     };
     
@@ -143,7 +149,10 @@
      * 設定するボタン押したとき
      */
     onClickUrlSetting(e) {
+      this.newUrl = me.$inputConfUrl.value;
+      
       console.log('[onClickUrlSetting]', this.newUrl, this.parent.localConfFile);
+      
       
      if ( !this.newUrl && ! this.parent.localConfFile ) {
        this.errorMessage = 'ファイルが指定されていません';
@@ -167,15 +176,19 @@
       
       
       Q.fcall(this.parent.loadConfig)
+       .fail(function(data){
+        console.log('faild', data)
+      })
        .done(function(data) {
           console.log('( ﾟдﾟ)ﾊｯ!', data);
           me.newUrl = null;
+          me.$inputConfUrl.value = null;
         
           if ( !data ) {
             me.update({errorMessage: 'conf.jsonの取得に失敗しました'});
           
           } else {
-            me.parent.update();
+            riot.route('config');
           }
         
         
