@@ -56,6 +56,15 @@
            </dd>
          </dl>
          
+         <dl>
+           <dt class="clearfix">{Strings.Pr_HISTORY_DELETEUNUSEDEFFECT}
+             <button class="topcoat-button--large pull-r" type="button" onclick="{ onDeleteUnusedEffect }">{Strings.Pr_BUTTON_EXECUTE}</button>
+           </dt>
+           <dd>
+             <!--{Strings.Pr_DESCRIPTION_DELETEUNUSEDEFFECT}-->
+             <string category="DESCRIPTION" prop="DELETEUNUSEDEFFECT"></string>
+           </dd>
+         </dl>
       </div>
 
     </div>
@@ -238,13 +247,12 @@
         switch ( obj.status ) {
           case 200:
             var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETEEMPTYGROUP, obj.groups, obj.total);
-            var hidden = Math.max(0, app.tags.header.hiddenVal - obj.total);
             
             if ( !obj.total ) {
               message = Strings.Pr_NOTFOUND_DELETEEMPTYGROUP;
             }
             
-            me.parent.trigger('toolEnd', {message: message, time: time, hiddenVal: hidden});
+            me.parent.trigger('toolEnd', {message: message, time: time});
             
             break;
             
@@ -259,7 +267,44 @@
         } 
       });
     }
-    
+    /**
+     * 未使用エフェクト削除
+     */
+    onDeleteUnusedEffect() {
+      var start = Date.now();
+      console.log('（＾ω＾）DeleteUnusedEffect start');
+      
+      me.parent.trigger('toolStart', {message: Strings.Pr_START_DELETEUNUSEDEFFECT});
+     
+      JSXRunner.runJSX("deleteUnusedEffect", {Strings: Strings}, function (result) {
+        var obj = JSON.parse(result);
+        var time = start - Date.now();
+        
+      console.log('（＾ω＾）DeleteUnusedEffect end', obj);
+        
+        switch ( obj.status ) {
+          case 200:
+            var message = Strings.formatStr(Strings.Pr_COMPLETE_DELETEUNUSEDEFFECT, obj.effects, obj.total);
+            
+            if ( !obj.total ) {
+              message = Strings.Pr_NOTFOUND_DELETEUNUSEDEFFECT;
+            }
+            
+            me.parent.trigger('toolEnd', {message: message, time: time});
+            
+            break;
+            
+          case 404:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_NODOCUMENT_CREATEDUMMYLAYER,
+                                         time: time});
+            break;
+            
+          default:
+            me.parent.trigger('toolEnd', {message: Strings.Pr_ERROR_TOOLS,
+                                         time: time});
+        } 
+      });
+    }
   </script>
 </tools>
 

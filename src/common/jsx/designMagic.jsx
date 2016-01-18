@@ -101,6 +101,19 @@ DM.selectLayerById = function(id) {
   executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
 };
 
+/**
+ * Indexを元にレイヤーを選択する
+ * @param {number} idx レイヤーのIndex
+ */
+DM.selectLayerByIndex = function(idx) {
+  var desc = new ActionDescriptor();
+  var ref = new ActionReference();
+
+  ref.putIndex(charIDToTypeID("Lyr "), idx);
+  desc.putReference( charIDToTypeID( "null" ), ref );
+  desc.putBoolean( charIDToTypeID( "MkVs" ), false );
+  executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
+};
 
 
 /**
