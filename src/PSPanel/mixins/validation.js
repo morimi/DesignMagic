@@ -497,7 +497,7 @@ riot.mixin('Validation', {
         if ( _.isArray(r.list) && r.list.length ) {
           var i = r.list.length-1;
           var minSize = c.check.fonts.minSize;
-          var unitsLabel = me.UNITS_LABEL[c.check.config.rulserUnitsType];
+          var unitsLabel = me.UNITS_LABEL[c.check.config.rulrUnitsType];
           
           while( i > -1 ) {
             var obj = r.list[i];

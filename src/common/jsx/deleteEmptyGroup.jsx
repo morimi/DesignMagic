@@ -1,6 +1,6 @@
 /**
  * @fileoverview 空のグループを削除する
- * @since version 0.5.0
+ * @since version 0.6.0
  */
 
 (function() {
