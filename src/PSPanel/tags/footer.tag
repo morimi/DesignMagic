@@ -32,5 +32,12 @@
 
       return g;
     }
+    
+    
+    //ドキュメント閉じた時
+    //内容のリセットする
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , function() {
+      me.update({time: null, message:null});
+    });
   </script>
 </footer>

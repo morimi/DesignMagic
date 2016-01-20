@@ -52,6 +52,12 @@
       location.hash = '#check';
     }
 
+    //ドキュメント閉じた時
+    //内容のリセットする
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , function() {
+      me.update({errorVal:0, warnVal:0, hiddenVal:0});
+    });
+    
     
   </script>
 </header>
