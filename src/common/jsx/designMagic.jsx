@@ -144,7 +144,26 @@ DM.getActiveLayerId = function() {
   var ref = new ActionReference();
   ref.putEnumerated( charIDToTypeID("Lyr "), charIDToTypeID("Ordn"), charIDToTypeID("Trgt") );
   return executeActionGet(ref).getInteger( stringIDToTypeID( "layerID" ) );
-}
+};
+
+/**
+ * レイヤー効果の使用状況を返す
+ * @param {number} index レイヤーindex
+ * @return {boolean} 使用中(visible)true 未使用(hidden)false
+ */
+DM.isLayerFXVisible = function(index) {
+  
+var ref = new ActionReference(); 
+
+  ref.putProperty( charIDToTypeID("Prpr") , stringIDToTypeID( 'layerFXVisible')); 
+
+  ref.putIndex( charIDToTypeID( "Lyr " ), index);
+
+  var desc = executeActionGet(ref);
+
+  return ( desc.hasKey(stringIDToTypeID('layerFXVisible')) && 
+          desc.getBoolean(stringIDToTypeID('layerFXVisible')));
+};
 
 
 '{"status": 200}';

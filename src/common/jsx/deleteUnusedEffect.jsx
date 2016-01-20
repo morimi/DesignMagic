@@ -61,18 +61,7 @@
         if( desc.hasKey(stringIDToTypeID('layerEffects')) ){
           _effect = (_effect+1)|0;
           
-          
-          var ref9 = new ActionReference(); 
-
-          ref9.putProperty( charIDToTypeID("Prpr") , stringIDToTypeID( 'layerFXVisible')); 
-
-          ref9.putIndex( charIDToTypeID( "Lyr " ), i);
-
-          var vis = executeActionGet(ref9);
-          
-
-          if( vis.hasKey(stringIDToTypeID('layerFXVisible')) && 
-              !vis.getBoolean(stringIDToTypeID('layerFXVisible'))) {
+          if( !DM.isLayerFXVisible(i) ) {
               DM.selectLayerByIndex(i);
               delFx();
               _total = (_total+1)|0;
