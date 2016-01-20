@@ -187,14 +187,19 @@
     };
     
     
+    //初期化時のお知らせメッセージをconf.jsonの読み込み状態に合わせてセットする
+    this.setValidationInfo = function () {
+      me.validation_info.innerHTML = getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
+    };
+    
+    
     /**
      * conf.js読み込み終わったとき
      */
     this.parent.on('loadconf', function(c) {
       console.log('<validation> on loadconf');
       
-      //初期化時のお知らせメッセージをconf.jsonの読み込み状態に合わせてセットする
-      me.validation_info.innerHTML = getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
+      me.setValidationInfo();
       
       //JSXの共通関数読み込んでおく
       JSXRunner.runJSX("designMagic", {config: c.check, Strings: Strings}, function(r) {
@@ -286,10 +291,7 @@
     
     //ドキュメント閉じた時
     //内容のリセットする
-    window.csInterface.addEventListener( 'documentAfterDeactivate' , function() {
-      me.resetResult();
-      me.update({reset: true});
-    });
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
     
     /**
      * appが持ってるconf.jsonを得る
@@ -297,6 +299,21 @@
     function getConfig() {
       return me.parent.confCache;
     }
+    
+    //リセット
+    function reset() {
+      me.selectedItem = null;
+      me.selectedIds.length = 0;
+      me.resetResult();
+      me.setValidationInfo();
+      me.update();
+    }
+    
+    
+    /**
+     * 親のリセットイベント監視
+     */
+    this.parent.on('reset', reset);
 
     
     this.mixin('Validation');

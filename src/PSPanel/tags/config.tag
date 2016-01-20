@@ -76,25 +76,27 @@
     </div>
     
   <div id="setting" class="container"
-    show="{ this.parent.mode == 'setting' || !this.parent.confCache }">
+    show="{ this.parent.mode == 'setting' || this.parent.mode == 'config' && !this.parent.confCache }">
      
       <div id="setting-list" class="list">
+       
+        <p class="error-message" if="{ errorMessage }">
+          { errorMessage }
+        </p>
+        
         <div id="setting-form">
          <p>{Strings.Pr_INPUT_TO_CONFIG_URL}</p>
           <p>URL:<input type="text" class="topcoat-text-input--large" id="input-config-url" style="width:100%" onkeyup="{ onChangeInputUrl }"></p>
           <p>{Strings.Pr_SELECT_LOCAL_CONFIG_FILE}</p>
-          <p><input type="file" accept="application/json" class="topcoat-text-input--large" id="select-config-file" style="width:100%" onchange="{ onChangeSelectFile }"></p>
+          <p><input type="file" accept="application/json" class="topcoat-text-input--large" id="select-config-file" name="select" style="width:100%" onchange="{ onChangeSelectFile }"></p>
           
-          <p class="error-message" if="{ errorMessage }">
-            { errorMessage }
-          </p>
           <p>
           <!--キャンセルボタン-->
           <a href="#config" class="js-btn-cancel topcoat-button--large">{Strings.Pr_BUTTON_CANCEL}</a>
           <!--設定するボタン-->
           <button class="topcoat-button--large js-btn-setting" type="button" onclick="{ onClickUrlSetting }">{Strings.Pr_BUTTON_SETTING}</button>
           </p>
-          <p style="margin-top: 20px"><button id="resetButton" class="js-btn-reset topcoat-button--large" type="button">{Strings.Pr_BUTTON_RESET}</button></p>
+          <p style="margin-top: 20px"><button id="resetButton" class="js-btn-reset topcoat-button--large" type="button" onclick="{ onClickReset }">{Strings.Pr_BUTTON_RESET}</button></p>
         </div>
       </div>
    
@@ -132,6 +134,7 @@
     
     this.on('mount', function() {
       this.$inputConfUrl = document.getElementById('input-config-url');
+      this.$selectConfFile = document.getElementById('select-config-file');
     })
     
     
@@ -159,6 +162,8 @@
        console.log('conf.jsonのURLもローカルのconf.jsonファイルも指定されていません');
        return;
      }
+      
+      this.parent.resetConfigCache();
       
       //リモートのconfigファイルが指定された
       if ( _.isString(this.newUrl) && this.newUrl.match(/^(http|https)/) ) {
@@ -189,6 +194,7 @@
           
           } else {
             riot.route('config');
+            me.update();
           }
         
         
@@ -196,6 +202,15 @@
       
     };
     
+    /**
+     * リセット
+     */
+    onClickReset() {
+      this.parent.trigger('reset');
+      this.errorMessage = '設定をリセットしました';
+      this.$inputConfUrl.value = null;
+      this.$selectConfFile.value = null;
+    }
     
     
     /**

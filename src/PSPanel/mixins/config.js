@@ -21,7 +21,23 @@ riot.mixin('Config', {
      */
     this.conf = require("../conf.json");
     
-
+  },
+  
+  /**
+   * 全てリセット
+   */
+  resetConfig: function() {
+    this.localConfFile = null;
+    this.confCache = null;
+    window.localStorage.clear();
+  },
+  
+  /**
+   * キャッシュだけリセット
+   */
+  resetConfigCache: function() {
+    this.confCache = null;
+    window.localStorage.setItem('com.cyberagent.designmagic:conf.result', '');
   },
   
   /**
