@@ -16,7 +16,8 @@
       BLENDMODE: "BLENDMODE",
       FONT_ABSVALUE: "FONT_ABSVALUE",
       FONT_MINSIZE : "FONT_MINSIZE",
-      FONT_EMPTY : "FONT_EMPTY"
+      FONT_EMPTY : "FONT_EMPTY",
+      EFFECT_UNUSED: "EFFECT_UNUSED"
     };
 
     /**
@@ -62,7 +63,9 @@
         //フォントサイズが整数かどうかチェックする (boolean -> string)
         CONF_FONTS_ABSVALUE = "<%= config.fonts.absValue %>" === 'true',
         //最小サイズ (number)
-        CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>");
+        CONF_FONTS_MINSIZE = parseInt("<%= config.fonts.minSize %>"),
+        //レイヤー効果が未使用か
+        CONF_EFFECT_UNUSED = "<%= config.effects.unused %>" === 'true';
 
     /**
      *
@@ -160,6 +163,21 @@
               //命名
               if ( nameRegex.test(name) && CONF_LAYERS_NAME) {
                 hint.push(VALIDATION_HINT.NONAME);
+              }
+              
+              //レイヤー効果
+              if ( CONF_EFFECT_UNUSED ) {
+            
+                var ref3 = new ActionReference();
+                    ref3.putProperty( charIDToTypeID("Prpr") , stringIDToTypeID( "layerEffects" ));
+                    ref3.putIndex( charIDToTypeID( "Lyr " ), i);
+                var desc2 = executeActionGet(ref3);
+                
+               if ( desc2.hasKey(stringIDToTypeID('layerEffects'))) {
+                  if ( !DM.isLayerFXVisible(i) ) {
+                    hint.push(VALIDATION_HINT.EFFECT_UNUSED);
+                  }
+                }
               }
 
               break;

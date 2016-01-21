@@ -34,8 +34,7 @@
     },
 
     "effects": {
-      "absValue": false,
-      "totalCount": -1
+      "unused": false
     }
   }
 
