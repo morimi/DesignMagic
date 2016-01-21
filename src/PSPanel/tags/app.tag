@@ -56,6 +56,10 @@
     });
     
     
+    this.on('reset', function() {
+      me.resetConfig();
+    });
+    
     /**
      * 保存したとき自動チェック
      * csInterfaceに渡すイベント

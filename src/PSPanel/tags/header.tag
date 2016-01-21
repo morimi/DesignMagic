@@ -51,13 +51,19 @@
       this.parent.update({mode: 'check'})
       location.hash = '#check';
     }
+      
+    this.reset = function() {
+      me.update({errorVal:0, warnVal:0, hiddenVal:0});
+    };
 
     //ドキュメント閉じた時
     //内容のリセットする
-    window.csInterface.addEventListener( 'documentAfterDeactivate' , function() {
-      me.update({errorVal:0, warnVal:0, hiddenVal:0});
-    });
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , this.reset);
     
+    /**
+     * 親のリセットイベント監視
+     */
+    this.parent.on('reset', this.reset);
     
   </script>
 </header>
