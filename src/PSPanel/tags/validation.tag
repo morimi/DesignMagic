@@ -43,6 +43,7 @@
     
     
     var me = this;
+    var app = this.parent;
     
     
     /**
@@ -289,9 +290,6 @@
 
     });
     
-    //ドキュメント閉じた時
-    //内容のリセットする
-    window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
     
     /**
      * appが持ってるconf.jsonを得る
@@ -315,6 +313,104 @@
      */
     this.parent.on('reset', reset);
 
+    //ドキュメント閉じた時
+    //内容のリセットする
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
+     
+    
+    /**
+     * Photoshopイベントコールバック
+     * 引数で渡されるイベントデータに含まれるイベントタイプIDで処理を仕分けている
+     *
+     * delete(1147958304) - レイヤー削除時　エラーメッセージがあれば消す
+     *
+     * 参考：
+     * http://www.davidebarranca.com/2015/09/html-panel-tips-18-photoshop-json-callback/
+     */
+    window.csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, function PhotoshopCallbackUnique(csEvent) {
+      try {
+          if (typeof csEvent.data === "string") {
+            csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
+            
+            switch(csEvent.data.eventID) {
+              case 1147958304: //delete
+                  handleDeleteEvent(csEvent.data.eventData.layerID);
+                break;
+
+//              case 1298866208: //make
+//                  handleMakeEvent(csEvent.data.eventData.layerID);
+//                break;
+            }
+
+          } else {
+              console.log("PhotoshopCallbackUnique expecting string for csEvent.data!");
+          }
+      } catch(e) {
+          console.log("PhotoshopCallbackUnique catch: " + e);
+      }
+    });
+
+    /**
+     * IDで指定したPhotoshop処理にイベントをディスパッチする
+     * イベントIDは Photoshop Javascript Scription Reference の 'Appendix A: Event ID Codes' で確認できる
+     * http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/photoshop/pdfs/photoshop-cc-javascript-ref-2015.pdf
+     *
+     * @param {string} eventStringID 'stringIDToTypeID' に対応したイベントID
+     * @return {void}
+     */
+    function eventRegistering (eventStringID) {
+
+      var event  = new CSEvent("com.adobe.PhotoshopRegisterEvent",
+                               "APPLICATION");
+      event.extensionId = extensionId;
+
+      csInterface.evalScript("app.stringIDToTypeID('" + eventStringID + "')", function (typeID) {
+          event.data = typeID;
+          csInterface.dispatchEvent(event);
+          console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
+      });
+    }
+    
+    
+    /**
+     * Photoshop レイヤー削除イベント時の処理
+     * エラーメッセージから該当するレイヤーIDのメッセージを消す
+     * レイヤーセットを削除したときはIDが渡されない(undefined)ため何も出来ない。。。
+     * @param {?Array.<number>} layerID 削除されたレイヤーID
+     * @return {void}
+     */
+    function handleDeleteEvent (layerID) {
+
+      if ( !layerID.length ) {
+        return;
+      }
+      
+      layerID = layerID[0];
+
+      var i = 0, l = me.layersMes.length;
+      
+      while ( i < l ) {
+        var item = me.layersMes[i];
+
+        if ( item.id === layerID ) {
+
+            me.layersMes.splice(i, 1);
+            l = l-1;
+            i = i-1;
+            //チェック結果のerrorVal, warnValも減らす
+            me.countDownError(item);
+
+        }
+
+        i = i+1|0;
+      }
+      
+      me.update();
+      app.trigger('toolEnd', me.result);
+      
+    }
+
+    eventRegistering('delete'); //1147958304
     
     this.mixin('Validation');
     
