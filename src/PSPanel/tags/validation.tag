@@ -82,6 +82,9 @@
       
       if ( this.processing || this.selectedItem && this.selectedItem.id === item.id ) return;
       
+      //this.processing = true;
+      
+      console.log('onClickMessage');
       
       /**
        * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
@@ -107,9 +110,10 @@
       
       //レイヤーパネルも選択状態にする
       JSXRunner.runJSX("selectLayer", { id: item.id }, function (result) {
-        console.log('End selectLayer', result)
+        console.log('End selectLayer', result);
+        me.processing = false;
       });
-      
+
     };
     
     /**
@@ -133,8 +137,8 @@
      * @param {Object} item メッセージデータ
      */
     messageFilter(item) {
-
-      if (! this.selectedItem ) {
+      
+      if (! me.selectedItem ) {
          return item;
       }
 
@@ -337,9 +341,9 @@
                   handleDeleteEvent(csEvent.data.eventData.layerID);
                 break;
 
-//              case 1298866208: //make
-//                  handleMakeEvent(csEvent.data.eventData.layerID);
-//                break;
+              case 1298866208: //make
+                  handleMakeEvent(csEvent.data.eventData.layerID);
+                break;
             }
 
           } else {
@@ -408,9 +412,76 @@
       me.update();
       app.trigger('toolEnd', me.result);
       
-    }
+    };
+    
+    
+    /**
+     * Photoshop レイヤー作成イベント時の処理
+     * バリデーションリストに命名してくださいメッセージを追加する
+     * レイヤーセットを作成したときはIDが渡されない(undefined)ため何も出来ない。。。
+     * @param {?Array.<number>} layerID 削除されたレイヤーID
+     * @return {void}
+     */
+    function handleMakeEvent(layerID) {
+
+      if ( !layerID) {
+        return;
+      }
+
+      var data = {
+        id: layerID
+      };
+
+      JSXRunner.runJSX("getLayerData", {data: data}, function (result) {
+        //result = {"id": 237, "title": "レイヤー 6", "index": 32, "kind": "LayerKind.NORMAL"}
+        console.log('handleMakeEvent:' + result);
+
+        var obj = me.stringToObject(result);
+        var complete;
+
+        if ( !obj.index ) {
+          return;
+        }
+
+        obj.hint = [{code: 'NONAME', text: me.getValidationMessage('NONAME_LAYERS', 'hint')}];
+        obj.type = 'warn';
+
+
+        if ( !me.layersMes.length ) {
+          me.layersMes.push(obj);
+          me.countUpError(obj);
+          me.update();
+          app.trigger('toolEnd', me.result);
+          return;
+        }
+
+        var i = 0, l = me.layersMes.length;
+
+        while ( i < l && !complete ) {
+          var item = me.layersMes[i];
+
+          if ( item.index < obj.index ) {
+              me.layersMes.splice(i, 0, obj);
+              l = l+1;
+              i = i+1;
+              //チェック結果のerrorVal, warnVal再計算
+              me.countUpError(item);
+              complete = true;
+
+          }
+
+          i = i+1|0;
+        }
+
+        me.update();
+        app.trigger('toolEnd', me.result);
+
+
+      });
+    };
 
     eventRegistering('delete'); //1147958304
+    eventRegistering('make'); //1147958304
     
     this.mixin('Validation');
     
