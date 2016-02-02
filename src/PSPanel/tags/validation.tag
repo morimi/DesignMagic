@@ -5,7 +5,7 @@
     
     <ul id="message-layers" class="list" if="{ layersMes.length }">
       
-       <li class="message" each="{ layersMes.filter(messageFilter) }" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }">
+       <li each="{ layersMes.filter(messageFilter) }" class="message id-{id}" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }" data-index="i">
          <div class="message-wrapper {selected:selected}">
           <p class="message-title">
             <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
@@ -66,12 +66,21 @@
     
     
     /**
+     * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
+     * true: 変更する
+     * @type {boolean}
+     */
+    this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
+    
+    
+    /**
      * バリデーションメッセージがクリックされた時の処理
      * レイヤーパネルも選択状態にする
      * @param {MouseEvent} e イベントオブジェクト
      * @return {void}
      */
     onClickMessage(e) {
+      e.preventDefault();
       
       /**
        * クリックされたメッセージデータ
@@ -82,7 +91,8 @@
       
       if ( this.processing || this.selectedItem && this.selectedItem.id === item.id ) return;
       
-      //this.processing = true;
+      this.processing = true;
+      this.isClickMes = true;
       
       console.log('onClickMessage');
       
@@ -141,13 +151,14 @@
       if (! me.selectedItem ) {
          return item;
       }
-
+      
       //自身のIDと比較して選択状態を変更
       if ( this.selectedItem.id != item.id ) {
         item.selected = false;
         item.changeName = false;
         item.showForm = false;
       }
+
 
       //同じレイヤー名を持つメッセージのIDが発見されたら（オプションでONになってる場合）
       if (this.selectedItem.title == item.title && this.isAllChangeLayerName) {
@@ -344,6 +355,11 @@
               case 1298866208: //make
                   handleMakeEvent(csEvent.data.eventData.layerID);
                 break;
+              case 1936483188: //select
+                if (! me.isClickMes )
+                  handleSlctEvent(csEvent.data.eventData.layerID);
+                  me.isClickMes = false;
+                break;
             }
 
           } else {
@@ -479,9 +495,37 @@
 
       });
     };
+    
+    /**
+     * Photoshop レイヤー選択イベント時の処理
+     * レイヤーパネルで選択されたかどうかの区別をする為に、
+     * messageのonclickイベント時にisClickMesをtrueにしている
+     * @param {?Array.<number>} layerID 選択されたレイヤーID
+     */
+    function handleSlctEvent(layerID) {
+      
+      if ( !me.layersMes.length) {
+        return;
+      }
+      
+      var i = 0, l = me.layersMes.length;
+      
+      while ( i < l ) {
+        var item = me.layersMes[i];
+        if ( layerID.indexOf(item.id) !== -1 ) {
+          item.selected = true;
+          me.selectedItem = item;
+        }
+        
+        i = i+1|0;
+      }
+      
+      me.update();
+    };
 
     eventRegistering('delete'); //1147958304
     eventRegistering('make'); //1147958304
+    eventRegistering('select');
     
     this.mixin('Validation');
     
