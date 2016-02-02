@@ -5,7 +5,7 @@
     
     <ul id="message-layers" class="list" if="{ layersMes.length }">
       
-       <li each="{ layersMes.filter(messageFilter) }" class="message id-{id}" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }" data-index="i">
+       <li each="{ layersMes.filter(messageFilter) }" class="message id-{id}" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }">
          <div class="message-wrapper {selected:selected}">
           <p class="message-title">
             <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
@@ -528,6 +528,12 @@
       
       if ( !me.layersMes.length) {
         return;
+      }
+      
+      var el = document.getElementsByClassName('id-' + layerID);
+      
+      if ( el.item() ) {
+        el.item().scrollIntoView(true);
       }
       
       var i = 0, l = me.layersMes.length;
