@@ -45,6 +45,18 @@
     var me = this;
     var app = this.parent;
     
+    /**
+     * 命名チェックレベル毎の正規表現
+     * 0 : レイヤー、グループ のコピー のみ
+     * 1 : Lv0 + シェイプ
+     * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
+     */
+    var NAME_REGEX = {
+      0 : /<%= Strings.Pr_LAYER_NAME_REGEX_0 %>/,
+      1 : /<%= Strings.Pr_LAYER_NAME_REGEX_1 %>/,
+      2 : /<%= Strings.Pr_LAYER_NAME_REGEX_2 %>/
+    };
+
     
     /**
      * 処理中の場合 true 
@@ -149,7 +161,12 @@
     messageFilter(item) {
       
       if (! me.selectedItem ) {
-         return item;
+        item.selected = false;
+        item.changeName = false;
+        item.showForm = false;
+        item.changeName = false;
+        
+        return item;
       }
       
       //自身のIDと比較して選択状態を変更
@@ -185,6 +202,7 @@
        if ( this.processing ) return;
        
        this.processing = true;
+       this.isClickMes = true;
        
        e.item.changeName = true;
        e.item.showForm = true;
@@ -345,6 +363,7 @@
     window.csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, function PhotoshopCallbackUnique(csEvent) {
       try {
           if (typeof csEvent.data === "string") {
+            
             csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
             
             switch(csEvent.data.eventID) {
@@ -359,6 +378,9 @@
                 if (! me.isClickMes )
                   handleSlctEvent(csEvent.data.eventData.layerID);
                   me.isClickMes = false;
+                break;
+              case 1936028772: //set
+                handleSetEvent(csEvent.data.eventData.to)
                 break;
             }
 
@@ -522,10 +544,54 @@
       
       me.update();
     };
+    
+    /**
+     * Photoshop setイベント時の処理
+     * <to.name> 命名変更
+     *  レイヤー名チェックがtrueになっており、
+     *  命名規則チェックにパスして命名エラー以外のヒントが存在しない場合は
+     *  該当するエラーメッセージを削除する
+     * @param {Object} to  charIDToTypeID( "T   " ) の値
+     */
+    function handleSetEvent(to) {
+      var config = getConfig().check;
+      
+      if ( to.name && me.selectedItem && config.layers.name) {
+        console.log('handleSetEvent:name');
+        
+        if ( ! NAME_REGEX[config.layers.namingLevel].test(to.name) ) {
+          
+          me.selectedItem.title = to.name;
+
+          for(var m = me.selectedItem.hint.length; m--; ) {
+            //命名のヒントを消す
+            if ( me.selectedItem.hint[m].code == 'NONAME' ) {
+              me.selectedItem.hint.splice(m, 1);
+            } 
+          }
+
+          //ヒントが無くなったら削除
+          if ( !me.selectedItem.hint.length ) {
+            var index = me.layersMes.indexOf(me.selectedItem);
+            me.layersMes.splice(index, 1);
+            
+            //チェック結果のerrorVal, warnValも減らす
+            me.countDownError(me.selectedItem);
+            me.selectedItem = null;
+            me.selectedIds.length = 0;
+          }
+          
+          me.update();
+          me.parent.trigger('toolEnd', me.result);
+        }
+      }
+      
+    };
 
     eventRegistering('delete'); //1147958304
     eventRegistering('make'); //1147958304
-    eventRegistering('select');
+    eventRegistering('select');//1936483188
+    eventRegistering('set');//1936028772
     
     this.mixin('Validation');
     
