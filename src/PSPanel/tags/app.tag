@@ -119,6 +119,10 @@
       result.loading = false;
       me.tags.header.update(result);
       me.tags.footer.update(result);
+      
+      // Analytics 送信
+      me.addCount();
+      me.report();
     });
     
     /**
@@ -142,7 +146,7 @@
       me.tags.footer.update(data);
     });
     
-    
     this.mixin('Config');
+    this.mixin('Analytics');
   </script>
 </app>

@@ -1,6 +1,6 @@
 {
   "name": "DesignMagic",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Photoshop 2015 Validator Extension",
   "main": "PSPanel/index.html",
   "scripts": {
@@ -25,7 +25,9 @@
     "handlebars": "^3.0.3",
     "lodash": "^3.10.0",
     "q": "^1.4.1",
-    "riot": "^2.3.12"
+    "riot": "^2.3.12",
+    "xml2js": "^0.4.16",
+    "node-uuid": "^1.4.7"
   },
   "devDependencies": {
     "del": "^2.1.0",
