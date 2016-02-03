@@ -22,7 +22,7 @@
     </ul>
     
     <ul id="message-others" class="list">
-       <li class="validation-info" id="validation_info" if="{ !othersMes.length }"></li>
+       <li class="validation-info" id="validation_info" if="{ !othersMes.length && !layersMes.length }"></li>
        
        <li class="message" each="{ othersMes }" data-type="{ type }" data-id="{ id }" data-index="{ index }" data-hints="{ hintCodes }">
         <div class="message-wrapper">
@@ -44,18 +44,6 @@
     
     var me = this;
     var app = this.parent;
-    
-    /**
-     * 命名チェックレベル毎の正規表現
-     * 0 : レイヤー、グループ のコピー のみ
-     * 1 : Lv0 + シェイプ
-     * 2 : Lv0-1 + 全ての矩形(多角形,楕円形,長方形,角丸長方形)
-     */
-    var NAME_REGEX = {
-      0 : /<%= Strings.Pr_LAYER_NAME_REGEX_0 %>/,
-      1 : /<%= Strings.Pr_LAYER_NAME_REGEX_1 %>/,
-      2 : /<%= Strings.Pr_LAYER_NAME_REGEX_2 %>/
-    };
 
     
     /**
@@ -83,6 +71,14 @@
      * @type {boolean}
      */
     this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
+    
+    
+    /**
+     * メッセージがクリックされたらtrue
+     * PsEventCallback(mixin)のレイヤーパネルクリック判別用
+     * @type {boolean}
+     */
+    this.isClickMes = false;
     
     
     /**
@@ -223,7 +219,7 @@
     
     //初期化時のお知らせメッセージをconf.jsonの読み込み状態に合わせてセットする
     this.setValidationInfo = function () {
-      me.validation_info.innerHTML = getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
+      me.validation_info.innerHTML = this.getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
     };
     
     
@@ -250,7 +246,7 @@
     this.on('update', function(opt) {
       
       //実行を手動updateに限定する
-      if ( getConfig() && (opt && opt.mode === 'check') ) {
+      if ( this.getConfig() && (opt && opt.mode === 'check') ) {
        console.log('<validation> on update...checkExecute');
         
         //レイヤーパネルの選択状態を解除
@@ -263,7 +259,7 @@
        this.selectedItem = null;
        this.selectedIds.length = 0;
         
-       this.checkExecute(getConfig());
+       this.checkExecute(this.getConfig());
       }
     
     });
@@ -327,8 +323,8 @@
     /**
      * appが持ってるconf.jsonを得る
      */
-    function getConfig() {
-      return me.parent.confCache;
+    this.getConfig = function() {
+      return this.parent.confCache;
     }
     
     //リセット
@@ -349,257 +345,11 @@
     //ドキュメント閉じた時
     //内容のリセットする
     window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
-     
-    
-    /**
-     * Photoshopイベントコールバック
-     * 引数で渡されるイベントデータに含まれるイベントタイプIDで処理を仕分けている
-     *
-     * delete(1147958304) - レイヤー削除時　エラーメッセージがあれば消す
-     *
-     * 参考：
-     * http://www.davidebarranca.com/2015/09/html-panel-tips-18-photoshop-json-callback/
-     */
-    window.csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + extensionId, function PhotoshopCallbackUnique(csEvent) {
-      try {
-          if (typeof csEvent.data === "string") {
-            
-            csEvent.data = JSON.parse(csEvent.data.replace("ver1,{", "{"));
-            
-            switch(csEvent.data.eventID) {
-              case 1147958304: //delete
-                  handleDeleteEvent(csEvent.data.eventData.layerID);
-                break;
-
-              case 1298866208: //make
-                  handleMakeEvent(csEvent.data.eventData.layerID);
-                break;
-              case 1936483188: //select
-                if (! me.isClickMes )
-                  handleSlctEvent(csEvent.data.eventData.layerID);
-                  me.isClickMes = false;
-                break;
-              case 1936028772: //set
-                handleSetEvent(csEvent.data.eventData.to)
-                break;
-            }
-
-          } else {
-              console.log("PhotoshopCallbackUnique expecting string for csEvent.data!");
-          }
-      } catch(e) {
-          console.log("PhotoshopCallbackUnique catch: " + e);
-      }
-    });
-
-    /**
-     * IDで指定したPhotoshop処理にイベントをディスパッチする
-     * イベントIDは Photoshop Javascript Scription Reference の 'Appendix A: Event ID Codes' で確認できる
-     * http://wwwimages.adobe.com/content/dam/Adobe/en/devnet/photoshop/pdfs/photoshop-cc-javascript-ref-2015.pdf
-     *
-     * @param {string} eventStringID 'stringIDToTypeID' に対応したイベントID
-     * @return {void}
-     */
-    function eventRegistering (eventStringID) {
-
-      var event  = new CSEvent("com.adobe.PhotoshopRegisterEvent",
-                               "APPLICATION");
-      event.extensionId = extensionId;
-
-      csInterface.evalScript("app.stringIDToTypeID('" + eventStringID + "')", function (typeID) {
-          event.data = typeID;
-          csInterface.dispatchEvent(event);
-          console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
-      });
-    }
-    
-    
-    /**
-     * Photoshop レイヤー削除イベント時の処理
-     * エラーメッセージから該当するレイヤーIDのメッセージを消す
-     * レイヤーセットを削除したときはIDが渡されない(undefined)ため何も出来ない。。。
-     * @param {?Array.<number>} layerID 削除されたレイヤーID
-     * @return {void}
-     */
-    function handleDeleteEvent (layerID) {
-
-      if ( !layerID.length ) {
-        return;
-      }
-      
-      layerID = layerID[0];
-
-      var i = 0, l = me.layersMes.length;
-      
-      while ( i < l ) {
-        var item = me.layersMes[i];
-
-        if ( item.id === layerID ) {
-
-            me.layersMes.splice(i, 1);
-            l = l-1;
-            i = i-1;
-            //チェック結果のerrorVal, warnValも減らす
-            me.countDownError(item);
-
-        }
-
-        i = i+1|0;
-      }
-      
-      me.update();
-      app.trigger('toolEnd', me.result);
-      
-    };
-    
-    
-    /**
-     * Photoshop レイヤー作成イベント時の処理
-     * バリデーションリストに命名してくださいメッセージを追加する
-     * レイヤーセットを作成したときはIDが渡されない(undefined)ため何も出来ない。。。
-     * @param {?Array.<number>} layerID 削除されたレイヤーID
-     * @return {void}
-     */
-    function handleMakeEvent(layerID) {
-
-      if ( !layerID) {
-        return;
-      }
-
-      var data = {
-        id: layerID
-      };
-
-      JSXRunner.runJSX("getLayerData", {data: data}, function (result) {
-        //result = {"id": 237, "title": "レイヤー 6", "index": 32, "kind": "LayerKind.NORMAL"}
-        console.log('handleMakeEvent:' + result);
-
-        var obj = me.stringToObject(result);
-        var complete;
-
-        if ( !obj.index ) {
-          return;
-        }
-
-        obj.hint = [{code: 'NONAME', text: me.getValidationMessage('NONAME_LAYERS', 'hint')}];
-        obj.type = 'warn';
 
 
-        if ( !me.layersMes.length ) {
-          me.layersMes.push(obj);
-          me.countUpError(obj);
-          me.update();
-          app.trigger('toolEnd', me.result);
-          return;
-        }
-
-        var i = 0, l = me.layersMes.length;
-
-        while ( i < l && !complete ) {
-          var item = me.layersMes[i];
-
-          if ( item.index < obj.index ) {
-              me.layersMes.splice(i, 0, obj);
-              l = l+1;
-              i = i+1;
-              //チェック結果のerrorVal, warnVal再計算
-              me.countUpError(item);
-              complete = true;
-
-          }
-
-          i = i+1|0;
-        }
-
-        me.update();
-        app.trigger('toolEnd', me.result);
-
-
-      });
-    };
-    
-    /**
-     * Photoshop レイヤー選択イベント時の処理
-     * レイヤーパネルで選択されたかどうかの区別をする為に、
-     * messageのonclickイベント時にisClickMesをtrueにしている
-     * @param {?Array.<number>} layerID 選択されたレイヤーID
-     */
-    function handleSlctEvent(layerID) {
-      
-      if ( !me.layersMes.length) {
-        return;
-      }
-      
-      var el = document.getElementsByClassName('id-' + layerID);
-      
-      if ( el.item() ) {
-        el.item().scrollIntoView(true);
-      }
-      
-      var i = 0, l = me.layersMes.length;
-      
-      while ( i < l ) {
-        var item = me.layersMes[i];
-        if ( layerID.indexOf(item.id) !== -1 ) {
-          item.selected = true;
-          me.selectedItem = item;
-        }
-        
-        i = i+1|0;
-      }
-      
-      me.update();
-    };
-    
-    /**
-     * Photoshop setイベント時の処理
-     * <to.name> 命名変更
-     *  レイヤー名チェックがtrueになっており、
-     *  命名規則チェックにパスして命名エラー以外のヒントが存在しない場合は
-     *  該当するエラーメッセージを削除する
-     * @param {Object} to  charIDToTypeID( "T   " ) の値
-     */
-    function handleSetEvent(to) {
-      var config = getConfig().check;
-      
-      if ( to.name && me.selectedItem && config.layers.name) {
-        console.log('handleSetEvent:name');
-        
-        if ( ! NAME_REGEX[config.layers.namingLevel].test(to.name) ) {
-          
-          me.selectedItem.title = to.name;
-
-          for(var m = me.selectedItem.hint.length; m--; ) {
-            //命名のヒントを消す
-            if ( me.selectedItem.hint[m].code == 'NONAME' ) {
-              me.selectedItem.hint.splice(m, 1);
-            } 
-          }
-
-          //ヒントが無くなったら削除
-          if ( !me.selectedItem.hint.length ) {
-            var index = me.layersMes.indexOf(me.selectedItem);
-            me.layersMes.splice(index, 1);
-            
-            //チェック結果のerrorVal, warnValも減らす
-            me.countDownError(me.selectedItem);
-            me.selectedItem = null;
-            me.selectedIds.length = 0;
-          }
-          
-          me.update();
-          me.parent.trigger('toolEnd', me.result);
-        }
-      }
-      
-    };
-
-    eventRegistering('delete'); //1147958304
-    eventRegistering('make'); //1147958304
-    eventRegistering('select');//1936483188
-    eventRegistering('set');//1936028772
     
     this.mixin('Validation');
+    this.mixin('PsEventCallback');
     
   </script>
 
