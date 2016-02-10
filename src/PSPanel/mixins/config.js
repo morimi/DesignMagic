@@ -77,7 +77,7 @@ riot.mixin('Config', {
       
       console.info('[loadConfig] URL and local file was not found.');
       me.trigger('message', Strings.Pr_MESSAGE_NOT_SETTING_FILE);
-      d.resolve(null);
+      d.resolve(this.conf);
 
     //キャッシュあった
     } else if ( this.confCache && this.confCache.url === url ) {
