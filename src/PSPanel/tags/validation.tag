@@ -346,6 +346,7 @@
     //内容のリセットする
     window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
 
+    
 
     
     this.mixin('Validation');

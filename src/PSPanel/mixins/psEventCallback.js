@@ -19,15 +19,34 @@ riot.mixin('PsEventCallback', {
   
   init: function() {
     
-    //イベントコールバック
-    window.csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + window.extensionId, this.photoshopCallbackUnique);
-    
-    //イベントディスパッチ
+    this.psEventRegistering('make');
     this.psEventRegistering('delete'); //1147958304
-    this.psEventRegistering('make'); //1147958304
     this.psEventRegistering('select');//1936483188
     this.psEventRegistering('set');//1936028772
     
+  },
+  
+  registerEvent: function(typeID, unRegister) {
+    var eventEnding = null;  
+    if (unRegister) {  
+      console.log('UnRegistering ' + typeID);  
+      eventEnding = 'PhotoshopUnRegisterEvent';  
+      window.csInterface.removeEventListener('com.adobe.PhotoshopJSONCallback' + window.extensionId, this.photoshopCallbackUnique);  
+    } else {  
+      console.log('Registering ' + typeID);  
+      eventEnding = 'PhotoshopRegisterEvent';  
+      window.csInterface.addEventListener("com.adobe.PhotoshopJSONCallback" + window.extensionId, this.photoshopCallbackUnique);  
+    }  
+
+    var event = new CSEvent(  
+      "com.adobe." + eventEnding,  
+      "APPLICATION",  
+      applicationId,  
+      extensionId  
+    );  
+
+    event.data = typeID;  
+    csInterface.dispatchEvent(event);  
   },
           
   /**
@@ -87,10 +106,12 @@ riot.mixin('PsEventCallback', {
     event.extensionId = this.extensionId;
 
     csInterface.evalScript("app.stringIDToTypeID('" + eventStringID + "')", function (typeID) {
-        event.data = typeID;
-        csInterface.dispatchEvent(event);
-        console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
-    });
+        
+      this.registerEvent(typeID, true);  // unRegister (just in case)  
+      this.registerEvent(typeID, false); // Register  
+      
+      //console.log("Dispatched Event " + eventStringID + '(' + typeID + ')');
+    }.bind(this));
   },
   
   /**
@@ -157,6 +178,7 @@ riot.mixin('PsEventCallback', {
     if ( !layerID) {
       return;
     }
+  
 
     var data = {
       id: layerID

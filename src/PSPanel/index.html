@@ -23,6 +23,7 @@
     window.csInterface = new CSInterface();
     window.localeStrings = csInterface.initResourceBundle();
     window.extensionId =  csInterface.getExtensionID();
+    window.applicationId = csInterface.getApplicationID();  
     
     //Modules
     window._           = require("lodash"),
