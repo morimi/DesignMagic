@@ -5,7 +5,7 @@
     
     <ul id="message-layers" class="list" if="{ layersMes.length }">
       
-       <li class="message" each="{ layersMes.filter(messageFilter) }" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }">
+       <li each="{ layersMes.filter(messageFilter) }" class="message id-{id}" onclick="{ onClickMessage }" ondblclick="{ onDblClickMessage }">
          <div class="message-wrapper {selected:selected}">
           <p class="message-title">
             <img riot-src="images/icon/{ theme }/{ type }.png" width="14" height="14" class="icon { type } alert">
@@ -22,7 +22,7 @@
     </ul>
     
     <ul id="message-others" class="list">
-       <li class="validation-info" id="validation_info" if="{ !othersMes.length }"></li>
+       <li class="validation-info" id="validation_info" if="{ !othersMes.length && !layersMes.length }"></li>
        
        <li class="message" each="{ othersMes }" data-type="{ type }" data-id="{ id }" data-index="{ index }" data-hints="{ hintCodes }">
         <div class="message-wrapper">
@@ -43,7 +43,8 @@
     
     
     var me = this;
-    
+    var app = this.parent;
+
     
     /**
      * 処理中の場合 true 
@@ -65,12 +66,29 @@
     
     
     /**
+     * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
+     * true: 変更する
+     * @type {boolean}
+     */
+    this.isAllChangeLayerName = window.localStorage.getItem('com.cyberagent.designmagic:nameChangeAll') === 'true';
+    
+    
+    /**
+     * メッセージがクリックされたらtrue
+     * PsEventCallback(mixin)のレイヤーパネルクリック判別用
+     * @type {boolean}
+     */
+    this.isClickMes = false;
+    
+    
+    /**
      * バリデーションメッセージがクリックされた時の処理
      * レイヤーパネルも選択状態にする
      * @param {MouseEvent} e イベントオブジェクト
      * @return {void}
      */
     onClickMessage(e) {
+      e.preventDefault();
       
       /**
        * クリックされたメッセージデータ
@@ -81,6 +99,10 @@
       
       if ( this.processing || this.selectedItem && this.selectedItem.id === item.id ) return;
       
+      this.processing = true;
+      this.isClickMes = true;
+      
+      console.log('onClickMessage');
       
       /**
        * 同じレイヤー名がほかに存在する時まとめて変更するかどうか
@@ -106,9 +128,10 @@
       
       //レイヤーパネルも選択状態にする
       JSXRunner.runJSX("selectLayer", { id: item.id }, function (result) {
-        console.log('End selectLayer', result)
+        console.log('End selectLayer', result);
+        me.processing = false;
       });
-      
+
     };
     
     /**
@@ -132,17 +155,23 @@
      * @param {Object} item メッセージデータ
      */
     messageFilter(item) {
-
-      if (! this.selectedItem ) {
-         return item;
+      
+      if (! me.selectedItem ) {
+        item.selected = false;
+        item.changeName = false;
+        item.showForm = false;
+        item.changeName = false;
+        
+        return item;
       }
-
+      
       //自身のIDと比較して選択状態を変更
       if ( this.selectedItem.id != item.id ) {
         item.selected = false;
         item.changeName = false;
         item.showForm = false;
       }
+
 
       //同じレイヤー名を持つメッセージのIDが発見されたら（オプションでONになってる場合）
       if (this.selectedItem.title == item.title && this.isAllChangeLayerName) {
@@ -169,6 +198,7 @@
        if ( this.processing ) return;
        
        this.processing = true;
+       this.isClickMes = true;
        
        e.item.changeName = true;
        e.item.showForm = true;
@@ -189,7 +219,7 @@
     
     //初期化時のお知らせメッセージをconf.jsonの読み込み状態に合わせてセットする
     this.setValidationInfo = function () {
-      me.validation_info.innerHTML = getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
+      me.validation_info.innerHTML = this.getConfig() ? Strings.Pr_READY_TO_VALIDATION : Strings.Pr_SETTING_TO_URL;
     };
     
     
@@ -216,7 +246,7 @@
     this.on('update', function(opt) {
       
       //実行を手動updateに限定する
-      if ( getConfig() && (opt && opt.mode === 'check') ) {
+      if ( this.getConfig() && (opt && opt.mode === 'check') ) {
        console.log('<validation> on update...checkExecute');
         
         //レイヤーパネルの選択状態を解除
@@ -229,7 +259,7 @@
        this.selectedItem = null;
        this.selectedIds.length = 0;
         
-       this.checkExecute(getConfig());
+       this.checkExecute(this.getConfig());
       }
     
     });
@@ -289,15 +319,12 @@
 
     });
     
-    //ドキュメント閉じた時
-    //内容のリセットする
-    window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
     
     /**
      * appが持ってるconf.jsonを得る
      */
-    function getConfig() {
-      return me.parent.confCache;
+    this.getConfig = function() {
+      return this.parent.confCache;
     }
     
     //リセット
@@ -315,8 +342,15 @@
      */
     this.parent.on('reset', reset);
 
+    //ドキュメント閉じた時
+    //内容のリセットする
+    window.csInterface.addEventListener( 'documentAfterDeactivate' , reset);
+
+    
+
     
     this.mixin('Validation');
+    this.mixin('PsEventCallback');
     
   </script>
 

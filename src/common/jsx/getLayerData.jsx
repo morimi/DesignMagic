@@ -1,6 +1,6 @@
 /**
  * @fileoverview 渡されたIDを元にレイヤー/グループ名の情報を返す
- * 得られる情報は、レイヤー名、itemIndex、前にあるレイヤーのID、後ろにあるレイヤーのID
+ * 得られる情報は、{"id": 237, "title": "レイヤー 6", "index": 32, "kind": "LayerKind.NORMAL"}
  * @since version 0.4.0
  */
 
@@ -13,23 +13,12 @@
 
       ref.putIdentifier(charIDToTypeID("Lyr "), parseInt("<%= data.id %>"));
       var desc = executeActionGet(ref);
-//      var desc2 = new ActionDescriptor();
-//      var ref2 = new ActionReference();
-//      ref2.putEnumerated( charIDToTypeID( "Lyr " ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Prvs" ) );
-//      desc2.putReference( charIDToTypeID( "T   " ), ref2 );
-//
-//      var desc3 = new ActionDescriptor();
-//      var ref3 = new ActionReference();
-//      ref3.putEnumerated( charIDToTypeID( "Lyr " ), charIDToTypeID( "Ordn" ), charIDToTypeID( "Nxt " ) );
-//      desc3.putReference( charIDToTypeID( "T   " ), ref3 );
 
       return {
         id: desc.getInteger( stringIDToTypeID( "layerID" ) ),
         name: desc.getString(charIDToTypeID( "Nm  " )),
         index: desc.getInteger( charIDToTypeID( 'ItmI' ) ),
-        kind: getLayerKind(desc),
-       // prev: executeActionGet(ref2).getInteger( stringIDToTypeID( "layerID" ) ),
-        //next: executeActionGet(ref3).getInteger( stringIDToTypeID( "layerID" ) )
+        kind: getLayerKind(desc)
       };
 
     }
@@ -74,7 +63,7 @@
 
     var d = getLayerData();
 
-    return '{id: "' + d.id + '", title: "' + d.name + '", index: "' + d.index + '", kind: "' + d.kind + '"}';
+    return '{"id": ' + d.id + ', "title": "' + d.name + '", "index": ' + d.index + ', "kind": "' + d.kind + '"}';
 
   }
 

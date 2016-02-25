@@ -47,14 +47,14 @@
         <dt>{Strings.Pr_CONFIG_OPTION}</dt>
         <dd>
           <label class="topcoat-checkbox">
-            <input type="checkbox" class="js-is-autocheck" onchange="{ onChangeAutoSave }" checked="{ isAutoCheck }">
+            <input type="checkbox" class="js-is-autocheck" onchange="{ onChangeAutoSave }" __checked="{ isAutoCheck }">
             <div class="topcoat-checkbox__checkmark"></div>
             {Strings.Pr_CONFIG_OPTION_AUTOSAVE}
           </label>
         </dd>
         <dd>
           <label class="topcoat-checkbox">
-            <input type="checkbox" class="js-nameChangeAll" onchange="{ onChangeNameAll }" checked="{ isNameChangeAll }">
+            <input type="checkbox" class="js-nameChangeAll" onchange="{ onChangeNameAll }" __checked="{ isNameChangeAll }">
             <div class="topcoat-checkbox__checkmark"></div>
             同じ名前のレイヤー/グループを全て変更対象にする
           </label>

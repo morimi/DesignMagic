@@ -11,19 +11,11 @@
 
     if (documents.length !== 0 ) {
       
-      var desc = new ActionDescriptor();
-      var ref = new ActionReference();
-      var list = new ActionList();
       var id = parseInt("<%= id %>");
 
-      ref.putIdentifier( charIDToTypeID("Lyr "), id );
-      desc.putReference( charIDToTypeID( "null" ), ref );
-      desc.putBoolean( charIDToTypeID( "MkVs" ), false );
+      DM.selectLayerById(id)
 
-      list.putInteger( id );
-      desc.putList( charIDToTypeID( "LyrI" ), list );
-      executeAction(  charIDToTypeID( "slct" ), desc, DialogModes.NO );
-      
+
       return '{"status": 200}';
       
     } else {
