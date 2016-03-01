@@ -1,13 +1,13 @@
 /**
  * @fileoverview バリデーション機能を集約したミックスイン
- * 
+ *
  * カスタムイベント
  * validationStart - チェック開始時に発火する。
  * validationEnd - チェック完了時に発火する。引数で結果オブジェクトを渡す
  *
  */
 
-riot.mixin('Validation', { 
+riot.mixin('Validation', {
   /**
    * 単位
    * @const
@@ -21,11 +21,11 @@ riot.mixin('Validation', {
     POINTS: 'pt',
     PIXELS: 'px'
   },
-  
-  
+
+
   init: function() {
       console.log('init validation.js')
-    
+
     /**
      * 結果
      */
@@ -36,51 +36,51 @@ riot.mixin('Validation', {
       lv: 0,
       time: null
     };
-    
+
     /**
      * 処理中フラグ
      * @type {boolean}
      */
     this.prosessing = false;
-    
-    
+
+
     /**
      * check後のメッセージ総数
      */
     this.layersMesNum = 0;
-    
+
     /**
      * checkLayersのメッセージ
      * @type {Array.<Object>}
      */
     this.layersMes = [];
-    
-    
+
+
     /**
      * checkLayers以外のメッセージ
      * @type {Array.<Object>}
      */
     this.othersMes = [];
-    
-    
-    /** 
+
+
+    /**
      * 結果文字列一時保存先
      */
     this.cache = {};
 
     /**
      * 結果文字列をObject変換したものをプールする
-     */ 
+     */
     this.pool = {};
-    
+
   },
-  
-  
+
+
   /**
    * 結果のリセット
    */
   resetResult: function() {
-    
+
     this.result.errorVal = 0;
     this.result.warnVal = 0;
     this.result.hiddenVal = 0;
@@ -90,9 +90,9 @@ riot.mixin('Validation', {
     this.layersMes.length = 0;
     this.othersMes.length = 0;
     this.layersMesNum = 0;
-    
+
   },
-  
+
 
   /**
    * バリデーション実行
@@ -107,9 +107,9 @@ riot.mixin('Validation', {
     }
 
     console.info('check start ٩(ˊᗜˋ*)و');
-    
+
     me.trigger('validationStart');
-    
+
     this.resetResult();
 
     this.prosessing = true;
@@ -124,38 +124,38 @@ riot.mixin('Validation', {
      .then(this.checkLayers)
      .done(function() {
       console.info('check completed ٩(ˊᗜˋ*)و');
-      
+
       me.result.time = startTime - Date.now();
       me.result.message = me.getResultMessage(me.result);
-      
+
       me.trigger('validationEnd', me.result);
-      
+
       me.update();
-      
+
       me.prosessing = false;
     })
   },
-  
-  
+
+
   /**
    * 結果用メッセージを得る
    * @param {Object} r Result variable object
    * @return {string}
    */
   getResultMessage: function(r) {
-        
+
     if ( r.errorVal > 0 ) {
       //エラーの内容を確認してください
       return Strings.Pr_MESSAGE_CHECK_ERROR;
-      
+
     } else if (r.warnVal > 0) {
       //いくつか注意点があるようです
       return Strings.Pr_MESSAGE_CHECK_WARN;
-      
+
     } else {
       return Strings.Pr_MESSAGE_CHECK_SUCCESS;
     }
-    
+
   },
 
 
@@ -170,7 +170,7 @@ riot.mixin('Validation', {
     if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal + 1|0;
     //h = h+1|0;
   },
-  
+
 
   /**
    * エラー・注意のカウントダウン
@@ -182,8 +182,8 @@ riot.mixin('Validation', {
     if ( obj.type == 'warn' )  this.result.warnVal = this.result.warnVal - 1|0;
     //h = h+1|0;
   },
-  
-  
+
+
   /**
   * string を テンプレート用のobjectに変換する
   * UIテーマ(dark, light)を追加する
@@ -192,39 +192,40 @@ riot.mixin('Validation', {
   * @return {Object}
   */
   stringToObject: function(str) {
+
       var obj = JSON.parse(str) || {};
-    
+
       obj.theme = themeManager.getThemeColorType();
 
       return obj;
   },
-  
+
   /**
    * 結果の文字列をオブジェクト化して返す
    * 結果が同じ場合は保管してあるオブジェクトを返す
    */
   getResultObject: function(name, result) {
     var obj;
-    
+
     //レイヤーは物量多いのでスルー
     if ( name == 'checkLayers' ) {
-      
+
       obj = this.stringToObject(result);
-    
+
     //前回チェックと同じ結果である場合
     } else if ( this.cache[name] && this.cache[name] === result ) {
       obj = this.pool[name]; //プールから再利用
-      
+
     } else { //結果が無いか違う場合は新規作成して保管
       delete this.cache[name];
       delete this.pool[name];
-      
+
       obj = this.stringToObject(result);
-      
+
       this.pool[name] = obj;
       this.cache[name] = result;
     }
-    
+
     return obj;
   },
 
@@ -238,7 +239,7 @@ riot.mixin('Validation', {
     return Strings['Pr_' + type.toUpperCase() + '_' + rule];
   },
 
-  
+
   /**
    * 単位チェック
    * @param {Object} c config data object
@@ -250,9 +251,9 @@ riot.mixin('Validation', {
     if (c.check.config.rulerUnits || c.check.config.typeUnits) {
 
       JSXRunner.runJSX("checkUnits", {config: c.check.config}, function (result) {
-      
+
         var obj = me.getResultObject('checkUnits', result);
-        
+
         if (obj.status === 200 && obj.list) {
 
           _.each(obj.list, function(r, i) {
@@ -283,8 +284,8 @@ riot.mixin('Validation', {
     return d.promise;
 
   }
-  
-  
+
+
   /**
    * ドキュメントモードのチェック
    * @param {Object} c config data object
@@ -292,20 +293,20 @@ riot.mixin('Validation', {
   ,checkDocumentMode: function(c) {
     var me = this;
     var d = Q.defer();
-    
+
     if (c.check.config.documentMode) {
 
       JSXRunner.runJSX("checkDocumentMode", {config: c.check.config}, function (result) {
 
         var obj = me.getResultObject('checkDocumentMode', result);
-        
+
         if (obj.status === 200) {
           obj.value = obj.value.replace("DocumentMode.","");
 
           if ( obj.type === 'error' ) {
             obj.hint = [Strings.formatStr(me.getValidationMessage('DOCUMENTMODE', 'hint'), c.check.config.documentModeType)];
           }
-          
+
           obj.title = Strings.formatStr(me.getValidationMessage('DOCUMENTMODE', obj.type), obj.value);
 
           me.countUpError(obj);
@@ -316,7 +317,7 @@ riot.mixin('Validation', {
         } else {
           d.resolve(c);
         }
-        
+
       });
 
     } else {
@@ -327,7 +328,7 @@ riot.mixin('Validation', {
 
     return d.promise;
   }
-  
+
   /**
    * ファイル名チェック
    * @param {Object} c config data object
@@ -340,7 +341,7 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkFileName", {config: c.check.files}, function (result) {
 
         var obj = me.getResultObject('checkFileName', result);
-        
+
         if (obj.status === 200) {
 
           obj.title = me.getValidationMessage('DOCUMENTNAME', obj.type);
@@ -364,8 +365,8 @@ riot.mixin('Validation', {
     return d.promise;
 
   }
-  
-  
+
+
   /**
    * ファイルサイズのチェック
    */
@@ -378,7 +379,7 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkFileSize", {config: c.check.files}, function (result) {
 
         var obj = me.getResultObject('checkFileSize', result);
-        
+
         if (obj.status === 200) {
 
           obj.title = Strings.formatStr(me.getValidationMessage('FILESIZE', obj.type), obj.value, obj.limit);
@@ -403,7 +404,7 @@ riot.mixin('Validation', {
 
     return d.promise;
   }
-  
+
   /**
    * レイヤーカンプのチェック
    */
@@ -416,7 +417,7 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkLayerComps", {config: c.check.files}, function (result) {
 
         var obj = me.getResultObject('checkLayerComps', result);
-        
+
         if (obj.status === 200) {
 
           obj.title = [Strings.formatStr(me.getValidationMessage('LAYERCOMPS', obj.type), obj.value)];
@@ -440,7 +441,7 @@ riot.mixin('Validation', {
 
     return d.promise;
   }
-  
+
   /**
    * Ratioのチェック
    */
@@ -453,7 +454,7 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkDocumentRatio", {config: c.check.files}, function (result) {
 
         var obj = me.getResultObject('checkDocumentRatio', result);
-        
+
         if (obj.status === 200) {
           var unit =  me.UNITS_LABEL[c.check.config.rulerUnitsType];
           obj.title = me.getValidationMessage('DOCUMENTRATIO', obj.type, obj.value);
@@ -476,7 +477,7 @@ riot.mixin('Validation', {
 
     return d.promise;
   }
-  
+
   /**
    * レイヤーのチェック
    */
@@ -489,19 +490,19 @@ riot.mixin('Validation', {
       JSXRunner.runJSX("checkLayers", {config: c.check, Strings: Strings}, function (result) {
 
         var r = me.getResultObject('checkLayers', result);
-        
+
         if ( ! r.list || r.value === 404 ) {
           return d.resolve(c);
         }
-        
+
         if ( _.isArray(r.list) && r.list.length ) {
           var i = r.list.length-1;
           var minSize = c.check.fonts.minSize;
           var unitsLabel = me.UNITS_LABEL[c.check.config.rulrUnitsType];
-          
+
           while( i > -1 ) {
             var obj = r.list[i];
-            
+
             obj.hintCodes = obj.hint.join(',');
             obj.theme = r.theme;
 
@@ -520,13 +521,13 @@ riot.mixin('Validation', {
 
             me.countUpError(obj);
             me.layersMes.push(obj);
-            
+
             i = (i-1)|0;
           }
         }
-        
+
         me.result.hiddenVal = r.hidden;
-        
+
         d.resolve(c);
       });
 

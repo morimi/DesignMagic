@@ -67,19 +67,19 @@ function _evalJSX(script, callback, optScriptName) {
           // 返却値に {type:"jsx", message:message, status: 500} が存在する場合はログに出力する。(jsxでエラーが発生した場合の処理)
           if (arguments[0] != "EvalScript error.") {
             try {
-              if (arguments[0].indexOf('{ "type": "jsx"') !== -1) {
-                
+              if (arguments[0].indexOf('"status": 500') !== -1) {
+
                 var obj = JSON.parse(arguments[0]);
-                
-                console.log('[jsx error - ' + optScriptName + '] ' + obj.message);
-                
+
+                console.error('[jsx error - ' + optScriptName + '] ' + obj.message);
+
                 arguments[0] = null; //エラー用データを破棄
               }
             } catch(e) {
               // obj.type が undefined というエラーが表示されるので握りつぶす.
             }
           }
-          
+
           if (callback) callback.apply(self, arguments);
         });
     });
@@ -96,7 +96,7 @@ function _evalJSX(script, callback, optScriptName) {
 function runJSX(scriptName, data, callback) {
     var template = _getJSXTemplate(scriptName),
         rendered = template(data);
-  
+
     _evalJSX(rendered, callback, scriptName);
 }
 

@@ -3,9 +3,9 @@
  */
 
 (function() {
-  
+
   try {
-    
+
     var SELECTED_LAYER = activeDocument.activeLayer;
 
     /**
@@ -160,19 +160,22 @@
 
             default:
 
+              //trim()
+              name = name.replace(/^\s+|\s+$/g,'');
+
               //命名
               if ( nameRegex.test(name) && CONF_LAYERS_NAME) {
                 hint.push(VALIDATION_HINT.NONAME);
               }
-              
+
               //レイヤー効果
               if ( CONF_EFFECT_UNUSED ) {
-            
+
                 var ref3 = new ActionReference();
                     ref3.putProperty( charIDToTypeID("Prpr") , stringIDToTypeID( "layerEffects" ));
                     ref3.putIndex( charIDToTypeID( "Lyr " ), i);
                 var desc2 = executeActionGet(ref3);
-                
+
                if ( desc2.hasKey(stringIDToTypeID('layerEffects'))) {
                   if ( !DM.isLayerFXVisible(i) ) {
                     hint.push(VALIDATION_HINT.EFFECT_UNUSED);
@@ -201,7 +204,7 @@
           }
 
         }//if
-        
+
         desc = null;
         ref2 = null;
 
