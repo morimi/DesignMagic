@@ -22,7 +22,7 @@
           l = DM.getNumberOfLayers();
 
       //処理ここから
-      while ( i < l ) {
+      while ( i <= l ) {
         var ref = new ActionReference();
             ref.putIndex( charIDToTypeID( "Lyr " ), i);
         var desc = executeActionGet(ref);
