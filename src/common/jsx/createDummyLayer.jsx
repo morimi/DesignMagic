@@ -11,13 +11,14 @@ try {
   var _width = 100;
   var _height = 100;
   var _name = _width + 'x' + _height + 'px';
+  var _rayout = 1; //width x height
   var _bgColor = "989ea9";
   var _textColor = "000000";
   var _fontStyle = 'ArialMT';
   var _shapeId;
   var _layerRef;
   var _resultValue;
-  
+
   var _origUnit = preferences.rulerUnits;
 
   //backgroundColor(0～255)
@@ -99,7 +100,7 @@ try {
   function to255(num) {
     return Math.round((num / 10) * 255);
   }
-  
+
 
   /**
    * レイヤー名を変更する
@@ -137,11 +138,11 @@ try {
         f = Math.round(16 * r);
     return ( 30 < f ) ? 30 : (( f < 10 ) ? 10 : f);
   }
-  
-  
+
+
   function cTID(s) { return app.charIDToTypeID(s); };
   function sTID(s) { return app.stringIDToTypeID(s); };
-  
+
   /////////////////////////////////
 
   /**
@@ -165,7 +166,6 @@ try {
     var widthText = widthGroup.add("edittext", undefined, "100");
     widthText.preferredSize.width = 50;
 
-
     var markGroup = sizePanel.add("group");
     markGroup.orientation = "row";
     markGroup.alignChildren = "center";
@@ -178,6 +178,20 @@ try {
     heightGroup.add("statictext", undefined, "高さ");
     var heightText = heightGroup.add("edittext", undefined, "100");
     heightText.preferredSize.width = 50;
+
+
+    var sizeRayoutPanel = win.add("panel", undefined, "サイズの表記");
+    sizeRayoutPanel.orientation = "row";
+
+    //表記選択ラジオボタン
+	var sss = sizeRayoutPanel.add("group");
+    sss.orientation = "row";
+    sss.alignment ="center";
+
+	var sss1 = sss.add("radiobutton", undefined, "幅x高さ");
+	var sss2 = sss.add("radiobutton", undefined, "幅のみ");
+	var sss3 = sss.add("radiobutton", undefined, "高さのみ");
+	sss1.value = true;
 
 
     //カラー設定
@@ -275,10 +289,35 @@ try {
       }
     };
 
+
+    var changeSize = function () {
+      if (sss1.value) {
+        prevGroup2.children[0].text = 'W' + widthText.text + 'xH' + heightText.text + 'px';
+      }
+
+      if (sss2.value) {
+        prevGroup2.children[0].text = 'W' + widthText.text + 'px';
+      }
+
+      if (sss3.value) {
+        prevGroup2.children[0].text = 'H' + heightText.text + 'px';
+      }
+    };
+
+    heightText.onChanging = function () {
+      changeSize();
+    }
+
     //画像サイズによってフォントサイズ変更
     widthText.onChanging = function () {
+      changeSize();
       UI_font( prevText, _fontStyle, "BOLD", getFontSize() );
     };
+
+    sss1.onClick = changeSize;
+    sss2.onClick = changeSize;
+    sss3.onClick = changeSize;
+
 
     //カラースライダー
     sliderRed.onChanging = function()　{
@@ -314,6 +353,7 @@ try {
       _height = parseInt(heightText.text);
       _bgColor = bgColor.text;
       _textColor = textColor.text;
+      _rayout = sss1.value ? 1 : (sss2.value ? 2 : 3);
 
       //createDummyLayer();
       activeDocument.suspendHistory("<%= Strings.Pr_HISTORY_CREATEDUMMYLAYER %>", "createDummyLayer()");
@@ -424,19 +464,33 @@ try {
   function createTextLayer() {
 
     var layer = activeDocument.artLayers.add();
-    
+
     var dw = Math.round(activeDocument.width/2),
         dh = Math.round(activeDocument.height/2);
 
     layer.kind = LayerKind.TEXT;
-    layer.name = 'Dummy_'+ _name;
     layer.blendMode = BlendMode.NORMAL;
 
     var textColor = new SolidColor;
     textColor.rgb.hexValue = _textColor;
 
-    layer.textItem.contents = _width + 'x' + _height + 'px';
+    switch(_rayout) {
+      case 2:
+        _name = 'W' + _width + 'px';
+        layer.textItem.contents = _name;
+      break;
 
+      case 3:
+        _name = 'H' + _height + 'px';
+        layer.textItem.contents = _name;
+      break;
+
+      default:
+        _name = 'W' + _width + 'xH' + _height + 'px';
+        layer.textItem.contents = _name;
+    }
+
+    layer.name = 'Dummy_'+ _name;
     layer.textItem.font = _fontStyle;
     layer.textItem.size = getFontSize();
     layer.textItem.color = textColor;
@@ -461,13 +515,13 @@ try {
    * この関数はcreateDialog()で設定しているOKボタンのonClickイベントハンドラでsuspendHistoryにより実行される
    */
   function createDummyLayer() {
-    
+
     preferences.rulerUnits = Units.PIXELS; //pixelでないと狂うので強制変更
-    
+
     createSolidLayer(); //ベース作成
     createTextLayer(); //テキスト作成+マージ
     changeLayerName('Dummy_' + _name); //マージしたレイヤーの名前変更
-    
+
     preferences.rulerUnits = _origUnit; //保存しておいた単位に戻す
 
   }
