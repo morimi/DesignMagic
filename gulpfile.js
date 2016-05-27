@@ -161,6 +161,20 @@ function createzxp() {
 gulp.task( 'createzxp', createzxp );
 
 
+
+gulp.task('copy', function () {
+  var libs = [
+    'bower_components/riot/riot+compiler.min.js',
+    'bower_components/lodash/lodash.js',
+    'bower_components/q/q.js'
+  ];
+
+  gulp.src(libs)
+    .pipe(gulp.dest('src/PSPanel/js/libs'));
+
+});
+
+
 /**
  * gulp のデフォタスク
  */

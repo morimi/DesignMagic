@@ -22,10 +22,6 @@
   "author": "Misaki Mori",
   "license": "MIT",
   "dependencies": {
-    "handlebars": "^3.0.3",
-    "lodash": "^3.10.0",
-    "q": "^1.4.1",
-    "riot": "^2.3.12",
     "xml2js": "^0.4.16",
     "node-uuid": "^1.4.7"
   },

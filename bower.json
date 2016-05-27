@@ -1,0 +1,26 @@
+{
+  "name": "com.cyberagent.designmagic",
+  "version": "1.0.0",
+  "authors": [
+    "mori_misaki <mori_misaki@cyberagent.co.jp>"
+  ],
+  "description": "Photoshop Validator Extention",
+  "main": "PSPanel/index.html",
+  "keywords": [
+    "Photoshop"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests",
+    "spec"
+  ],
+  "dependencies": {
+    "lodash": "~4.13.1",
+    "riot": "~2.4.1",
+    "q": "1.0.1"
+  }
+}

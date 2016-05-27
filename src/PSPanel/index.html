@@ -18,21 +18,22 @@
 
   <script src="js/libs/CSInterface.js"></script>
   <script src="js/themeManager.js"></script>
+
+  <script src="js/libs/lodash.js"></script>
+  <script src="js/libs/q.js"></script>
+
   <script>
-    
     window.csInterface = new CSInterface();
     window.localeStrings = csInterface.initResourceBundle();
     window.extensionId =  csInterface.getExtensionID();
-    window.applicationId = csInterface.getApplicationID();  
-    
+    window.applicationId = csInterface.getApplicationID();
+
     //Modules
-    window._           = require("lodash"),
-    window.Q           = require("Q"),
     window.http        = require('http'),
     window.https        = require('https'),
     window.JSXRunner   = require("../common/JSXRunner"),
     window.Strings     = require("./js/LocStrings");
-    
+
     themeManager.init();
   </script>
 
@@ -41,7 +42,7 @@
   <script src="mixins/analytics.js" type="riot/tag"></script>
   <script src="mixins/psEventCallback.js" type="riot/tag"></script>
   <script src="mixins/validation.js" type="riot/tag"></script>
-  
+
   <script src="tags/app.tag" type="riot/tag"></script>
   <script src="tags/validation.tag" type="riot/tag"></script>
   <script src="tags/config.tag" type="riot/tag"></script>
@@ -49,14 +50,14 @@
   <script src="tags/header.tag" type="riot/tag"></script>
   <script src="tags/footer.tag" type="riot/tag"></script>
 
-  <script src="../node_modules/riot/riot+compiler.js"></script>
+  <script src="js/libs/riot+compiler.min.js"></script>
 
   <script>
-    
+
     location.hash = '';
     riot.mount('app')
     riot.route.start(true);
-   
+
     /**
      * raw html insert
      * @param {{category:string, prop:string}} opts
@@ -66,7 +67,7 @@
     riot.tag('string', '', function(opts) {
         this.root.innerHTML = Strings['Pr_' + opts.category.toUpperCase() + '_' + _.snakeCase(opts.prop).toUpperCase()];
     });
-      
+
   </script>
   </body>
 </html>
