@@ -14,7 +14,7 @@ try {
   var _rayout = 1; //width x height
   var _bgColor = "989ea9";
   var _textColor = "000000";
-  var _fontStyle = 'ArialMT';
+  var _fontStyle = 'ArialMT';//ArialMT
   var _shapeId;
   var _layerRef;
   var _resultValue;
@@ -69,15 +69,20 @@ try {
   function UI_font(uiObj, uiFont, uiFontStyle, uiFontSize) {
       /*
       15.1でこういうエラーが出るそうなのでコメントアウトしておく
-      （そもそも15.0でもフォントスタイルとかサイズ変わってなかった模様）
+      （そもそも2014からスタイルとかに関してはバグって動かないらしい）
+      https://forums.adobe.com/message/7354519#7354519
+
        Window layout failed
 - Panel layout failed
 - Group layout failed
 - cannot get value of preferredSize property for statictext: キャッチされていない例外 preferredSize
 */
-//      var fontStyle = eval("ScriptUI.FontStyle." + uiFontStyle);
-//      var gFont = ScriptUI.newFont(uiFont, fontStyle, uiFontSize);
-      //uiObj.graphics.font = gFont;
+//    try {
+//      //var fontStyle = eval("ScriptUI.FontStyle." + uiFontStyle);
+//      var gFont = ScriptUI.newFont(uiFont, uiFontStyle, uiFontSize);
+//      uiObj.graphics.font = gFont;
+//    } catch(e) {
+//    }
   }
 
   //http://www.javascripter.net/faq/hextorgb.htm
@@ -244,7 +249,7 @@ try {
     var prevGroup2 = prevPanel.add("group");
     prevGroup2.orientation = "row";
     prevGroup2.alignChildren = "fill";
-    var prevText = prevGroup2.add("statictext", undefined, _width + "x" + _height);
+    var prevText = prevGroup2.add("statictext", undefined, _width + "x" + _height + 'px');
     UI_font( prevText, _fontStyle, "BOLD", 16 );
 
     var prevGroup3 = prevPanel.add("group");
@@ -292,7 +297,7 @@ try {
 
     var changeSize = function () {
       if (sss1.value) {
-        prevGroup2.children[0].text = 'W' + widthText.text + 'xH' + heightText.text + 'px';
+        prevGroup2.children[0].text = widthText.text + 'x' + heightText.text + 'px';
       }
 
       if (sss2.value) {
@@ -486,7 +491,7 @@ try {
       break;
 
       default:
-        _name = 'W' + _width + 'xH' + _height + 'px';
+        _name = + _width + 'x' + _height + 'px';
         layer.textItem.contents = _name;
     }
 
