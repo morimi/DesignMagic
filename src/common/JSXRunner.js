@@ -18,8 +18,7 @@
 "use strict";
 
 var fs = require("fs"),
-    path = require("path"),
-    _ = require("lodash");
+    path = require("path");
 
 var JSX_DIRECTORY = path.join(path.dirname(module.filename), "jsx");
 
