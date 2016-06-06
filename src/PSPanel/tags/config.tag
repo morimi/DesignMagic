@@ -70,6 +70,12 @@
           <dd><img src="images/icon/{this.parent.theme}/warn.png" width="14" height="14" class="icon" alt=""> {Strings.Pr_NOTE_ICONS_WARN}</dd>
           <dd><img src="images/icon/{this.parent.theme}/eye.png" width="14" height="14" class="icon" alt=""> {Strings.Pr_NOTE_ICONS_EYE}</dd>
         </dl>
+        <hr>
+        <!-- ユーザーID -->
+          <dl>
+            <dt>{Strings.Pr_USER_ID}</dt>
+            <dd>{userId}</dd>
+          </dl>
      </div>
      
 
@@ -115,7 +121,12 @@
      * @type {string}
      */
     this.newUrl = null;
-    
+
+    /**
+     * 同じ名前のレイヤーを全て対象にする
+     */
+    this.userId = window.localStorage.getItem('com.cyberagent.designmagic:analytics.userId');
+
     /**
      * 自動でチェックするかどうかフラグ
      */
