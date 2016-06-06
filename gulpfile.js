@@ -166,7 +166,8 @@ gulp.task('copy', function () {
   var libs = [
     'bower_components/riot/riot+compiler.min.js',
     'bower_components/lodash/lodash.js',
-    'bower_components/q/q.js'
+    'bower_components/q/q.js',
+    'bower_components/node-uuid/uuid.js'
   ];
 
   gulp.src(libs)

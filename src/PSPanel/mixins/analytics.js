@@ -34,7 +34,7 @@ riot.mixin('Analytics', {
    * @return {string} uuid
    */
   createUserId: function() {
-    return require('node-uuid').v4();
+    return require('./js/libs/uuid.js').v4();
   },
   
   /**
@@ -85,7 +85,7 @@ riot.mixin('Analytics', {
           // トラッキングID
           tid: 'UA-71660557-1',
           // クライアントID
-          cid: 0,//me.getUserId(),
+          cid: me.getUserId(),
           // アプリのバージョン
           av: extension.version,
           // アプリの名称

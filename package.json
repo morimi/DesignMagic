@@ -21,9 +21,6 @@
   ],
   "author": "Misaki Mori",
   "license": "MIT",
-  "dependencies": {
-    "node-uuid": "^1.4.7"
-  },
   "devDependencies": {
     "del": "^2.1.0",
     "gulp": "^3.9.0",
