@@ -5,10 +5,10 @@
   "main": "PSPanel/index.html",
   "scripts": {
     "preinstall": "npm i -g gulp",
-    "install": "gulp ndm",
-    "update": "npm update; gulp ndm",
+    "install": "bower install; gulp bower:copy",
+    "update": "npm update; bower update; gulp bower:copy",
     "build": "gulp build",
-    "clean": "gulp clean",
+    "clean": "gulp build:clean",
     "docs": "gulp docs"
   },
   "repository": {
