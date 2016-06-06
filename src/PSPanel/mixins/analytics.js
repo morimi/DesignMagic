@@ -43,21 +43,18 @@ riot.mixin('Analytics', {
    */
   getExtensionInfo: function () {
     var fs = require('fs');
-    var xml2js = require('xml2js');
     
     var extensionId = window.__adobe_cep__.getExtensionId();
     var extension = window.csInterface.getExtensions([extensionId])[0];
     
     var d = Q.defer();
-    var parser = new xml2js.Parser();
-    var data = fs.readFileSync(extension.basePath + '/CSXS/manifest.xml');
-    parser.parseString(data, function (err, result) {
-      // extension data を生成
-      d.resolve({
-          id: extensionId,
-          name: extension.name,
-          version: result.ExtensionManifest.ExtensionList[0].Extension[0].$.Version
-      });
+    var manifest = String(fs.readFileSync(extension.basePath + '/CSXS/manifest.xml'));
+
+    // extension data を生成
+    d.resolve({
+        id: extensionId,
+        name: extension.name,
+        version: manifest.replace(/(.|\n)*<Extension Id="com\.cyberagent\.designmagic" Version="([0-9]\.[0-9]\.[0-9])" \/>(.|\n)*/g, "$2")
     });
     
     return d.promise;

@@ -22,7 +22,6 @@
   "author": "Misaki Mori",
   "license": "MIT",
   "dependencies": {
-    "xml2js": "^0.4.16",
     "node-uuid": "^1.4.7"
   },
   "devDependencies": {
