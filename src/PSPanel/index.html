@@ -24,9 +24,9 @@
 
   <script>
     window.csInterface = new CSInterface();
-    window.localeStrings = csInterface.initResourceBundle();
-    window.extensionId =  csInterface.getExtensionID();
-    window.applicationId = csInterface.getApplicationID();
+    window.localeStrings = window.csInterface.initResourceBundle();
+    window.extensionId =  window.csInterface.getExtensionID();
+    window.applicationId = window.csInterface.getApplicationID();
 
     //Modules
     window.http        = require('http'),
